@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Expedición Matemática · 6º de Primaria</title>
+<meta name="description" content="Repasa todo el temario de matemáticas de 6º de Primaria jugando: fracciones, decimales, geometría, porcentajes y mucho más." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="stars-bg" aria-hidden="true"></div>
+
+<header class="app-header">
+  <div class="brand">
+    <span class="brand-badge">🧭</span>
+    <div class="brand-text">
+      <h1>Expedición Matemática</h1>
+      <p>Repaso de 6º de Primaria</p>
+    </div>
+  </div>
+  <div class="header-progress" id="total-progress">0 / 81 ⭐</div>
+</header>
+
+<main>
+
+  <!-- ================= PANTALLA: MENÚ DE TEMAS ================= -->
+  <section id="screen-menu" class="screen active">
+    <p class="screen-intro">Elige un tema del temario y empieza tu expedición. Cada nivel superado te da estrellas.</p>
+    <div id="topics-grid" class="topics-grid"></div>
+  </section>
+
+  <!-- ================= PANTALLA: SELECCIÓN DE NIVEL ================= -->
+  <section id="screen-levels" class="screen">
+    <button class="back-btn" id="btn-back-levels">← Volver a los temas</button>
+    <h2 id="levels-title"></h2>
+    <div id="levels-list" class="levels-list"></div>
+  </section>
+
+  <!-- ================= PANTALLA: JUEGO ================= -->
+  <section id="screen-game" class="screen">
+    <div class="game-top">
+      <button class="back-btn" id="btn-back-menu">← Salir</button>
+      <span id="game-topic-name" class="game-topic-name"></span>
+    </div>
+    <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+    <div class="game-meta">
+      <span id="question-counter"></span>
+      <span id="streak-counter" class="streak-counter"></span>
+    </div>
+
+    <div class="question-card">
+      <p id="question-text" class="question-text"></p>
+      <div id="answer-area" class="answer-area"></div>
+      <p id="feedback" class="feedback"></p>
+    </div>
+  </section>
+
+  <!-- ================= PANTALLA: RESULTADOS ================= -->
+  <section id="screen-results" class="screen">
+    <div class="results-card">
+      <p id="results-stars" class="results-stars"></p>
+      <h2 id="results-message"></h2>
+      <p id="results-score" class="results-score"></p>
+      <p id="results-streak" class="results-streak"></p>
+      <div class="results-actions">
+        <button id="btn-retry" class="action-btn secondary">Repetir nivel</button>
+        <button id="btn-results-levels" class="action-btn secondary">Elegir nivel</button>
+        <button id="btn-results-menu" class="action-btn primary">Volver a los temas</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="app-footer">
+  <p>Hecho para practicar matemáticas de forma divertida 🚀</p>
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
