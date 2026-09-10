@@ -3,64 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Expedición Matemática 3D — Edición Completa</title>
+<title>Expedicion Matematica 3D</title>
 <style>
-  * { box-sizing: border-box; user-select: none; }
-  html, body {
-    margin: 0; padding: 0; width: 100%; height: 100%;
-    overflow: hidden;
-    font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
-    background: #87ceeb;
-  }
+  * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
+    font-family: 'Segoe UI', Roboto, system-ui, sans-serif; background: #87ceeb; }
   #canvas-container { width: 100vw; height: 100vh; display: block; }
-
-  #debug {
-    position: fixed; top: 10px; left: 10px;
-    background: rgba(0,0,0,0.65); color: #0f0;
-    padding: 8px 12px; font-family: monospace; font-size: 11px;
-    border-radius: 8px; z-index: 9999; max-width: 340px;
-    white-space: pre-wrap; line-height: 1.4;
-    pointer-events: none;
-  }
+  #debug { position: fixed; top: 8px; left: 8px; background: rgba(0,0,0,0.7); color: #0f0;
+    padding: 6px 10px; font-family: monospace; font-size: 11px; border-radius: 6px;
+    z-index: 9999; max-width: 300px; white-space: pre-wrap; line-height: 1.3;
+    pointer-events: none; }
   #debug.error { color: #ff6b6b; }
 
-  #hud {
-    position: fixed; top: 16px; left: 16px; right: 16px;
+  #hud { position: fixed; top: 16px; left: 16px; right: 16px;
     display: flex; justify-content: space-between; align-items: flex-start;
-    pointer-events: none; z-index: 10;
-    gap: 10px; flex-wrap: wrap;
-  }
-  .panel {
-    background: rgba(254, 247, 224, 0.95);
-    border: 3px solid #b98c5c;
-    border-radius: 100px;
-    padding: 8px 20px;
+    pointer-events: none; z-index: 10; gap: 10px; flex-wrap: wrap; }
+  .panel { background: rgba(254,247,224,0.95); border: 3px solid #b98c5c;
+    border-radius: 100px; padding: 8px 20px;
     box-shadow: 0 6px 0 #8b6f4c, 0 10px 20px rgba(0,0,0,0.3);
-    font-weight: 800; color: #3a2c1b;
-    font-size: 1.1rem;
-    display: flex; align-items: center; gap: 10px;
-    pointer-events: auto;
-  }
+    font-weight: 800; color: #3a2c1b; font-size: 1.1rem;
+    display: flex; align-items: center; gap: 10px; pointer-events: auto; }
   .stars-total { background: #ffd966; }
   .stars-total .num { font-size: 1.4rem; }
 
-  #top-buttons {
-    position: fixed; top: 70px; right: 16px;
-    display: flex; flex-direction: column; gap: 8px;
-    z-index: 11;
-  }
-  #top-buttons button {
-    background: rgba(255,255,255,0.9);
-    border: 2px solid #8b6f4c;
-    border-radius: 40px;
-    padding: 8px 14px;
-    font-size: 0.8rem; font-weight: 700;
-    cursor: pointer; color: #3a2c1b;
-    box-shadow: 0 3px 0 #b98c5c;
-    transition: 0.05s;
-    display: flex; align-items: center; gap: 6px;
-    position: relative;
-  }
+  #top-buttons { position: fixed; top: 70px; right: 16px;
+    display: flex; flex-direction: column; gap: 8px; z-index: 11; }
+  #top-buttons button { background: rgba(255,255,255,0.92); border: 2px solid #8b6f4c;
+    border-radius: 40px; padding: 8px 14px; font-size: 0.8rem; font-weight: 700;
+    cursor: pointer; color: #3a2c1b; box-shadow: 0 3px 0 #b98c5c; transition: 0.05s;
+    display: flex; align-items: center; gap: 6px; position: relative; font-family: inherit; }
   #top-buttons button:active { transform: translateY(3px); box-shadow: 0 0 0 #b98c5c; }
   #top-buttons .customize { background: #ffb3d9; }
   #top-buttons .achievements { background: #ffe066; }
@@ -68,483 +39,346 @@
   #top-buttons .music-on { background: #9be0ff; }
   #top-buttons .music-off { background: #ddd; opacity: 0.7; }
   #top-buttons .photo { background: #c8f7c5; }
-  #top-buttons .badge {
-    position: absolute;
-    top: -4px; right: -4px;
-    background: #ff4757; color: white;
-    border-radius: 50%;
-    font-size: 0.7rem; font-weight: 900;
-    width: 18px; height: 18px;
-    display: flex; align-items: center; justify-content: center;
-    border: 2px solid white;
-  }
+  #top-buttons .badge { position: absolute; top: -4px; right: -4px;
+    background: #ff4757; color: white; border-radius: 50%; font-size: 0.7rem;
+    font-weight: 900; width: 18px; height: 18px; display: flex;
+    align-items: center; justify-content: center; border: 2px solid white; }
 
-  #hint {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-    background: rgba(254, 247, 224, 0.95);
-    border: 3px solid #b98c5c; border-radius: 50px;
-    padding: 10px 24px; font-weight: 700; color: #3a2c1b;
-    box-shadow: 0 6px 0 #8b6f4c; z-index: 10;
-    text-align: center; font-size: 0.9rem;
-    transition: opacity 0.3s;
-    pointer-events: none; max-width: 90vw;
-  }
+  #hint { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: rgba(254,247,224,0.95); border: 3px solid #b98c5c; border-radius: 50px;
+    padding: 10px 24px; font-weight: 700; color: #3a2c1b; box-shadow: 0 6px 0 #8b6f4c;
+    z-index: 10; text-align: center; font-size: 0.9rem; transition: opacity 0.3s;
+    pointer-events: none; max-width: 90vw; }
 
-  #action-buttons {
-    position: fixed; bottom: 20px; left: 20px;
-    display: flex; flex-direction: column; gap: 10px;
-    z-index: 15;
-  }
-  #action-buttons button {
-    background: #ffd966;
-    border: 3px solid #b98c5c; border-radius: 50px;
-    font-size: 1rem; font-weight: 800; color: #3a2c1b;
-    padding: 14px 22px; cursor: pointer;
-    box-shadow: 0 5px 0 #8b6f4c; transition: 0.05s;
-    display: flex; align-items: center; gap: 8px;
-  }
+  #action-buttons { position: fixed; bottom: 20px; left: 20px;
+    display: flex; flex-direction: column; gap: 10px; z-index: 15; }
+  #action-buttons button { background: #ffd966; border: 3px solid #b98c5c;
+    border-radius: 50px; font-size: 1rem; font-weight: 800; color: #3a2c1b;
+    padding: 14px 22px; cursor: pointer; box-shadow: 0 5px 0 #8b6f4c;
+    transition: 0.05s; display: flex; align-items: center; gap: 8px; font-family: inherit; }
   #action-buttons button:active { transform: translateY(4px); box-shadow: 0 1px 0 #8b6f4c; }
   #action-buttons button:disabled { opacity: 0.4; pointer-events: none; }
   #action-buttons .talk-btn { background: #9be0ff; }
   #action-buttons .boss-btn { background: #ff7675; color: white; }
 
-  #touch-controls {
-    position: fixed; bottom: 20px; right: 20px;
-    display: grid;
-    grid-template-columns: repeat(3, 60px);
-    grid-template-rows: repeat(3, 60px);
-    gap: 6px; z-index: 15;
-  }
-  #touch-controls button {
-    background: #ffd966;
-    border: 3px solid #b98c5c; border-radius: 14px;
-    font-size: 1.8rem; font-weight: 900; color: #3a2c1b;
-    cursor: pointer; box-shadow: 0 5px 0 #8b6f4c;
-    display: flex; align-items: center; justify-content: center;
-    padding: 0; transition: 0.05s;
-  }
+  #touch-controls { position: fixed; bottom: 20px; right: 20px;
+    display: grid; grid-template-columns: repeat(3, 60px);
+    grid-template-rows: repeat(3, 60px); gap: 6px; z-index: 15; }
+  #touch-controls button { background: #ffd966; border: 3px solid #b98c5c;
+    border-radius: 14px; font-size: 1.8rem; font-weight: 900; color: #3a2c1b;
+    cursor: pointer; box-shadow: 0 5px 0 #8b6f4c; display: flex;
+    align-items: center; justify-content: center; padding: 0; transition: 0.05s;
+    font-family: inherit; }
   #touch-controls button:active { transform: translateY(4px); box-shadow: 0 1px 0 #8b6f4c; }
   #touch-controls .empty { visibility: hidden; }
 
-  #npc-dialog {
-    display: none;
-    position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
-    background: #fef7e0; border: 4px solid #b98c5c; border-radius: 24px;
-    padding: 16px 22px; max-width: 520px; width: 90vw;
-    box-shadow: 0 12px 24px rgba(0,0,0,0.4); z-index: 50;
-    font-weight: 600; color: #3a2c1b; font-size: 1.05rem;
-    animation: pop 0.2s ease-out;
-  }
-  #npc-dialog::before {
-    content: "💬"; position: absolute; top: -22px; left: 20px;
-    font-size: 1.8rem;
-  }
-  #npc-dialog .npc-name {
-    font-weight: 800; color: #b47c2e; margin-bottom: 6px;
-    font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;
-  }
-  #npc-dialog .close-dialog {
-    position: absolute; top: 6px; right: 10px;
-    background: none; border: none; font-size: 1.2rem;
-    cursor: pointer; color: #8b6f4c; font-weight: 900;
-  }
+  #npc-dialog { display: none; position: fixed; bottom: 100px; left: 50%;
+    transform: translateX(-50%); background: #fef7e0; border: 4px solid #b98c5c;
+    border-radius: 24px; padding: 16px 22px; max-width: 520px; width: 90vw;
+    box-shadow: 0 12px 24px rgba(0,0,0,0.4); z-index: 50; font-weight: 600;
+    color: #3a2c1b; font-size: 1.05rem; }
+  #npc-dialog .npc-name { font-weight: 800; color: #b47c2e; margin-bottom: 6px;
+    font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+  #npc-dialog .close-dialog { position: absolute; top: 6px; right: 10px;
+    background: none; border: none; font-size: 1.2rem; cursor: pointer;
+    color: #8b6f4c; font-weight: 900; }
 
-  .modal-bg {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.75);
-    justify-content: center; align-items: center;
-    z-index: 100; padding: 16px;
-    overflow-y: auto;
-  }
+  .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+    justify-content: center; align-items: center; z-index: 100; padding: 16px;
+    overflow-y: auto; }
   .modal-bg.show { display: flex; }
-
-  .card {
-    background: #fef7e0;
-    border-radius: 40px;
-    padding: 28px 24px;
-    max-width: 520px; width: 100%;
-    border: 6px solid #b98c5c;
-    box-shadow: 0 20px 40px black;
-    text-align: center;
-    animation: pop 0.25s ease-out;
-    max-height: 92vh; overflow-y: auto;
-  }
-  @keyframes pop {
-    0% { transform: scale(0.7); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-  .card h2 {
-    font-size: 1.7rem; margin: 0 0 8px; color: #3a2c1b;
-    display: flex; justify-content: center; align-items: center; gap: 10px;
-  }
-  .card .question {
-    font-size: 1.6rem; font-weight: 700;
-    background: #e6d5b8; padding: 18px; border-radius: 30px;
-    margin: 16px 0; border: 2px solid #b98c5c;
-    word-break: break-word;
-  }
-  .card input {
-    font-size: 1.7rem; width: 160px; text-align: center;
-    padding: 8px; border-radius: 30px;
-    border: 4px solid #b98c5c; font-weight: 700; background: white;
-  }
+  .card { background: #fef7e0; border-radius: 40px; padding: 28px 24px;
+    max-width: 520px; width: 100%; border: 6px solid #b98c5c;
+    box-shadow: 0 20px 40px black; text-align: center; max-height: 92vh;
+    overflow-y: auto; }
+  .card h2 { font-size: 1.7rem; margin: 0 0 8px; color: #3a2c1b;
+    display: flex; justify-content: center; align-items: center; gap: 10px; }
+  .card .question { font-size: 1.6rem; font-weight: 700; background: #e6d5b8;
+    padding: 18px; border-radius: 30px; margin: 16px 0; border: 2px solid #b98c5c;
+    word-break: break-word; }
+  .card input { font-size: 1.7rem; width: 160px; text-align: center; padding: 8px;
+    border-radius: 30px; border: 4px solid #b98c5c; font-weight: 700;
+    background: white; font-family: inherit; }
   .card input:focus { outline: 3px solid #ffb347; }
-  .card .btns {
-    display: flex; gap: 14px; justify-content: center;
-    margin-top: 20px; flex-wrap: wrap;
-  }
-  .card button {
-    background: #ffd966; border: none;
-    font-weight: 700; font-size: 1.1rem;
-    padding: 12px 26px; border-radius: 40px;
-    border-bottom: 6px solid #b98c5c;
-    cursor: pointer; color: #2c1e0e;
-    box-shadow: 0 6px 0 #8b6f4c;
-    font-family: inherit; transition: 0.05s;
-  }
+  .card .btns { display: flex; gap: 14px; justify-content: center;
+    margin-top: 20px; flex-wrap: wrap; }
+  .card button { background: #ffd966; border: none; font-weight: 700;
+    font-size: 1.1rem; padding: 12px 26px; border-radius: 40px;
+    border-bottom: 6px solid #b98c5c; cursor: pointer; color: #2c1e0e;
+    box-shadow: 0 6px 0 #8b6f4c; font-family: inherit; transition: 0.05s; }
   .card button:active { transform: translateY(4px); box-shadow: 0 2px 0 #8b6f4c; }
   .card button:disabled { opacity: 0.5; pointer-events: none; }
-  .feedback { font-size: 1.3rem; font-weight: 700; min-height: 2rem; margin: 6px 0; }
+  .feedback { font-size: 1.3rem; font-weight: 700; min-height: 2rem;
+    margin: 6px 0; }
   .success { color: #2e7d32; }
   .error { color: #c0392b; }
-  .stars-earned { font-size: 1.3rem; color: #b47c2e; min-height: 1.6rem; font-weight: 700; }
+  .stars-earned { font-size: 1.3rem; color: #b47c2e; min-height: 1.6rem;
+    font-weight: 700; }
 
   #customize-modal .card { max-width: 660px; text-align: left; }
   #customize-modal h2 { text-align: center; }
-  #customize-modal .subtitle {
-    text-align: center; color: #8b6f4c;
-    font-size: 0.85rem; font-weight: 600; margin-bottom: 14px;
-  }
-  .custom-section {
-    background: #f1e3c8; border: 2px solid #b98c5c;
-    border-radius: 20px; padding: 12px 14px; margin-bottom: 12px;
-  }
-  .custom-section .label {
-    font-weight: 800; color: #3a2c1b; font-size: 0.95rem;
+  .subtitle { text-align: center; color: #8b6f4c; font-size: 0.85rem;
+    font-weight: 600; margin-bottom: 14px; }
+  .custom-section { background: #f1e3c8; border: 2px solid #b98c5c;
+    border-radius: 20px; padding: 12px 14px; margin-bottom: 12px; }
+  .custom-section .label { font-weight: 800; color: #3a2c1b; font-size: 0.95rem;
     margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
-    justify-content: space-between;
-  }
-  .custom-section .label .lock-info {
-    font-size: 0.75rem; color: #b47c2e;
-    background: #ffd966; padding: 3px 8px; border-radius: 20px;
-    font-weight: 700;
-  }
+    justify-content: space-between; }
+  .custom-section .label .lock-info { font-size: 0.75rem; color: #b47c2e;
+    background: #ffd966; padding: 3px 8px; border-radius: 20px; font-weight: 700; }
   .options { display: flex; flex-wrap: wrap; gap: 8px; }
-  .options button {
-    background: white; border: 3px solid #b98c5c;
-    border-radius: 14px; padding: 8px 12px;
-    font-size: 0.8rem; font-weight: 700; color: #3a2c1b;
-    cursor: pointer; box-shadow: 0 3px 0 #b98c5c;
-    transition: 0.05s; font-family: inherit;
-    display: flex; align-items: center; gap: 6px;
-  }
+  .options button { background: white; border: 3px solid #b98c5c;
+    border-radius: 14px; padding: 8px 12px; font-size: 0.8rem; font-weight: 700;
+    color: #3a2c1b; cursor: pointer; box-shadow: 0 3px 0 #b98c5c;
+    transition: 0.05s; font-family: inherit; display: flex;
+    align-items: center; gap: 6px; }
   .options button:active { transform: translateY(2px); box-shadow: 0 1px 0 #b98c5c; }
-  .options button.selected {
-    background: #ffd966; border-color: #8b6f4c;
-    transform: translateY(2px); box-shadow: 0 1px 0 #8b6f4c;
-  }
-  .options button.locked {
-    opacity: 0.55; cursor: not-allowed; background: #e0d5c0;
-  }
-  .options button.locked::after {
-    content: "🔒"; font-size: 0.7rem; margin-left: 4px;
-  }
-  .color-swatch {
-    width: 32px; height: 32px; border-radius: 50%;
-    border: 3px solid #b98c5c; cursor: pointer;
-    box-shadow: 0 3px 0 #b98c5c; padding: 0;
-    transition: 0.05s; position: relative;
-  }
-  .color-swatch.selected {
-    border-color: #3a2c1b; transform: scale(1.15);
-    box-shadow: 0 3px 0 #3a2c1b;
-  }
+  .options button.selected { background: #ffd966; border-color: #8b6f4c;
+    transform: translateY(2px); box-shadow: 0 1px 0 #8b6f4c; }
+  .options button.locked { opacity: 0.55; cursor: not-allowed; background: #e0d5c0; }
+  .options button.locked::after { content: " (bloqueado)"; font-size: 0.7rem;
+    color: #b47c2e; }
+  .color-swatch { width: 32px; height: 32px; border-radius: 50%;
+    border: 3px solid #b98c5c; cursor: pointer; box-shadow: 0 3px 0 #b98c5c;
+    padding: 0; transition: 0.05s; position: relative; }
+  .color-swatch.selected { border-color: #3a2c1b; transform: scale(1.15);
+    box-shadow: 0 3px 0 #3a2c1b; }
   .color-swatch.locked { opacity: 0.5; cursor: not-allowed; }
-  .color-swatch.locked::after {
-    content: "🔒"; position: absolute;
-    top: -6px; right: -6px; font-size: 0.9rem;
-  }
-  .color-swatch.golden {
-    background: linear-gradient(135deg, #ffd700, #ffb300, #ffecb3) !important;
-  }
-  .color-swatch.rainbow {
-    background: linear-gradient(135deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3) !important;
-  }
+  .color-swatch.golden { background: linear-gradient(135deg, #ffd700, #ffb300, #ffecb3) !important; }
+  .color-swatch.rainbow { background: linear-gradient(135deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3) !important; }
 
   #customize-close, #achievements-close, #missions-close {
-    display: block; margin: 18px auto 0;
-    background: #ffd966; border: none; font-weight: 800;
-    font-size: 1.1rem; padding: 14px 40px; border-radius: 40px;
-    border-bottom: 6px solid #b98c5c; cursor: pointer;
-    color: #2c1e0e; box-shadow: 0 6px 0 #8b6f4c;
-    font-family: inherit; transition: 0.05s;
-  }
+    display: block; margin: 18px auto 0; background: #ffd966; border: none;
+    font-weight: 800; font-size: 1.1rem; padding: 14px 40px;
+    border-radius: 40px; border-bottom: 6px solid #b98c5c; cursor: pointer;
+    color: #2c1e0e; box-shadow: 0 6px 0 #8b6f4c; font-family: inherit;
+    transition: 0.05s; }
   #customize-close:active, #achievements-close:active, #missions-close:active {
-    transform: translateY(4px); box-shadow: 0 2px 0 #8b6f4c;
-  }
+    transform: translateY(4px); box-shadow: 0 2px 0 #8b6f4c; }
 
   #achievements-modal .card { text-align: left; }
-  .ach-item {
-    display: flex; align-items: center; gap: 12px;
-    background: #f1e3c8; border: 2px solid #b98c5c;
-    border-radius: 20px; padding: 12px 14px;
-    margin-bottom: 10px;
-  }
+  .ach-item { display: flex; align-items: center; gap: 12px;
+    background: #f1e3c8; border: 2px solid #b98c5c; border-radius: 20px;
+    padding: 12px 14px; margin-bottom: 10px; }
   .ach-item.locked { opacity: 0.55; filter: grayscale(0.7); }
   .ach-item.unlocked { background: #fff2b8; border-color: #ffb300; }
   .ach-icon { font-size: 2.2rem; min-width: 50px; text-align: center; }
   .ach-info { flex: 1; }
   .ach-name { font-weight: 800; color: #3a2c1b; font-size: 1rem; }
-  .ach-desc { font-size: 0.8px solid; color: #8b6f4c; margin-top: 2px; }
+  .ach-desc { font-size: 0.8rem; color: #8b6f4c; margin-top: 2px; }
 
   #missions-modal .card { text-align: left; }
-  #missions-modal .date-info {
-    text-align: center; font-size: 0.85rem;
-    color: #8b6f4c; font-weight: 600; margin-bottom: 14px;
-  }
-  .mission-item {
-    display: flex; align-items: center; gap: 12px;
-    background: #f1e3c8; border: 2px solid #b98c5c;
-    border-radius: 20px; padding: 12px 14px;
-    margin-bottom: 10px;
-  }
+  #missions-modal .date-info { text-align: center; font-size: 0.85rem;
+    color: #8b6f4c; font-weight: 600; margin-bottom: 14px; }
+  .mission-item { display: flex; align-items: center; gap: 12px;
+    background: #f1e3c8; border: 2px solid #b98c5c; border-radius: 20px;
+    padding: 12px 14px; margin-bottom: 10px; }
   .mission-item.done { background: #d4f5d4; border-color: #4caf50; }
   .mission-icon { font-size: 2rem; min-width: 44px; text-align: center; }
   .mission-info { flex: 1; }
   .mission-name { font-weight: 800; color: #3a2c1b; font-size: 0.95rem; }
   .mission-desc { font-size: 0.8rem; color: #8b6f4c; margin: 2px 0 4px; }
-  .mission-progress {
-    height: 8px; background: #d9c9a8;
-    border-radius: 10px; overflow: hidden; margin-top: 4px;
-  }
-  .mission-progress-bar {
-    height: 100%; background: linear-gradient(90deg, #ffd966, #ffb300);
-    transition: width 0.3s;
-  }
-  .mission-reward {
-    font-size: 0.85rem; font-weight: 800; color: #b47c2e;
-    margin-top: 3px;
-  }
+  .mission-progress { height: 8px; background: #d9c9a8; border-radius: 10px;
+    overflow: hidden; margin-top: 4px; }
+  .mission-progress-bar { height: 100%;
+    background: linear-gradient(90deg, #ffd966, #ffb300);
+    transition: width 0.3s; }
+  .mission-reward { font-size: 0.85rem; font-weight: 800; color: #b47c2e;
+    margin-top: 3px; }
+  .mission-claim-btn { background: #51cf66; color: white; border: none;
+    border-radius: 20px; padding: 4px 10px; font-weight: 800;
+    cursor: pointer; font-size: 0.75rem; font-family: inherit; }
 
-  #achievement-toast, #mission-toast {
-    position: fixed; top: 20px; left: 50%;
-    transform: translateX(-50%) translateY(-100px);
-    border: 4px solid #8b6f4c;
+  #achievement-toast, #mission-toast { position: fixed; top: 20px; left: 50%;
+    transform: translateX(-50%) translateY(-100px); border: 4px solid #8b6f4c;
     border-radius: 24px; padding: 14px 24px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-    z-index: 500;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4); z-index: 500;
     display: flex; align-items: center; gap: 14px;
     transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    font-weight: 800; color: #3a2c1b;
-    pointer-events: none;
-  }
-  #achievement-toast {
-    background: linear-gradient(135deg, #ffd700, #ffb300);
-  }
-  #mission-toast {
-    background: linear-gradient(135deg, #a8e6cf, #7fccba);
-    top: 90px;
-  }
+    font-weight: 800; color: #3a2c1b; pointer-events: none; }
+  #achievement-toast { background: linear-gradient(135deg, #ffd700, #ffb300); }
+  #mission-toast { background: linear-gradient(135deg, #a8e6cf, #7fccba); top: 90px; }
   #achievement-toast.show, #mission-toast.show {
-    transform: translateX(-50%) translateY(0);
-  }
+    transform: translateX(-50%) translateY(0); }
   #achievement-toast .toast-icon, #mission-toast .toast-icon { font-size: 2rem; }
-  #achievement-toast .toast-title, #mission-toast .toast-title {
-    font-size: 0.75rem; text-transform: uppercase; color: #8b3a00;
-  }
+  #achievement-toast .toast-title, #mission-toast .toast-title { font-size: 0.75rem;
+    text-transform: uppercase; color: #8b3a00; }
   #mission-toast .toast-title { color: #1e5a4a; }
   #achievement-toast .toast-name, #mission-toast .toast-name { font-size: 1rem; }
 
-  #boss-modal .card {
-    background: linear-gradient(180deg, #4a1a1a, #fef7e0 30%);
-    border-color: #6b2c2c;
-  }
-  .boss-hp-bar {
-    width: 100%; height: 22px;
-    background: #4a1a1a;
-    border-radius: 20px; overflow: hidden;
-    margin: 10px 0 14px;
-    border: 3px solid #3a2c1b;
-    position: relative;
-  }
-  .boss-hp-fill {
-    height: 100%;
+  #boss-modal .card { background: linear-gradient(180deg, #4a1a1a, #fef7e0 30%);
+    border-color: #6b2c2c; }
+  .boss-hp-bar { width: 100%; height: 22px; background: #4a1a1a;
+    border-radius: 20px; overflow: hidden; margin: 10px 0 14px;
+    border: 3px solid #3a2c1b; position: relative; }
+  .boss-hp-fill { height: 100%;
     background: linear-gradient(90deg, #ff4757, #ff6b81);
-    transition: width 0.4s ease;
-    border-radius: 20px;
-  }
-  .boss-hp-bar .boss-hp-text {
-    position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 0.8rem; font-weight: 900;
-    color: white; text-shadow: 1px 1px 2px black;
-    z-index: 2;
-  }
-  .boss-progress {
-    display: flex; justify-content: center;
-    gap: 6px; margin: 10px 0;
-  }
-  .boss-progress .punto {
-    width: 22px; height: 22px; border-radius: 50%;
-    background: #d9c9a8; border: 2px solid #8b6f4c;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.75rem; font-weight: 900; color: #8b6f4c;
-  }
+    transition: width 0.4s ease; border-radius: 20px; }
+  .boss-hp-bar .boss-hp-text { position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%); font-size: 0.8rem; font-weight: 900;
+    color: white; text-shadow: 1px 1px 2px black; z-index: 2; }
+  .boss-progress { display: flex; justify-content: center; gap: 6px;
+    margin: 10px 0; flex-wrap: wrap; }
+  .boss-progress .punto { width: 22px; height: 22px; border-radius: 50%;
+    background: #d9c9a8; border: 2px solid #8b6f4c; display: flex;
+    align-items: center; justify-content: center; font-size: 0.75rem;
+    font-weight: 900; color: #8b6f4c; }
   .boss-progress .punto.correct { background: #51cf66; color: white; border-color: #2e7d32; }
   .boss-progress .punto.wrong { background: #ff4757; color: white; border-color: #a02020; }
   .boss-progress .punto.current { box-shadow: 0 0 0 3px #ffd966; }
 
+  #photo-flash { position: fixed; inset: 0; background: white; opacity: 0;
+    pointer-events: none; z-index: 400; transition: opacity 0.15s; }
+  #photo-toast { position: fixed; bottom: 100px; left: 50%;
+    transform: translateX(-50%) translateY(60px); background: #c8f7c5;
+    border: 4px solid #8b6f4c; border-radius: 40px; padding: 12px 24px;
+    font-weight: 800; color: #2c5a1e; box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+    z-index: 500; opacity: 0; transition: 0.3s; pointer-events: none; }
+  #photo-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
   @media (max-width: 700px) {
     .panel { font-size: 0.85rem; padding: 6px 12px; }
     .stars-total .num { font-size: 1.1rem; }
-    #touch-controls { grid-template-columns: repeat(3, 48px); grid-template-rows: repeat(3, 48px); }
+    #touch-controls { grid-template-columns: repeat(3, 48px);
+      grid-template-rows: repeat(3, 48px); }
     #touch-controls button { font-size: 1.3rem; }
     #hint { font-size: 0.75rem; padding: 8px 14px; bottom: 190px; }
     #action-buttons button { padding: 10px 16px; font-size: 0.8rem; }
     #top-buttons { top: 60px; }
     #top-buttons button { padding: 6px 10px; font-size: 0.7rem; }
-    #debug { font-size: 9px; max-width: 200px; }
   }
 </style>
 </head>
 <body>
 
 <div id="canvas-container"></div>
-
-<div id="debug">Iniciando…</div>
+<div id="debug">Iniciando...</div>
 
 <div id="hud">
-  <div class="panel">🧭 Expedición Matemática</div>
-  <div class="panel stars-total">⭐ <span class="num" id="star-counter">0</span> / <span id="star-max">126</span></div>
+  <div class="panel">Expedicion Matematica</div>
+  <div class="panel stars-total">Estrellas: <span class="num" id="star-counter">0</span> / <span id="star-max">126</span></div>
 </div>
 
 <div id="top-buttons">
-  <button id="missions-btn" class="missions">📅 Misiones <span class="badge" id="missions-badge" style="display:none;">0</span></button>
-  <button id="music-btn" class="music-off">🎵 Música: OFF</button>
-  <button id="photo-btn" class="photo">📸 Foto</button>
-  <button id="customize-btn" class="customize">👗 Personalizar</button>
-  <button id="achievements-btn" class="achievements">🏆 Logros</button>
-  <button id="reset-btn">🔄 Reiniciar</button>
+  <button id="missions-btn" class="missions">Misiones <span class="badge" id="missions-badge" style="display:none;">0</span></button>
+  <button id="music-btn" class="music-off">Musica: OFF</button>
+  <button id="photo-btn" class="photo">Foto</button>
+  <button id="customize-btn" class="customize">Personalizar</button>
+  <button id="achievements-btn" class="achievements">Logros</button>
+  <button id="reset-btn">Reiniciar</button>
 </div>
 
-<div id="hint">🎮 Muévete con WASD o flechas</div>
+<div id="hint">Muevete con WASD o flechas</div>
 
 <div id="action-buttons">
-  <button id="btn-enter" disabled>🚪 ENTRAR</button>
-  <button id="btn-talk" class="talk-btn" disabled>💬 HABLAR</button>
-  <button id="btn-boss" class="boss-btn" disabled>👹 DESAFIAR</button>
+  <button id="btn-enter" disabled>ENTRAR</button>
+  <button id="btn-talk" class="talk-btn" disabled>HABLAR</button>
+  <button id="btn-boss" class="boss-btn" disabled>DESAFIAR</button>
 </div>
 
 <div id="touch-controls">
   <button class="empty"></button>
-  <button id="t-up">▲</button>
+  <button id="t-up">^</button>
   <button class="empty"></button>
-  <button id="t-left">◀</button>
+  <button id="t-left">&lt;</button>
   <button class="empty"></button>
-  <button id="t-right">▶</button>
+  <button id="t-right">&gt;</button>
   <button class="empty"></button>
-  <button id="t-down">▼</button>
+  <button id="t-down">v</button>
   <button class="empty"></button>
 </div>
 
 <div id="npc-dialog">
-  <button class="close-dialog" onclick="document.getElementById('npc-dialog').style.display='none'">✕</button>
+  <button class="close-dialog" id="npc-close">X</button>
   <div class="npc-name" id="npc-name">Aldeano</div>
   <div id="npc-text">Hola, viajero.</div>
 </div>
 
 <div id="achievement-toast">
-  <div class="toast-icon">🏆</div>
+  <div class="toast-icon">*</div>
   <div>
-    <div class="toast-title">¡Logro desbloqueado!</div>
+    <div class="toast-title">Logro desbloqueado!</div>
     <div class="toast-name" id="toast-name">Nombre</div>
   </div>
 </div>
 
 <div id="mission-toast">
-  <div class="toast-icon">📅</div>
+  <div class="toast-icon">*</div>
   <div>
-    <div class="toast-title">¡Misión completada!</div>
+    <div class="toast-title">Mision completada!</div>
     <div class="toast-name" id="mission-toast-name">Nombre</div>
   </div>
 </div>
 
-<div id="photo-flash" style="position:fixed;inset:0;background:white;opacity:0;pointer-events:none;z-index:400;transition:opacity 0.15s;"></div>
-<div id="photo-toast" style="position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(60px);background:#c8f7c5;border:4px solid #8b6f4c;border-radius:40px;padding:12px 24px;font-weight:800;color:#2c5a1e;box-shadow:0 10px 25px rgba(0,0,0,0.35);z-index:500;opacity:0;transition:0.3s;pointer-events:none;">📸 ¡Foto guardada!</div>
+<div id="photo-flash"></div>
+<div id="photo-toast">Foto guardada!</div>
 
-<!-- MODAL EJERCICIOS -->
 <div id="modal" class="modal-bg">
   <div class="card">
-    <h2 id="modal-title">🏠 Casita</h2>
+    <h2 id="modal-title">Casita</h2>
     <div id="question-text" class="question"></div>
     <input type="text" id="answer-input" placeholder="?" autocomplete="off">
     <div id="feedback" class="feedback"></div>
     <div class="btns">
-      <button id="check-btn">✅ Comprobar</button>
-      <button id="close-btn">🔙 Salir</button>
+      <button id="check-btn">Comprobar</button>
+      <button id="close-btn">Salir</button>
     </div>
     <div id="stars-earned" class="stars-earned"></div>
   </div>
 </div>
 
-<!-- MODAL JEFE -->
 <div id="boss-modal" class="modal-bg">
   <div class="card">
-    <h2>👹 ¡El Devorador de Números!</h2>
+    <h2>El Devorador de Numeros!</h2>
     <div style="font-size:0.9rem;color:#8b3a00;font-weight:700;margin-bottom:6px;">Responde 10 seguidas. Si fallas una, vuelves a empezar.</div>
     <div class="boss-hp-bar">
       <div class="boss-hp-fill" id="boss-hp-fill" style="width:100%"></div>
-      <div class="boss-hp-text" id="boss-hp-text">10 / 10 ❤️</div>
+      <div class="boss-hp-text" id="boss-hp-text">10 / 10</div>
     </div>
     <div class="boss-progress" id="boss-progress"></div>
-    <div class="question" id="boss-question">¿Cuánto es 2+2?</div>
+    <div class="question" id="boss-question">Cuanto es 2+2?</div>
     <input type="text" id="boss-answer-input" placeholder="?" autocomplete="off">
     <div class="feedback" id="boss-feedback"></div>
     <div class="btns">
-      <button id="boss-check-btn">⚔️ Atacar</button>
-      <button id="boss-close-btn">🔙 Huir</button>
+      <button id="boss-check-btn">Atacar</button>
+      <button id="boss-close-btn">Huir</button>
     </div>
-    <div class="stars-earned" id="boss-stars-earned"></div>
   </div>
 </div>
 
-<!-- MODAL PERSONALIZACIÓN -->
 <div id="customize-modal" class="modal-bg">
   <div class="card">
-    <h2>👗 Vestidor</h2>
-    <div class="subtitle">Personaliza tu personaje · Se guarda automáticamente</div>
-    <div class="custom-section"><div class="label">👧 Color de piel</div><div class="options" id="skin-options"></div></div>
-    <div class="custom-section"><div class="label">💇 Pelo</div><div class="options" id="hair-style-options"></div><div class="options" id="hair-color-options" style="margin-top:8px;"></div></div>
-    <div class="custom-section"><div class="label">👀 Ojos</div><div class="options" id="eye-style-options"></div><div class="options" id="eye-color-options" style="margin-top:8px;"></div></div>
-    <div class="custom-section"><div class="label">😊 Cara</div><div class="options" id="face-options"></div></div>
-    <div class="custom-section"><div class="label">👗 Ropa <span class="lock-info" id="outfit-lock-info">0 ⭐</span></div><div class="options" id="outfit-style-options"></div><div class="options" id="outfit-color-options" style="margin-top:8px;"></div></div>
-    <div class="custom-section"><div class="label">🎒 Accesorios</div><div class="options" id="accessory-options"></div></div>
-    <div class="custom-section"><div class="label">🐾 Mascota</div><div class="options" id="pet-options"></div></div>
-    <button id="customize-close">✅ ¡Listo!</button>
+    <h2>Vestidor</h2>
+    <div class="subtitle">Personaliza tu personaje. Se guarda automaticamente.</div>
+    <div class="custom-section"><div class="label">Color de piel</div><div class="options" id="skin-options"></div></div>
+    <div class="custom-section"><div class="label">Pelo (estilo)</div><div class="options" id="hair-style-options"></div><div class="options" id="hair-color-options" style="margin-top:8px;"></div></div>
+    <div class="custom-section"><div class="label">Ojos (estilo)</div><div class="options" id="eye-style-options"></div><div class="options" id="eye-color-options" style="margin-top:8px;"></div></div>
+    <div class="custom-section"><div class="label">Cara</div><div class="options" id="face-options"></div></div>
+    <div class="custom-section"><div class="label">Ropa <span class="lock-info" id="outfit-lock-info">0 estrellas</span></div><div class="options" id="outfit-style-options"></div><div class="options" id="outfit-color-options" style="margin-top:8px;"></div></div>
+    <div class="custom-section"><div class="label">Accesorios</div><div class="options" id="accessory-options"></div></div>
+    <div class="custom-section"><div class="label">Mascota</div><div class="options" id="pet-options"></div></div>
+    <button id="customize-close">Listo!</button>
   </div>
 </div>
 
-<!-- MODAL LOGROS -->
 <div id="achievements-modal" class="modal-bg">
   <div class="card">
-    <h2>🏆 Logros</h2>
+    <h2>Logros</h2>
     <div class="subtitle">Consigue logros mientras juegas</div>
     <div id="achievements-list"></div>
-    <button id="achievements-close">✅ Cerrar</button>
+    <button id="achievements-close">Cerrar</button>
   </div>
 </div>
 
-<!-- MODAL MISIONES -->
 <div id="missions-modal" class="modal-bg">
   <div class="card">
-    <h2>📅 Misiones diarias</h2>
+    <h2>Misiones diarias</h2>
     <div class="date-info" id="missions-date">Hoy</div>
     <div id="missions-list"></div>
     <div style="font-size:0.8rem;text-align:center;color:#8b6f4c;margin-top:10px;">
-      🌅 Las misiones se renuevan cada día a medianoche.
+      Las misiones se renuevan cada dia a medianoche.
     </div>
-    <button id="missions-close">✅ Cerrar</button>
+    <button id="missions-close">Cerrar</button>
   </div>
 </div>
 
@@ -560,163 +394,179 @@
 import * as THREE from 'three';
 
 const debugEl = document.getElementById('debug');
-let logCount = 0;
-const log = (msg, isError = false) => {
-  console.log(msg);
-  if (isError) debugEl.classList.add('error');
+function log(msg, isError) {
   debugEl.textContent = msg;
-  logCount++;
-};
+  if (isError) debugEl.classList.add('error');
+  console.log(msg);
+}
 
-window.addEventListener('error', (e) => {
-  log('❌ ERROR: ' + e.message + ' (línea ' + e.lineno + ')', true);
+window.addEventListener('error', function(e) {
+  log('ERROR: ' + e.message + ' linea ' + e.lineno, true);
 });
 
 try {
-  log('⏳ Cargando Three.js…');
+  log('1. Three.js v' + THREE.REVISION);
 
-  // ============ SONIDOS ============
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  function playTone(freq, duration = 0.15, type = 'sine', volume = 0.2, delay = 0) {
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = type;
-    osc.frequency.value = freq;
-    const t = audioCtx.currentTime + delay;
-    gain.gain.setValueAtTime(0, t);
-    gain.gain.linearRampToValueAtTime(volume, t + 0.01);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
-    osc.connect(gain).connect(audioCtx.destination);
-    osc.start(t); osc.stop(t + duration + 0.05);
+  // ================================================================
+  // AUDIO
+  // ================================================================
+  var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  function playTone(freq, duration, type, volume, delay) {
+    duration = duration || 0.15;
+    type = type || 'sine';
+    volume = volume || 0.2;
+    delay = delay || 0;
+    try {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      var t = audioCtx.currentTime + delay;
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(volume, t + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(t);
+      osc.stop(t + duration + 0.05);
+    } catch(e) {}
   }
-  const Sounds = {
-    step: () => playTone(220, 0.06, 'square', 0.05),
-    open: () => { playTone(523, 0.1, 'sine', 0.15); playTone(659, 0.12, 'sine', 0.15, 0.08); },
-    correct: () => { playTone(659, 0.12, 'sine', 0.25); playTone(784, 0.12, 'sine', 0.25, 0.1); playTone(1047, 0.2, 'sine', 0.25, 0.2); },
-    wrong: () => { playTone(200, 0.15, 'sawtooth', 0.15); playTone(150, 0.2, 'sawtooth', 0.15, 0.1); },
-    complete: () => { [523, 659, 784, 1047, 1319].forEach((f, i) => playTone(f, 0.18, 'triangle', 0.22, i * 0.1)); },
-    talk: () => { playTone(500, 0.05, 'triangle', 0.12); playTone(700, 0.05, 'triangle', 0.12, 0.06); },
-    change: () => { playTone(880, 0.08, 'triangle', 0.15); playTone(1100, 0.08, 'triangle', 0.15, 0.06); },
-    achievement: () => { [659, 784, 988, 1319, 1568].forEach((f, i) => playTone(f, 0.15, 'triangle', 0.2, i * 0.08)); },
-    mission: () => { [784, 988, 1175].forEach((f, i) => playTone(f, 0.18, 'sine', 0.22, i * 0.1)); },
-    photo: () => { playTone(1500, 0.04, 'square', 0.25); playTone(900, 0.06, 'square', 0.2, 0.05); },
-    bossRoar: () => { playTone(80, 0.5, 'sawtooth', 0.25); playTone(120, 0.5, 'sawtooth', 0.2, 0.1); },
-    bossHit: () => { playTone(200, 0.1, 'square', 0.3); playTone(100, 0.15, 'sawtooth', 0.25, 0.05); },
-    bossWin: () => { [523, 659, 784, 1047, 1319, 1568].forEach((f, i) => playTone(f, 0.25, 'triangle', 0.28, i * 0.15)); }
+  var Sounds = {
+    step: function() { playTone(220, 0.06, 'square', 0.05); },
+    open: function() { playTone(523, 0.1); playTone(659, 0.12, 'sine', 0.15, 0.08); },
+    correct: function() { playTone(659, 0.12, 'sine', 0.25); playTone(784, 0.12, 'sine', 0.25, 0.1); playTone(1047, 0.2, 'sine', 0.25, 0.2); },
+    wrong: function() { playTone(200, 0.15, 'sawtooth', 0.15); playTone(150, 0.2, 'sawtooth', 0.15, 0.1); },
+    complete: function() { [523, 659, 784, 1047, 1319].forEach(function(f, i) { playTone(f, 0.18, 'triangle', 0.22, i * 0.1); }); },
+    talk: function() { playTone(500, 0.05, 'triangle', 0.12); playTone(700, 0.05, 'triangle', 0.12, 0.06); },
+    change: function() { playTone(880, 0.08, 'triangle', 0.15); playTone(1100, 0.08, 'triangle', 0.15, 0.06); },
+    achievement: function() { [659, 784, 988, 1319, 1568].forEach(function(f, i) { playTone(f, 0.15, 'triangle', 0.2, i * 0.08); }); },
+    mission: function() { [784, 988, 1175].forEach(function(f, i) { playTone(f, 0.18, 'sine', 0.22, i * 0.1); }); },
+    photo: function() { playTone(1500, 0.04, 'square', 0.25); playTone(900, 0.06, 'square', 0.2, 0.05); },
+    bossRoar: function() { playTone(80, 0.5, 'sawtooth', 0.25); playTone(120, 0.5, 'sawtooth', 0.2, 0.1); },
+    bossHit: function() { playTone(200, 0.1, 'square', 0.3); playTone(100, 0.15, 'sawtooth', 0.25, 0.05); },
+    bossWin: function() { [523, 659, 784, 1047, 1319, 1568].forEach(function(f, i) { playTone(f, 0.25, 'triangle', 0.28, i * 0.15); }); }
   };
-  const Music = {
+  var Music = {
     playing: false, timer: null, step: 0,
-    scale: [0, 2, 4, 5, 7, 9, 11, 12], chord: [0, 4, 7],
-    start() {
-      if (this.playing) return;
-      this.playing = true; this.step = 0;
-      const tick = () => {
-        if (!this.playing) return;
-        const idx = this.scale[(this.step * 3) % this.scale.length];
+    scale: [0, 2, 4, 5, 7, 9, 11, 12],
+    chord: [0, 4, 7],
+    start: function() {
+      var self = this;
+      if (self.playing) return;
+      self.playing = true;
+      self.step = 0;
+      function tick() {
+        if (!self.playing) return;
+        var idx = self.scale[(self.step * 3) % self.scale.length];
         playTone(261.63 * Math.pow(2, idx / 12), 0.9, 'sine', 0.035);
-        if (this.step % 4 === 0) {
-          const bassIdx = this.chord[Math.floor(this.step / 4) % this.chord.length];
-          playTone(130.81 * Math.pow(2, bassIdx / 12), 1.8, 'triangle', 0.045);
+        if (self.step % 4 === 0) {
+          var bi = self.chord[Math.floor(self.step / 4) % self.chord.length];
+          playTone(130.81 * Math.pow(2, bi / 12), 1.8, 'triangle', 0.045);
         }
-        this.step++;
-        this.timer = setTimeout(tick, 500);
-      };
+        self.step++;
+        self.timer = setTimeout(tick, 500);
+      }
       tick();
     },
-    stop() { this.playing = false; if (this.timer) clearTimeout(this.timer); }
+    stop: function() {
+      this.playing = false;
+      if (this.timer) clearTimeout(this.timer);
+    }
+  };
+  log('2. Audio OK');
+
+  // ================================================================
+  // DATOS
+  // ================================================================
+  var ZONES = {
+    pueblo:  { name: 'Pueblo',  unlockStars: 0,  offset: { x: 0,  z: 0 } },
+    bosque:  { name: 'Bosque',  unlockStars: 10, offset: { x: 0,  z: -70 } },
+    montana: { name: 'Montana', unlockStars: 30, offset: { x: 70, z: 0 } }
   };
 
-  log('✅ Audio OK');
-
-  // ============ ZONAS ============
-  const ZONES = {
-    pueblo:  { name: 'Pueblo',  unlockStars: 0,  offset: { x: 0,  z: 0 },    color: 0x7ec850 },
-    bosque:  { name: 'Bosque',  unlockStars: 10, offset: { x: 0,  z: -70 },  color: 0x4a8c4a },
-    montana: { name: 'Montaña', unlockStars: 30, offset: { x: 70, z: 0 },    color: 0x8a7a5a }
-  };
-
-  // ============ TEMAS ============
-  const topics = [
-    // Pueblo (9)
-    { id:'numeros',       name:'Números',        icon:'🔢', color:0xff6b6b, zone:'pueblo',  position:{x:-14, z:-14}, question:'¿Cuánto es 15 + 27?', answer:'42', stars:0, maxStars:9, hints:['Sumar es juntar.','15+20=35, +7.'] },
-    { id:'divisibilidad', name:'Divisibilidad',  icon:'🧩', color:0x4ecdc4, zone:'pueblo',  position:{x:-7,  z:-16}, question:'¿MCD de 12 y 18?', answer:'6', stars:0, maxStars:9, hints:['El mayor que divide a ambos.','12=2·2·3 y 18=2·3·3.'] },
-    { id:'fracciones',    name:'Fracciones',     icon:'🍕', color:0xffa94d, zone:'pueblo',  position:{x:0,   z:-16}, question:'1/2 + 1/4 (ej: 3/4)', answer:'3/4', stars:0, maxStars:9, hints:['Denominador común.','1/2 = 2/4.'] },
-    { id:'decimales',     name:'Decimales',      icon:'🔬', color:0x845ef7, zone:'pueblo',  position:{x:7,   z:-16}, question:'2,5 + 1,75 (coma)', answer:'4,25', stars:0, maxStars:9, hints:['Alinea las comas.','250 + 175 = 425.'] },
-    { id:'porcentajes',   name:'Porcentajes',    icon:'📊', color:0xff922b, zone:'pueblo',  position:{x:14,  z:-14}, question:'20% de 150', answer:'30', stars:0, maxStars:9, hints:['20% = 1/5.','150 ÷ 5.'] },
-    { id:'geometria',     name:'Geometría',      icon:'📐', color:0x51cf66, zone:'pueblo',  position:{x:16,  z:0},   question:'Área 8×5', answer:'40', stars:0, maxStars:9, hints:['base × altura.','8×5.'] },
-    { id:'medidas',       name:'Medidas',        icon:'⏱️', color:0x22b8cf, zone:'pueblo',  position:{x:16,  z:12},  question:'cm en 3,5 m', answer:'350', stars:0, maxStars:9, hints:['1 m = 100 cm.','3,5×100.'] },
-    { id:'problemas',     name:'Problemas',      icon:'🧠', color:0xf06595, zone:'pueblo',  position:{x:0,   z:17},  question:'4 lápices a 0,75€', answer:'3', stars:0, maxStars:9, hints:['Multiplica.','0,75×4.'] },
-    { id:'estadistica',   name:'Estadística',    icon:'🎲', color:0x748ffc, zone:'pueblo',  position:{x:-14, z:14},  question:'Media de 4,6,8', answer:'6', stars:0, maxStars:9, hints:['Suma ÷ cuántos.','18 ÷ 3.'] },
-    // Bosque (3)
-    { id:'potencias',     name:'Potencias',      icon:'⚡', color:0xff7675, zone:'bosque', position:{x:-8, z:-12}, question:'¿2⁵?', answer:'32', stars:0, maxStars:9, hints:['2×2×2×2×2.','Multiplica 2 cinco veces.'] },
-    { id:'enteros',       name:'Enteros',        icon:'🌡️', color:0x74b9ff, zone:'bosque', position:{x:0, z:-15},  question:'(-5) + 8', answer:'3', stars:0, maxStars:9, hints:['Avanza 8 desde -5.','-5+5=0, +3.'] },
-    { id:'algebra',       name:'Álgebra',        icon:'🧮', color:0xa29bfe, zone:'bosque', position:{x:8, z:-12},  question:'x+5=12, x?', answer:'7', stars:0, maxStars:9, hints:['Resta 5.','12 - 5.'] },
-    // Montaña (2)
-    { id:'ecuaciones',    name:'Ecuaciones',     icon:'⚖️', color:0xfab1a0, zone:'montana', position:{x:-6, z:0}, question:'3x=21, x?', answer:'7', stars:0, maxStars:9, hints:['Divide entre 3.','21 ÷ 3.'] },
-    { id:'probabilidad',  name:'Probabilidad',   icon:'🎯', color:0xffd93d, zone:'montana', position:{x:6, z:0},  question:'P(par en dado)? 1/2', answer:'1/2', stars:0, maxStars:9, hints:['Pares: 2,4,6.','3 de 6.'] }
+  var topics = [
+    { id:'numeros', name:'Numeros', icon:'1', color:0xff6b6b, zone:'pueblo', position:{x:-14, z:-14}, question:'Cuanto es 15 + 27?', answer:'42', stars:0, maxStars:9, hints:['15+20=35, +7.','Suma por partes.'] },
+    { id:'divisibilidad', name:'Divisibilidad', icon:'2', color:0x4ecdc4, zone:'pueblo', position:{x:-7, z:-16}, question:'MCD de 12 y 18', answer:'6', stars:0, maxStars:9, hints:['Mayor divisor comun.','12=2x2x3.'] },
+    { id:'fracciones', name:'Fracciones', icon:'3', color:0xffa94d, zone:'pueblo', position:{x:0, z:-16}, question:'1/2 + 1/4 (ej: 3/4)', answer:'3/4', stars:0, maxStars:9, hints:['Denominador comun.','1/2 = 2/4.'] },
+    { id:'decimales', name:'Decimales', icon:'4', color:0x845ef7, zone:'pueblo', position:{x:7, z:-16}, question:'2,5 + 1,75', answer:'4,25', stars:0, maxStars:9, hints:['Alinea las comas.','250+175=425.'] },
+    { id:'porcentajes', name:'Porcentajes', icon:'5', color:0xff922b, zone:'pueblo', position:{x:14, z:-14}, question:'20% de 150', answer:'30', stars:0, maxStars:9, hints:['20%=1/5.','150/5.'] },
+    { id:'geometria', name:'Geometria', icon:'6', color:0x51cf66, zone:'pueblo', position:{x:16, z:0}, question:'Area 8 x 5', answer:'40', stars:0, maxStars:9, hints:['base x altura.','8x5.'] },
+    { id:'medidas', name:'Medidas', icon:'7', color:0x22b8cf, zone:'pueblo', position:{x:16, z:12}, question:'cm en 3,5 m', answer:'350', stars:0, maxStars:9, hints:['1m = 100cm.','3,5 x 100.'] },
+    { id:'problemas', name:'Problemas', icon:'8', color:0xf06595, zone:'pueblo', position:{x:0, z:17}, question:'4 lapices a 0,75 euros', answer:'3', stars:0, maxStars:9, hints:['Multiplica.','0,75 x 4.'] },
+    { id:'estadistica', name:'Estadistica', icon:'9', color:0x748ffc, zone:'pueblo', position:{x:-14, z:14}, question:'Media de 4, 6, 8', answer:'6', stars:0, maxStars:9, hints:['Suma entre cuantos.','18/3.'] },
+    { id:'potencias', name:'Potencias', icon:'P', color:0xff7675, zone:'bosque', position:{x:-8, z:-12}, question:'2 elevado a 5', answer:'32', stars:0, maxStars:9, hints:['2x2x2x2x2.','5 veces.'] },
+    { id:'enteros', name:'Enteros', icon:'E', color:0x74b9ff, zone:'bosque', position:{x:0, z:-15}, question:'(-5) + 8', answer:'3', stars:0, maxStars:9, hints:['Desde -5 avanza 8.','-5+5=0, +3.'] },
+    { id:'algebra', name:'Algebra', icon:'A', color:0xa29bfe, zone:'bosque', position:{x:8, z:-12}, question:'x+5=12, x?', answer:'7', stars:0, maxStars:9, hints:['Resta 5.','12-5.'] },
+    { id:'ecuaciones', name:'Ecuaciones', icon:'X', color:0xfab1a0, zone:'montana', position:{x:-6, z:0}, question:'3x=21, x?', answer:'7', stars:0, maxStars:9, hints:['Divide entre 3.','21/3.'] },
+    { id:'probabilidad', name:'Probabilidad', icon:'D', color:0xffd93d, zone:'montana', position:{x:6, z:0}, question:'P(par)? 1/2', answer:'1/2', stars:0, maxStars:9, hints:['Pares: 2, 4, 6.','3 de 6.'] }
   ];
-  const MAX_TOTAL_STARS = topics.length * 9;
+  var MAX_TOTAL_STARS = topics.length * 9;
+  var totalStars = 0;
 
   function getWorldPosition(topic) {
-    const zone = ZONES[topic.zone];
+    var zone = ZONES[topic.zone];
     return { x: topic.position.x + zone.offset.x, z: topic.position.z + zone.offset.z };
   }
   function isZoneUnlocked(zoneId) { return totalStars >= ZONES[zoneId].unlockStars; }
 
-  let totalStars = 0;
-
-  // ============ LOGROS ============
-  const achievements = [
-    { id:'first_star', icon:'⭐', name:'Primera estrella',  desc:'Consigue 1 estrella', check: () => totalStars >= 1, unlocked: false },
-    { id:'ten_stars',  icon:'✨', name:'Coleccionista',     desc:'Consigue 10 estrellas', check: () => totalStars >= 10, unlocked: false },
-    { id:'fast_math',  icon:'⚡', name:'Matemática veloz',  desc:'Responde en menos de 5 s', check: () => false, unlocked: false },
-    { id:'first_house',icon:'🏠', name:'Primera casita',    desc:'Completa un tema', check: () => topics.some(t => t.stars >= t.maxStars), unlocked: false },
-    { id:'explorer',   icon:'🌲', name:'Exploradora',       desc:'Desbloquea el Bosque', check: () => totalStars >= 10, unlocked: false },
-    { id:'mountaineer',icon:'⛰️', name:'Montañera',         desc:'Desbloquea la Montaña', check: () => totalStars >= 30, unlocked: false },
-    { id:'boss_slayer',icon:'👹', name:'Cazadora de Jefes', desc:'Derrota al jefe', check: () => false, unlocked: false },
-    { id:'town_complete',icon:'🏘️', name:'Pueblo completo', desc:'Completa los 9 temas del Pueblo', check: () => topics.filter(t => t.zone === 'pueblo').every(t => t.stars >= t.maxStars), unlocked: false },
-    { id:'all_stars',  icon:'🌟', name:'Maestría total',    desc:'Todas las estrellas', check: () => totalStars >= MAX_TOTAL_STARS, unlocked: false }
+  // LOGROS
+  var achievements = [
+    { id:'first_star', icon:'*', name:'Primera estrella', desc:'Consigue 1 estrella', check: function(){ return totalStars >= 1; }, unlocked: false },
+    { id:'ten_stars', icon:'*', name:'Coleccionista', desc:'10 estrellas', check: function(){ return totalStars >= 10; }, unlocked: false },
+    { id:'fast_math', icon:'!', name:'Matematica veloz', desc:'Acierta en menos de 5 s', check: function(){ return false; }, unlocked: false },
+    { id:'first_house', icon:'#', name:'Primera casita', desc:'Completa un tema', check: function(){ return topics.some(function(t){ return t.stars >= t.maxStars; }); }, unlocked: false },
+    { id:'explorer', icon:'T', name:'Exploradora', desc:'Desbloquea el Bosque', check: function(){ return totalStars >= 10; }, unlocked: false },
+    { id:'mountaineer', icon:'M', name:'Montanera', desc:'Desbloquea la Montana', check: function(){ return totalStars >= 30; }, unlocked: false },
+    { id:'boss_slayer', icon:'B', name:'Cazadora de Jefes', desc:'Derrota al jefe', check: function(){ return false; }, unlocked: false },
+    { id:'town_complete', icon:'P', name:'Pueblo completo', desc:'9 temas del Pueblo', check: function(){ return topics.filter(function(t){ return t.zone === 'pueblo'; }).every(function(t){ return t.stars >= t.maxStars; }); }, unlocked: false },
+    { id:'all_stars', icon:'*', name:'Maestria total', desc:'Todas las estrellas', check: function(){ return totalStars >= MAX_TOTAL_STARS; }, unlocked: false }
   ];
 
+  function showAchievementToast(a) {
+    var toast = document.getElementById('achievement-toast');
+    document.getElementById('toast-name').textContent = a.name;
+    toast.classList.add('show');
+    setTimeout(function() { toast.classList.remove('show'); }, 3200);
+  }
   function checkAchievements() {
-    achievements.forEach(a => {
+    achievements.forEach(function(a) {
       if (!a.unlocked && a.check()) {
         a.unlocked = true;
-        const toast = document.getElementById('achievement-toast');
-        document.getElementById('toast-name').textContent = a.name;
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 3200);
+        showAchievementToast(a);
         Sounds.achievement();
         saveAll();
       }
     });
   }
 
-  // ============ MISIONES ============
-  const MISSION_TEMPLATES = [
-    { id:'answer5',  icon:'📝', name:'Estudiosa',      desc:'Responde 5 preguntas', target:5, reward:2, field:'answersToday' },
-    { id:'stars3',   icon:'⭐', name:'Cazadora estrellas', desc:'Gana 3 estrellas', target:3, reward:2, field:'starsToday' },
-    { id:'talk2',    icon:'💬', name:'Charlatana',     desc:'Habla con 2 aldeanos', target:2, reward:1, field:'npcsTalkedToday' },
-    { id:'oneTheme', icon:'🏠', name:'Especialista',   desc:'Completa un tema', target:1, reward:3, field:'themesCompletedToday' }
+  // MISIONES
+  var MISSION_TEMPLATES = [
+    { id:'answer5', icon:'E', name:'Estudiosa', desc:'Responde 5 preguntas', target:5, reward:2, field:'answersToday' },
+    { id:'stars3', icon:'*', name:'Cazadora estrellas', desc:'Gana 3 estrellas hoy', target:3, reward:2, field:'starsToday' },
+    { id:'talk2', icon:'C', name:'Charlatana', desc:'Habla con 2 aldeanos', target:2, reward:1, field:'npcsTalkedToday' },
+    { id:'oneTheme', icon:'H', name:'Especialista', desc:'Completa un tema hoy', target:1, reward:3, field:'themesCompletedToday' }
   ];
-  const DAILY_KEY = 'expedicion_matematica_daily_v1';
+  var DAILY_KEY = 'expedicion_matematica_daily_v3';
   function getTodayKey() {
-    const d = new Date();
-    return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`;
+    var d = new Date();
+    return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
   }
-  let dailyData = {
+  var dailyData = {
     date: getTodayKey(),
     progress: { answersToday: 0, starsToday: 0, npcsTalkedToday: 0, themesCompletedToday: 0, npcsSeen: [] },
     completed: [], rewarded: []
   };
   function loadDailyData() {
     try {
-      const raw = localStorage.getItem(DAILY_KEY);
+      var raw = localStorage.getItem(DAILY_KEY);
       if (raw) {
-        const data = JSON.parse(raw);
+        var data = JSON.parse(raw);
         if (data.date === getTodayKey()) dailyData = data;
-        else { dailyData = { date: getTodayKey(), progress: { answersToday:0, starsToday:0, npcsTalkedToday:0, themesCompletedToday:0, npcsSeen:[] }, completed: [], rewarded: [] }; saveDailyData(); }
+        else {
+          dailyData = { date: getTodayKey(), progress: { answersToday: 0, starsToday: 0, npcsTalkedToday: 0, themesCompletedToday: 0, npcsSeen: [] }, completed: [], rewarded: [] };
+          saveDailyData();
+        }
       }
     } catch(e) {}
   }
@@ -726,316 +576,1551 @@ try {
     return dailyData.progress[field] || 0;
   }
   function updateMissions() {
-    let nuevos = false;
-    MISSION_TEMPLATES.forEach(m => {
-      if (getMissionProgress(m.field) >= m.target && !dailyData.completed.includes(m.id)) {
-        dailyData.completed.push(m.id); nuevos = true;
+    var nuevos = false;
+    MISSION_TEMPLATES.forEach(function(m) {
+      if (getMissionProgress(m.field) >= m.target && dailyData.completed.indexOf(m.id) === -1) {
+        dailyData.completed.push(m.id);
+        nuevos = true;
       }
     });
     if (nuevos) { saveDailyData(); updateMissionsBadge(); }
   }
   function claimMissionReward(mission) {
-    if (dailyData.rewarded.includes(mission.id) || !dailyData.completed.includes(mission.id)) return;
+    if (dailyData.rewarded.indexOf(mission.id) !== -1) return;
+    if (dailyData.completed.indexOf(mission.id) === -1) return;
     dailyData.rewarded.push(mission.id);
     totalStars += mission.reward;
     updateStarDisplay();
-    saveAll(); saveDailyData();
-    const toast = document.getElementById('mission-toast');
-    document.getElementById('mission-toast-name').textContent = `${mission.name} (+${mission.reward}⭐)`;
+    saveAll();
+    saveDailyData();
+    var toast = document.getElementById('mission-toast');
+    document.getElementById('mission-toast-name').textContent = mission.name + ' (+' + mission.reward + ')';
     toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3200);
+    setTimeout(function() { toast.classList.remove('show'); }, 3200);
     Sounds.mission();
-    checkAchievements(); updateMissionsBadge(); renderMissions();
+    checkAchievements();
+    updateMissionsBadge();
+    renderMissions();
   }
   function updateMissionsBadge() {
-    const badge = document.getElementById('missions-badge');
-    const pend = MISSION_TEMPLATES.filter(m => dailyData.completed.includes(m.id) && !dailyData.rewarded.includes(m.id));
+    var badge = document.getElementById('missions-badge');
+    var pend = MISSION_TEMPLATES.filter(function(m) {
+      return dailyData.completed.indexOf(m.id) !== -1 && dailyData.rewarded.indexOf(m.id) === -1;
+    });
     if (pend.length > 0) { badge.textContent = pend.length; badge.style.display = 'flex'; }
-    else badge.style.display = 'none';
+    else { badge.style.display = 'none'; }
   }
   function renderMissions() {
-    const list = document.getElementById('missions-list');
-    const d = new Date();
-    document.getElementById('missions-date').textContent = `Misiones de ${d.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long' })}`;
+    var list = document.getElementById('missions-list');
+    var d = new Date();
+    document.getElementById('missions-date').textContent = 'Misiones de hoy';
     list.innerHTML = '';
-    MISSION_TEMPLATES.forEach(m => {
-      const prog = Math.min(getMissionProgress(m.field), m.target);
-      const pct = (prog / m.target) * 100;
-      const done = dailyData.completed.includes(m.id);
-      const rewarded = dailyData.rewarded.includes(m.id);
-      const div = document.createElement('div');
+    MISSION_TEMPLATES.forEach(function(m) {
+      var prog = Math.min(getMissionProgress(m.field), m.target);
+      var pct = (prog / m.target) * 100;
+      var done = dailyData.completed.indexOf(m.id) !== -1;
+      var rewarded = dailyData.rewarded.indexOf(m.id) !== -1;
+      var div = document.createElement('div');
       div.className = 'mission-item' + (done ? ' done' : '');
-      div.innerHTML = `
-        <div class="mission-icon">${m.icon}</div>
-        <div class="mission-info">
-          <div class="mission-name">${m.name} ${done ? '✅' : ''}</div>
-          <div class="mission-desc">${m.desc}</div>
-          <div class="mission-progress"><div class="mission-progress-bar" style="width:${pct}%"></div></div>
-          <div class="mission-reward">
-            ${prog}/${m.target} · +${m.reward}⭐
-            ${done && !rewarded ? ` — <button style="background:#51cf66;color:white;border:none;border-radius:20px;padding:4px 10px;font-weight:800;cursor:pointer;font-size:0.75rem;" onclick="window.claimMission('${m.id}')">¡RECLAMAR!</button>` : ''}
-            ${rewarded ? ' — ✅ Reclamada' : ''}
-          </div>
-        </div>`;
+      var boton = '';
+      if (done && !rewarded) boton = ' - <button class="mission-claim-btn" data-mission="' + m.id + '">RECLAMAR!</button>';
+      else if (rewarded) boton = ' - OK Reclamada';
+      div.innerHTML = '<div class="mission-icon">' + m.icon + '</div>' +
+        '<div class="mission-info">' +
+        '<div class="mission-name">' + m.name + (done ? ' OK' : '') + '</div>' +
+        '<div class="mission-desc">' + m.desc + '</div>' +
+        '<div class="mission-progress"><div class="mission-progress-bar" style="width:' + pct + '%"></div></div>' +
+        '<div class="mission-reward">' + prog + '/' + m.target + ' - +' + m.reward + ' estrellas' + boton + '</div>' +
+        '</div>';
       list.appendChild(div);
     });
+    var botones = list.querySelectorAll('.mission-claim-btn');
+    botones.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var m = MISSION_TEMPLATES.find(function(x) { return x.id === btn.dataset.mission; });
+        if (m) claimMissionReward(m);
+      });
+    });
   }
-  window.claimMission = (id) => { const m = MISSION_TEMPLATES.find(x => x.id === id); if (m) claimMissionReward(m); };
-  function trackDaily(field, val = 1) {
+  function trackDaily(field, val) {
+    val = val || 1;
     if (field === 'npcsTalkedToday') return;
     dailyData.progress[field] = (dailyData.progress[field] || 0) + val;
-    updateMissions(); saveDailyData();
+    updateMissions();
+    saveDailyData();
   }
   function trackDailyNPC(npcName) {
-    if (!dailyData.progress.npcsSeen.includes(npcName)) {
+    if (dailyData.progress.npcsSeen.indexOf(npcName) === -1) {
       dailyData.progress.npcsSeen.push(npcName);
-      updateMissions(); saveDailyData();
+      updateMissions();
+      saveDailyData();
     }
   }
   loadDailyData();
-  log('✅ Misiones OK');
 
-  // ============ PERSONALIZACIÓN ============
-  const defaultAppearance = {
+  // APARIENCIA
+  var defaultAppearance = {
     skinColor: 0xffe0b2, hairStyle: 'short', hairColor: 0x4a2c17,
     eyeStyle: 'round', eyeColor: 0x222222, face: 'smile',
     outfitStyle: 'dress', outfitColor: 0x3d5a99,
     accessory: 'none', pet: 'none'
   };
-  let appearance = { ...defaultAppearance };
-  const UNLOCKS = {
-    outfits: { dress:0, tshirt:0, uniform:10, overalls:20 },
-    outfitColors: { 0x3d5a99:0, 0xff6b6b:0, 0x4ecdc4:0, 0xffa94d:0, 0x845ef7:5, 0x51cf66:10, 0xf06595:15, 0xffd93d:25, 0xffffff:30, 0x2c2c2c:40, 0xffd700:50, 0xrainbow:70 },
-    accessories: { none:0, cap:3, glasses:8, backpack:15, all:35 },
-    pets: { none:0, cat:12, dog:25, bird:45 }
+  var appearance = JSON.parse(JSON.stringify(defaultAppearance));
+  var UNLOCKS = {
+    outfits: { dress: 0, tshirt: 0, uniform: 10, overalls: 20 },
+    outfitColors: { '0x3d5a99': 0, '0xff6b6b': 0, '0x4ecdc4': 0, '0xffa94d': 0, '0x845ef7': 5, '0x51cf66': 10, '0xf06595': 15, '0xffd93d': 25, '0xffffff': 30, '0x2c2c2c': 40, '0xffd700': 50, '0xrainbow': 70 },
+    accessories: { none: 0, cap: 3, glasses: 8, backpack: 15, all: 35 },
+    pets: { none: 0, cat: 12, dog: 25, bird: 45 }
   };
   function isUnlocked(cat, val) {
-    const map = UNLOCKS[cat];
+    var map = UNLOCKS[cat];
     if (!map) return true;
-    const req = map[val];
-    return req === undefined ? true : totalStars >= req;
+    var key = String(val);
+    var req = map[key];
+    if (req === undefined) return true;
+    return totalStars >= req;
   }
 
-  // ============ LOCALSTORAGE ============
-  const STORAGE_KEY = 'expedicion_matematica_save_v5';
-  const APPEARANCE_KEY = 'expedicion_matematica_appearance_v4';
-  const ACHIEVEMENTS_KEY = 'expedicion_matematica_achievements_v3';
+  // STORAGE
+  var STORAGE_KEY = 'expedicion_matematica_save_v8';
+  var APPEARANCE_KEY = 'expedicion_matematica_appearance_v7';
+  var ACHIEVEMENTS_KEY = 'expedicion_matematica_achievements_v6';
   function saveAll() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ stars: topics.map(t => ({ id: t.id, stars: t.stars })), totalStars }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ stars: topics.map(function(t) { return { id: t.id, stars: t.stars }; }), totalStars: totalStars }));
       localStorage.setItem(APPEARANCE_KEY, JSON.stringify(appearance));
-      localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify(achievements.map(a => ({ id: a.id, unlocked: a.unlocked }))));
+      localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify(achievements.map(function(a) { return { id: a.id, unlocked: a.unlocked }; })));
     } catch(e) {}
   }
   function loadAll() {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      var raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
-        const data = JSON.parse(raw);
+        var data = JSON.parse(raw);
         if (data.stars) {
-          data.stars.forEach(s => { const t = topics.find(x => x.id === s.id); if (t) t.stars = s.stars; });
-          totalStars = topics.reduce((a, t) => a + t.stars, 0);
+          data.stars.forEach(function(s) {
+            var t = topics.find(function(x) { return x.id === s.id; });
+            if (t) t.stars = s.stars;
+          });
+          totalStars = topics.reduce(function(a, t) { return a + t.stars; }, 0);
         }
       }
-      const rawA = localStorage.getItem(APPEARANCE_KEY);
-      if (rawA) appearance = { ...defaultAppearance, ...JSON.parse(rawA) };
-      const rawAch = localStorage.getItem(ACHIEVEMENTS_KEY);
-      if (rawAch) JSON.parse(rawAch).forEach(s => { const a = achievements.find(x => x.id === s.id); if (a) a.unlocked = s.unlocked; });
+      var rawA = localStorage.getItem(APPEARANCE_KEY);
+      if (rawA) {
+        var ap = JSON.parse(rawA);
+        Object.keys(defaultAppearance).forEach(function(k) {
+          if (ap[k] !== undefined) appearance[k] = ap[k];
+        });
+      }
+      var rawAch = localStorage.getItem(ACHIEVEMENTS_KEY);
+      if (rawAch) {
+        JSON.parse(rawAch).forEach(function(s) {
+          var a = achievements.find(function(x) { return x.id === s.id; });
+          if (a) a.unlocked = s.unlocked;
+        });
+      }
     } catch(e) {}
   }
   loadAll();
-  log('✅ LocalStorage OK');
+  log('3. Datos OK (' + totalStars + ')');
 
-  // ============ ESCENA 3D ============
-  const container = document.getElementById('canvas-container');
-  const scene = new THREE.Scene();
-  const DAY_BG = new THREE.Color(0x87ceeb);
-  const NIGHT_BG = new THREE.Color(0x0a0a2a);
+  // ================================================================
+  // ESCENA
+  // ================================================================
+  var container = document.getElementById('canvas-container');
+  var scene = new THREE.Scene();
+  var DAY_BG = new THREE.Color(0x87ceeb);
+  var NIGHT_BG = new THREE.Color(0x0a0a2a);
   scene.background = DAY_BG.clone();
   scene.fog = new THREE.Fog(0x87ceeb, 50, 150);
 
-  const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 500);
-  const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+  var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 500);
+  var renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   container.appendChild(renderer.domElement);
-  log('✅ Escena creada');
+  log('4. Escena OK');
 
-  // Luces
-  scene.add(new THREE.AmbientLight(0xffffff, 0.45));
-  const hemi = new THREE.HemisphereLight(0xffffff, 0x88aa88, 0.85);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+  var hemi = new THREE.HemisphereLight(0xffffff, 0x88aa88, 0.85);
   scene.add(hemi);
-  const sun = new THREE.DirectionalLight(0xfff5d0, 1.4);
+  var sun = new THREE.DirectionalLight(0xfff5d0, 1.4);
   sun.position.set(30, 50, 20);
   sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
-  sun.shadow.camera.left = -80; sun.shadow.camera.right = 80;
-  sun.shadow.camera.top = 80; sun.shadow.camera.bottom = -80;
-  sun.shadow.camera.near = 1; sun.shadow.camera.far = 200;
+  sun.shadow.camera.left = -80;
+  sun.shadow.camera.right = 80;
+  sun.shadow.camera.top = 80;
+  sun.shadow.camera.bottom = -80;
+  sun.shadow.camera.near = 1;
+  sun.shadow.camera.far = 200;
   sun.shadow.bias = -0.0005;
   scene.add(sun);
-  log('✅ Luces OK');
 
-  // Suelo por zonas
-  Object.entries(ZONES).forEach(([id, zone]) => {
-    const geo = new THREE.PlaneGeometry(60, 60);
-    const mat = new THREE.MeshStandardMaterial({ color: zone.color, roughness: 0.9 });
-    const mesh = new THREE.Mesh(geo, mat);
+  // Suelos
+  Object.keys(ZONES).forEach(function(id) {
+    var zone = ZONES[id];
+    var color = id === 'bosque' ? 0x4a8c4a : (id === 'montana' ? 0x8a7a5a : 0x7ec850);
+    var geo = new THREE.PlaneGeometry(60, 60);
+    var mat = new THREE.MeshStandardMaterial({ color: color, roughness: 0.9 });
+    var mesh = new THREE.Mesh(geo, mat);
     mesh.rotation.x = -Math.PI / 2;
     mesh.position.set(zone.offset.x, 0, zone.offset.z);
     mesh.receiveShadow = true;
     scene.add(mesh);
   });
 
-  // Camino circular
-  const pathMesh = new THREE.Mesh(
+  var pathMesh = new THREE.Mesh(
     new THREE.RingGeometry(18, 21, 64),
     new THREE.MeshStandardMaterial({ color: 0xd9b382, roughness: 0.9, side: THREE.DoubleSide })
   );
-  pathMesh.rotation.x = -Math.PI/2;
+  pathMesh.rotation.x = -Math.PI / 2;
   pathMesh.position.y = 0.02;
   pathMesh.receiveShadow = true;
   scene.add(pathMesh);
 
   // Fuente
-  const fountain = new THREE.Mesh(
+  var fountain = new THREE.Mesh(
     new THREE.CylinderGeometry(2, 2.2, 0.6, 24),
     new THREE.MeshStandardMaterial({ color: 0xb0b0b0 })
   );
-  fountain.position.y = 0.3; fountain.castShadow = true;
+  fountain.position.y = 0.3;
+  fountain.castShadow = true;
   scene.add(fountain);
-
-  const fountainTop = new THREE.Mesh(
+  var fountainTop = new THREE.Mesh(
     new THREE.CylinderGeometry(0.5, 0.5, 1.5, 16),
     new THREE.MeshStandardMaterial({ color: 0x9aa0a6 })
   );
-  fountainTop.position.y = 1.35; fountainTop.castShadow = true;
+  fountainTop.position.y = 1.35;
+  fountainTop.castShadow = true;
   scene.add(fountainTop);
-
-  const waterBall = new THREE.Mesh(
+  var waterBall = new THREE.Mesh(
     new THREE.SphereGeometry(0.5, 16, 12),
     new THREE.MeshStandardMaterial({ color: 0x5bc0eb, transparent: true, opacity: 0.85 })
   );
   waterBall.position.y = 2.2;
   scene.add(waterBall);
 
-  // Árboles
-  function createTree(x, z, scale = 1) {
-    const g = new THREE.Group();
-    const trunk = new THREE.Mesh(
+  // Arboles
+  function createTree(x, z, scale) {
+    scale = scale || 1;
+    var g = new THREE.Group();
+    var trunk = new THREE.Mesh(
       new THREE.CylinderGeometry(0.25, 0.35, 1.4, 8),
       new THREE.MeshStandardMaterial({ color: 0x8b5a2b, roughness: 1 })
     );
-    trunk.position.y = 0.7; trunk.castShadow = true; g.add(trunk);
-    const lm = new THREE.MeshStandardMaterial({ color: 0x3d9e3d, roughness: 0.9, flatShading: true });
-    const l1 = new THREE.Mesh(new THREE.ConeGeometry(1.3, 1.6, 8), lm); l1.position.y = 1.9; l1.castShadow = true; g.add(l1);
-    const l2 = new THREE.Mesh(new THREE.ConeGeometry(1.0, 1.3, 8), lm); l2.position.y = 2.7; l2.castShadow = true; g.add(l2);
-    const l3 = new THREE.Mesh(new THREE.ConeGeometry(0.7, 1.0, 8), lm); l3.position.y = 3.4; l3.castShadow = true; g.add(l3);
+    trunk.position.y = 0.7;
+    trunk.castShadow = true;
+    g.add(trunk);
+    var lm = new THREE.MeshStandardMaterial({ color: 0x3d9e3d, roughness: 0.9, flatShading: true });
+    for (var i = 0; i < 3; i++) {
+      var l = new THREE.Mesh(new THREE.ConeGeometry(1.3 - i * 0.3, 1.6 - i * 0.3, 8), lm);
+      l.position.y = 1.9 + i * 0.75;
+      l.castShadow = true;
+      g.add(l);
+    }
     g.position.set(x, 0, z);
     g.rotation.y = Math.random() * Math.PI * 2;
     g.scale.set(scale, scale, scale);
     return g;
   }
-  // Árboles del pueblo (perímetro exterior)
-  for (let i = 0; i < 24; i++) {
-    const angle = (i / 24) * Math.PI * 2;
-    const r = 28 + Math.random() * 4;
-    scene.add(createTree(Math.cos(angle) * r, Math.sin(angle) * r, 0.9 + Math.random() * 0.4));
+  for (var i = 0; i < 24; i++) {
+    var a = (i / 24) * Math.PI * 2;
+    var r = 28 + Math.random() * 4;
+    scene.add(createTree(Math.cos(a) * r, Math.sin(a) * r, 0.9 + Math.random() * 0.4));
   }
-  // Árboles del bosque
-  for (let i = 0; i < 30; i++) {
-    const bx = ZONES.bosque.offset.x + (Math.random() - 0.5) * 40;
-    const bz = ZONES.bosque.offset.z + (Math.random() - 0.5) * 40;
+  for (var i = 0; i < 30; i++) {
+    var bx = ZONES.bosque.offset.x + (Math.random() - 0.5) * 40;
+    var bz = ZONES.bosque.offset.z + (Math.random() - 0.5) * 40;
     if (Math.hypot(bx - ZONES.bosque.offset.x, bz - ZONES.bosque.offset.z) < 12) continue;
     scene.add(createTree(bx, bz, 0.9 + Math.random() * 0.4));
   }
-
-  // Rocas en montaña
-  function createRock(x, z) {
-    const g = new THREE.Group();
-    const mat = new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 1, flatShading: true });
-    const r1 = new THREE.Mesh(new THREE.DodecahedronGeometry(0.7 + Math.random() * 0.4), mat);
-    r1.position.y = 0.5; r1.castShadow = true; g.add(r1);
-    const r2 = new THREE.Mesh(new THREE.DodecahedronGeometry(0.5 + Math.random() * 0.3), mat);
-    r2.position.set(0.6, 0.3, 0.3); r2.castShadow = true; g.add(r2);
-    g.position.set(x, 0, z);
-    g.rotation.y = Math.random() * Math.PI * 2;
-    return g;
-  }
-  for (let i = 0; i < 20; i++) {
-    const mx = ZONES.montana.offset.x + (Math.random() - 0.5) * 45;
-    const mz = ZONES.montana.offset.z + (Math.random() - 0.5) * 45;
+  for (var i = 0; i < 20; i++) {
+    var mx = ZONES.montana.offset.x + (Math.random() - 0.5) * 45;
+    var mz = ZONES.montana.offset.z + (Math.random() - 0.5) * 45;
     if (Math.hypot(mx - ZONES.montana.offset.x, mz - ZONES.montana.offset.z) < 14) continue;
-    scene.add(createRock(mx, mz));
+    var gRock = new THREE.Group();
+    var rockMat = new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 1, flatShading: true });
+    var r1 = new THREE.Mesh(new THREE.DodecahedronGeometry(0.7 + Math.random() * 0.4), rockMat);
+    r1.position.y = 0.5;
+    r1.castShadow = true;
+    gRock.add(r1);
+    gRock.position.set(mx, 0, mz);
+    scene.add(gRock);
   }
 
   // Flores
-  function createFlower(x, z, color) {
-    const g = new THREE.Group();
-    const stem = new THREE.Mesh(
+  var flowerColors = [0xff6b6b, 0xffd93d, 0xff9ff3, 0xffffff, 0xa29bfe, 0xffa94d];
+  for (var i = 0; i < 80; i++) {
+    var a = Math.random() * Math.PI * 2;
+    var r = 24 + Math.random() * 15;
+    var g = new THREE.Group();
+    var stem = new THREE.Mesh(
       new THREE.CylinderGeometry(0.04, 0.04, 0.5, 5),
       new THREE.MeshStandardMaterial({ color: 0x3d8c3d })
     );
-    stem.position.y = 0.25; g.add(stem);
-    const petals = new THREE.Mesh(
+    stem.position.y = 0.25;
+    g.add(stem);
+    var c = flowerColors[Math.floor(Math.random() * flowerColors.length)];
+    var petals = new THREE.Mesh(
       new THREE.SphereGeometry(0.15, 8, 6),
-      new THREE.MeshStandardMaterial({ color, roughness: 0.7, emissive: color, emissiveIntensity: 0.15 })
+      new THREE.MeshStandardMaterial({ color: c, roughness: 0.7, emissive: c, emissiveIntensity: 0.15 })
     );
-    petals.position.y = 0.55; petals.scale.y = 0.6; g.add(petals);
-    g.position.set(x, 0, z);
-    return g;
-  }
-  const flowerColors = [0xff6b6b, 0xffd93d, 0xff9ff3, 0xffffff, 0xa29bfe, 0xffa94d];
-  for (let i = 0; i < 80; i++) {
-    const angle = Math.random() * Math.PI * 2;
-    const r = 24 + Math.random() * 15;
-    const x = Math.cos(angle) * r;
-    const z = Math.sin(angle) * r;
-    scene.add(createFlower(x, z, flowerColors[Math.floor(Math.random() * flowerColors.length)]));
+    petals.position.y = 0.55;
+    petals.scale.y = 0.6;
+    g.add(petals);
+    g.position.set(Math.cos(a) * r, 0, Math.sin(a) * r);
+    scene.add(g);
   }
 
   // Farolas
-  const lampposts = [];
+  var lampposts = [];
   function createLamppost(x, z) {
-    const g = new THREE.Group();
-    const poleMat = new THREE.MeshStandardMaterial({ color: 0x2c2c2c, roughness: 0.5, metalness: 0.6 });
-    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 4, 8), poleMat);
-    pole.position.y = 2; pole.castShadow = true; g.add(pole);
-    const lampMat = new THREE.MeshStandardMaterial({ color: 0xffe066, emissive: 0xffc93c, emissiveIntensity: 0 });
-    const lamp = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), lampMat);
-    lamp.position.y = 4.2; g.add(lamp);
-    const light = new THREE.PointLight(0xffd070, 0, 12, 2);
-    light.position.y = 4.2; g.add(light);
+    var g = new THREE.Group();
+    var poleMat = new THREE.MeshStandardMaterial({ color: 0x2c2c2c, roughness: 0.5, metalness: 0.6 });
+    var pole = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 4, 8), poleMat);
+    pole.position.y = 2;
+    pole.castShadow = true;
+    g.add(pole);
+    var lampMat = new THREE.MeshStandardMaterial({ color: 0xffe066, emissive: 0xffc93c, emissiveIntensity: 0 });
+    var lamp = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), lampMat);
+    lamp.position.y = 4.2;
+    g.add(lamp);
+    var light = new THREE.PointLight(0xffd070, 0, 12, 2);
+    light.position.y = 4.2;
+    g.add(light);
     g.position.set(x, 0, z);
-    lampposts.push({ group: g, lamp, light, lampMat });
+    lampposts.push({ light: light, lampMat: lampMat });
     return g;
   }
-  for (let i = 0; i < 8; i++) {
-    const angle = (i / 8) * Math.PI * 2;
-    scene.add(createLamppost(Math.cos(angle) * 19.5, Math.sin(angle) * 19.5));
+  for (var i = 0; i < 8; i++) {
+    var a = (i / 8) * Math.PI * 2;
+    scene.add(createLamppost(Math.cos(a) * 19.5, Math.sin(a) * 19.5));
   }
 
   // Vallas
-  for (let i = 0; i < 60; i++) {
-    const angle = (i / 60) * Math.PI * 2;
-    const deg = (i / 60) * 360;
-    const nearHouse = topics.filter(t => t.zone === 'pueblo').some(t => {
-      const tAngle = (Math.atan2(t.position.z, t.position.x) * 180 / Math.PI + 360) % 360;
-      let d = Math.abs(deg - tAngle);
+  for (var i = 0; i < 60; i++) {
+    var a = (i / 60) * Math.PI * 2;
+    var deg = (i / 60) * 360;
+    var nearHouse = topics.filter(function(t) { return t.zone === 'pueblo'; }).some(function(t) {
+      var ta = (Math.atan2(t.position.z, t.position.x) * 180 / Math.PI + 360) % 360;
+      var d = Math.abs(deg - ta);
       if (d > 180) d = 360 - d;
       return d < 18;
     });
     if (nearHouse) continue;
-    const r = 23;
-    const x = Math.cos(angle) * r;
-    const z = Math.sin(angle) * r;
-    const fence = new THREE.Group();
-    const woodMat = new THREE.MeshStandardMaterial({ color: 0xb58b5a });
-    const p1 = new THREE.Mesh(new THREE.BoxGeometry(0.15, 1, 0.15), woodMat);
-    p1.position.y = 0.5; p1.castShadow = true; fence.add(p1);
-    const bar = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.1, 1), woodMat);
-    bar.position.set(0, 0.7, -0.45); fence.add(bar);
-    fence.position.set(x, 0, z);
-    fence.rotation.y = -angle + Math.PI/
+    var r = 23;
+    var fence = new THREE.Group();
+    var woodMat = new THREE.MeshStandardMaterial({ color: 0xb58b5a });
+    var p = new THREE.Mesh(new THREE.BoxGeometry(0.15, 1, 0.15), woodMat);
+    p.position.y = 0.5;
+    p.castShadow = true;
+    fence.add(p);
+    var bar = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.1, 1), woodMat);
+    bar.position.set(0, 0.7, -0.45);
+    fence.add(bar);
+    fence.position.set(Math.cos(a) * r, 0, Math.sin(a) * r);
+    fence.rotation.y = -a + Math.PI / 2;
+    scene.add(fence);
+  }
+  log('5. Decoracion OK');
+
+  // ================================================================
+  // CASITAS
+  // ================================================================
+  var houses = [];
+  topics.forEach(function(topic) {
+    var wp = getWorldPosition(topic);
+    var g = new THREE.Group();
+
+    var base = new THREE.Mesh(
+      new THREE.BoxGeometry(4, 3, 4),
+      new THREE.MeshStandardMaterial({ color: 0xfbe5c8 })
+    );
+    base.position.y = 1.5;
+    base.castShadow = true;
+    base.receiveShadow = true;
+    g.add(base);
+
+    var roofMat = new THREE.MeshStandardMaterial({ color: topic.color, flatShading: true });
+    var roof = new THREE.Mesh(new THREE.ConeGeometry(3.3, 2.2, 4), roofMat);
+    roof.position.y = 4.1;
+    roof.rotation.y = Math.PI / 4;
+    roof.castShadow = true;
+    g.add(roof);
+
+    var door = new THREE.Mesh(
+      new THREE.BoxGeometry(1.1, 1.8, 0.1),
+      new THREE.MeshStandardMaterial({ color: 0x6b3e1d })
+    );
+    door.position.set(0, 0.9, 2.01);
+    g.add(door);
+
+    var wm = new THREE.MeshStandardMaterial({ color: 0x9be0ff, emissive: 0x224466, emissiveIntensity: 0.4 });
+    var w1 = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.9, 0.1), wm);
+    w1.position.set(-1.2, 1.7, 2.01);
+    g.add(w1);
+    var w2 = w1.clone();
+    w2.position.x = 1.2;
+    g.add(w2);
+
+    // Sprite con el numero/letra
+    var cv = document.createElement('canvas');
+    cv.width = 256;
+    cv.height = 256;
+    var ctx = cv.getContext('2d');
+    ctx.beginPath();
+    ctx.arc(128, 128, 110, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+    ctx.fill();
+    ctx.strokeStyle = '#3a2c1b';
+    ctx.lineWidth = 10;
+    ctx.stroke();
+    ctx.font = 'bold 160px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#3a2c1b';
+    ctx.fillText(topic.icon, 128, 140);
+    var tex = new THREE.CanvasTexture(cv);
+    var spriteMat = new THREE.SpriteMaterial({ map: tex, depthTest: false });
+    var sprite = new THREE.Sprite(spriteMat);
+    sprite.scale.set(2.2, 2.2, 2.2);
+    sprite.position.y = 6.2;
+    g.add(sprite);
+
+    // Etiqueta
+    var lc = document.createElement('canvas');
+    lc.width = 512;
+    lc.height = 96;
+    var lctx = lc.getContext('2d');
+    lctx.fillStyle = 'rgba(254, 247, 224, 0.95)';
+    lctx.strokeStyle = '#8b6f4c';
+    lctx.lineWidth = 6;
+    lctx.beginPath();
+    if (lctx.roundRect) lctx.roundRect(4, 4, 504, 88, 30);
+    else lctx.rect(4, 4, 504, 88);
+    lctx.fill();
+    lctx.stroke();
+    lctx.fillStyle = '#2c1e0e';
+    lctx.font = 'bold 38px Arial';
+    lctx.textAlign = 'center';
+    lctx.textBaseline = 'middle';
+    var name = topic.name.length > 20 ? topic.name.slice(0, 18) + '...' : topic.name;
+    lctx.fillText(name, 256, 50);
+    var ltex = new THREE.CanvasTexture(lc);
+    var lmat = new THREE.SpriteMaterial({ map: ltex, depthTest: false });
+    var lsprite = new THREE.Sprite(lmat);
+    lsprite.scale.set(5, 0.95, 1);
+    lsprite.position.y = 7.4;
+    g.add(lsprite);
+
+    g.position.set(wp.x, 0, wp.z);
+    g.rotation.y = Math.atan2(-wp.x, -wp.z);
+    scene.add(g);
+    houses.push({ topic: topic, mesh: g, x: wp.x, z: wp.z, zone: topic.zone, roofMat: roofMat });
+
+    if (topic.stars >= topic.maxStars) roofMat.color.set(0xffd700);
+  });
+  log('6. ' + houses.length + ' casitas OK');
+
+  // ================================================================
+  // NPCs
+  // ================================================================
+  var npcs = [];
+  function createNPC(x, z, color, name, hints) {
+    var g = new THREE.Group();
+    var body = new THREE.Mesh(
+      new THREE.CapsuleGeometry(0.5, 0.7, 4, 12),
+      new THREE.MeshStandardMaterial({ color: color })
+    );
+    body.position.y = 1;
+    body.castShadow = true;
+    g.add(body);
+    var head = new THREE.Mesh(
+      new THREE.SphereGeometry(0.55, 16, 12),
+      new THREE.MeshStandardMaterial({ color: 0xffe0b2 })
+    );
+    head.position.y = 2;
+    head.castShadow = true;
+    g.add(head);
+    var hatMat = new THREE.MeshStandardMaterial({ color: 0x3a2c1b });
+    var hat = new THREE.Mesh(new THREE.ConeGeometry(0.7, 0.6, 8), hatMat);
+    hat.position.y = 2.55;
+    g.add(hat);
+    var brim = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.7, 0.05, 12), hatMat);
+    brim.position.y = 2.3;
+    g.add(brim);
+    var em = new THREE.MeshStandardMaterial({ color: 0x222222 });
+    var e1 = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 8), em);
+    e1.position.set(-0.18, 2.05, 0.48);
+    g.add(e1);
+    var e2 = e1.clone();
+    e2.position.x = 0.18;
+    g.add(e2);
+    g.position.set(x, 0, z);
+    g.rotation.y = Math.random() * Math.PI * 2;
+    scene.add(g);
+    npcs.push({ mesh: g, x: x, z: z, name: name, hints: hints, hintIndex: 0 });
+  }
+  createNPC(-5, 5, 0xff6b6b, 'Maestro Ramon', ['Descompone: 15+20=35, +7.', 'Dibuja si dudas.']);
+  createNPC(7, -3, 0x4ecdc4, 'Dona Marta', ['Busca denominador comun.', 'El 50% es la mitad.']);
+  createNPC(2, 10, 0xffa94d, 'Pequeno Leo', ['Area = lado x lado.', '1 m = 100 cm.']);
+
+  function getNearestTopicToNPC(npc) {
+    var best = null;
+    var bd = Infinity;
+    topics.forEach(function(t) {
+      var wp = getWorldPosition(t);
+      var d = Math.hypot(wp.x - npc.x, wp.z - npc.z);
+      if (d < bd) { bd = d; best = t; }
+    });
+    return best;
+  }
+
+  // JEFE
+  var bossPos = { x: ZONES.montana.offset.x + 15, z: ZONES.montana.offset.z - 15 };
+  (function() {
+    var g = new THREE.Group();
+    var rockMat = new THREE.MeshStandardMaterial({ color: 0x4a3a3a, roughness: 1, flatShading: true });
+    var big = new THREE.Mesh(new THREE.DodecahedronGeometry(5), rockMat);
+    big.position.y = 3;
+    big.castShadow = true;
+    g.add(big);
+    var ent = new THREE.Mesh(
+      new THREE.CircleGeometry(1.6, 16),
+      new THREE.MeshStandardMaterial({ color: 0x0a0a0a, side: THREE.DoubleSide })
+    );
+    ent.position.set(0, 1.8, 4.5);
+    g.add(ent);
+    var eyeMat = new THREE.MeshStandardMaterial({ color: 0xff0000, emissive: 0xff0000, emissiveIntensity: 1.5 });
+    var e1 = new THREE.Mesh(new THREE.SphereGeometry(0.25, 8, 8), eyeMat);
+    e1.position.set(-0.5, 2, 4.6);
+    g.add(e1);
+    var e2 = e1.clone();
+    e2.position.x = 0.5;
+    g.add(e2);
+    g.position.set(bossPos.x, 0, bossPos.z);
+    g.rotation.y = Math.PI;
+    scene.add(g);
+  })();
+  log('7. NPCs y jefe OK');
+
+  // ================================================================
+  // PERSONAJE
+  // ================================================================
+  var player = new THREE.Group();
+  scene.add(player);
+  var parts = {};
+
+  var headMat = new THREE.MeshStandardMaterial({ color: appearance.skinColor });
+  var head = new THREE.Mesh(new THREE.SphereGeometry(0.55, 16, 12), headMat);
+  head.position.y = 2;
+  head.castShadow = true;
+  player.add(head);
+  parts.head = head;
+
+  var neck = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.18, 0.2, 0.2, 8),
+    new THREE.MeshStandardMaterial({ color: appearance.skinColor })
+  );
+  neck.position.y = 1.55;
+  player.add(neck);
+  parts.neck = neck;
+
+  var body = new THREE.Mesh(
+    new THREE.CapsuleGeometry(0.5, 0.7, 4, 12),
+    new THREE.MeshStandardMaterial({ color: appearance.outfitColor })
+  );
+  body.position.y = 1;
+  body.castShadow = true;
+  player.add(body);
+  parts.body = body;
+
+  var overlay = new THREE.Mesh(
+    new THREE.BoxGeometry(0.7, 0.7, 0.05),
+    new THREE.MeshStandardMaterial({ color: 0xffffff })
+  );
+  overlay.position.set(0, 1.15, 0.5);
+  overlay.visible = false;
+  player.add(overlay);
+  parts.bodyOverlay = overlay;
+
+  var hairGroup = new THREE.Group();
+  player.add(hairGroup);
+  parts.hairGroup = hairGroup;
+
+  var eyeMat = new THREE.MeshStandardMaterial({ color: appearance.eyeColor });
+  var eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.09, 10, 10), eyeMat);
+  eyeL.position.set(-0.18, 2.05, 0.48);
+  player.add(eyeL);
+  var eyeR = eyeL.clone();
+  eyeR.position.x = 0.18;
+  player.add(eyeR);
+  parts.eyeL = eyeL;
+  parts.eyeR = eyeR;
+
+  var pupilMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+  var pupilL = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), pupilMat);
+  pupilL.position.set(-0.18, 2.08, 0.55);
+  player.add(pupilL);
+  var pupilR = pupilL.clone();
+  pupilR.position.x = 0.18;
+  player.add(pupilR);
+  parts.pupilL = pupilL;
+  parts.pupilR = pupilR;
+
+  var smile = new THREE.Mesh(
+    new THREE.TorusGeometry(0.13, 0.025, 6, 12, Math.PI),
+    new THREE.MeshStandardMaterial({ color: 0x8b3a1f })
+  );
+  smile.position.set(0, 1.85, 0.5);
+  smile.rotation.x = Math.PI;
+  smile.rotation.z = Math.PI;
+  player.add(smile);
+  parts.smile = smile;
+
+  var freckleMat = new THREE.MeshStandardMaterial({ color: 0x8b5a2b });
+  parts.freckles = [];
+  for (var i = 0; i < 6; i++) {
+    var f = new THREE.Mesh(new THREE.SphereGeometry(0.025, 6, 6), freckleMat);
+    var side = i % 2 === 0 ? -1 : 1;
+    var idx = Math.floor(i / 2);
+    f.position.set(side * (0.15 + idx * 0.08), 1.98 + (idx % 2) * 0.03, 0.51);
+    f.visible = false;
+    player.add(f);
+    parts.freckles.push(f);
+  }
+
+  var blushMat = new THREE.MeshStandardMaterial({ color: 0xff8fa3, transparent: true, opacity: 0.7 });
+  var blushL = new THREE.Mesh(new THREE.CircleGeometry(0.09, 12), blushMat);
+  blushL.position.set(-0.3, 1.92, 0.51);
+  blushL.visible = false;
+  player.add(blushL);
+  var blushR = new THREE.Mesh(new THREE.CircleGeometry(0.09, 12), blushMat);
+  blushR.position.set(0.3, 1.92, 0.51);
+  blushR.visible = false;
+  player.add(blushR);
+  parts.blushL = blushL;
+  parts.blushR = blushR;
+
+  var armMat = new THREE.MeshStandardMaterial({ color: appearance.skinColor });
+  var armL = new THREE.Mesh(new THREE.CapsuleGeometry(0.15, 0.5, 3, 8), armMat);
+  armL.position.set(-0.65, 1.05, 0);
+  armL.castShadow = true;
+  player.add(armL);
+  var armR = armL.clone();
+  armR.position.x = 0.65;
+  player.add(armR);
+  parts.armL = armL;
+  parts.armR = armR;
+
+  var legMat = new THREE.MeshStandardMaterial({ color: appearance.outfitColor });
+  var legL = new THREE.Mesh(new THREE.CapsuleGeometry(0.17, 0.5, 3, 8), legMat);
+  legL.position.set(-0.22, 0.3, 0);
+  legL.castShadow = true;
+  player.add(legL);
+  var legR = legL.clone();
+  legR.position.x = 0.22;
+  player.add(legR);
+  parts.legL = legL;
+  parts.legR = legR;
+
+  var accGroup = new THREE.Group();
+  player.add(accGroup);
+  parts.accessoriesGroup = accGroup;
+
+  var petGroup = new THREE.Group();
+  petGroup.position.set(1.3, 0, -0.5);
+  scene.add(petGroup);
+  parts.petGroup = petGroup;
+
+  player.position.set(0, 0, 5);
+
+  function rebuildHair() {
+    while (parts.hairGroup.children.length > 0) {
+      var c = parts.hairGroup.children[0];
+      parts.hairGroup.remove(c);
+      if (c.geometry) c.geometry.dispose();
+      if (c.material) c.material.dispose();
+    }
+    var hm = new THREE.MeshStandardMaterial({ color: appearance.hairColor, roughness: 0.8 });
+    var s = appearance.hairStyle;
+    if (s === 'short') {
+      var h = new THREE.Mesh(new THREE.SphereGeometry(0.58, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.55), hm);
+      h.position.y = 2.18;
+      parts.hairGroup.add(h);
+    } else if (s === 'long') {
+      var cap = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.6), hm);
+      cap.position.y = 2.15;
+      parts.hairGroup.add(cap);
+      var back = new THREE.Mesh(new THREE.BoxGeometry(0.85, 1.0, 0.4), hm);
+      back.position.set(0, 1.55, -0.4);
+      parts.hairGroup.add(back);
+    } else if (s === 'ponytails') {
+      var cap2 = new THREE.Mesh(new THREE.SphereGeometry(0.58, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.6), hm);
+      cap2.position.y = 2.18;
+      parts.hairGroup.add(cap2);
+      var tL = new THREE.Mesh(new THREE.SphereGeometry(0.25, 10, 8), hm);
+      tL.position.set(-0.65, 2.15, -0.1);
+      parts.hairGroup.add(tL);
+      var tR = tL.clone();
+      tR.position.x = 0.65;
+      parts.hairGroup.add(tR);
+    } else if (s === 'curly') {
+      var cap3 = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.65), hm);
+      cap3.position.y = 2.18;
+      parts.hairGroup.add(cap3);
+      for (var i = 0; i < 8; i++) {
+        var a = (i / 8) * Math.PI * 2;
+        var c = new THREE.Mesh(new THREE.SphereGeometry(0.16, 8, 6), hm);
+        c.position.set(Math.cos(a) * 0.55, 2.15, Math.sin(a) * 0.55);
+        parts.hairGroup.add(c);
+      }
+    }
+  }
+  function rebuildAccessories() {
+    while (parts.accessoriesGroup.children.length > 0) {
+      var c = parts.accessoriesGroup.children[0];
+      parts.accessoriesGroup.remove(c);
+      if (c.geometry) c.geometry.dispose();
+      if (c.material) c.material.dispose();
+    }
+    var a = appearance.accessory;
+    if (a === 'cap' || a === 'all') {
+      var cm = new THREE.MeshStandardMaterial({ color: 0xff6b6b });
+      var cap = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 8, 0, Math.PI * 2, 0, Math.PI * 0.5), cm);
+      cap.position.y = 2.35;
+      parts.accessoriesGroup.add(cap);
+      var v = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.08, 0.5), cm);
+      v.position.set(0, 2.32, 0.45);
+      parts.accessoriesGroup.add(v);
+    }
+    if (a === 'glasses' || a === 'all') {
+      var fm = new THREE.MeshStandardMaterial({ color: 0x222222 });
+      var lm = new THREE.MeshStandardMaterial({ color: 0x88ccff, transparent: true, opacity: 0.5 });
+      [-0.18, 0.18].forEach(function(x) {
+        var l = new THREE.Mesh(new THREE.CircleGeometry(0.14, 16), lm);
+        l.position.set(x, 2.05, 0.57);
+        parts.accessoriesGroup.add(l);
+        var r = new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.02, 6, 16), fm);
+        r.position.set(x, 2.05, 0.58);
+        parts.accessoriesGroup.add(r);
+      });
+    }
+    if (a === 'backpack' || a === 'all') {
+      var pm = new THREE.MeshStandardMaterial({ color: 0x8b5a2b });
+      var pack = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.8, 0.35), pm);
+      pack.position.set(0, 1.1, -0.6);
+      parts.accessoriesGroup.add(pack);
+    }
+  }
+  function rebuildPet() {
+    while (parts.petGroup.children.length > 0) {
+      var c = parts.petGroup.children[0];
+      parts.petGroup.remove(c);
+      if (c.geometry) c.geometry.dispose();
+      if (c.material) c.material.dispose();
+    }
+    var p = appearance.pet;
+    if (p === 'cat') {
+      var m = new THREE.MeshStandardMaterial({ color: 0xffa94d });
+      var b = new THREE.Mesh(new THREE.SphereGeometry(0.3, 12, 10), m);
+      b.position.y = 0.35;
+      b.castShadow = true;
+      parts.petGroup.add(b);
+      var h = new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 10), m);
+      h.position.set(0, 0.6, 0.15);
+      parts.petGroup.add(h);
+    } else if (p === 'dog') {
+      var m2 = new THREE.MeshStandardMaterial({ color: 0x8b5a2b });
+      var b2 = new THREE.Mesh(new THREE.SphereGeometry(0.32, 12, 10), m2);
+      b2.position.y = 0.35;
+      b2.castShadow = true;
+      parts.petGroup.add(b2);
+      var h2 = new THREE.Mesh(new THREE.SphereGeometry(0.24, 12, 10), m2);
+      h2.position.set(0, 0.62, 0.18);
+      parts.petGroup.add(h2);
+    } else if (p === 'bird') {
+      var m3 = new THREE.MeshStandardMaterial({ color: 0x4ecdc4 });
+      var b3 = new THREE.Mesh(new THREE.SphereGeometry(0.25, 12, 10), m3);
+      b3.position.y = 0.4;
+      b3.castShadow = true;
+      parts.petGroup.add(b3);
+      var h3 = new THREE.Mesh(new THREE.SphereGeometry(0.18, 12, 10), m3);
+      h3.position.set(0, 0.6, 0.1);
+      parts.petGroup.add(h3);
+    }
+  }
+  function applyAppearance() {
+    parts.head.material.color.setHex(appearance.skinColor);
+    parts.neck.material.color.setHex(appearance.skinColor);
+    parts.armL.material.color.setHex(appearance.skinColor);
+    parts.armR.material.color.setHex(appearance.skinColor);
+    rebuildHair();
+    parts.eyeL.material.color.setHex(appearance.eyeColor);
+    parts.eyeR.material.color.setHex(appearance.eyeColor);
+    var es = appearance.eyeStyle;
+    parts.eyeL.scale.set(1, 1, 1);
+    parts.eyeR.scale.set(1, 1, 1);
+    parts.pupilL.visible = true;
+    parts.pupilR.visible = true;
+    if (es === 'happy') {
+      parts.eyeL.scale.set(1, 0.5, 1);
+      parts.eyeR.scale.set(1, 0.5, 1);
+      parts.pupilL.visible = false;
+      parts.pupilR.visible = false;
+    } else if (es === 'sparkle') {
+      parts.eyeL.scale.set(1.2, 1.2, 1.2);
+      parts.eyeR.scale.set(1.2, 1.2, 1.2);
+    } else if (es === 'sleepy') {
+      parts.eyeL.scale.set(1, 0.25, 1);
+      parts.eyeR.scale.set(1, 0.25, 1);
+      parts.pupilL.visible = false;
+      parts.pupilR.visible = false;
+    }
+    var face = appearance.face;
+    parts.smile.visible = (face === 'smile' || face === 'all' || face === 'freckles' || face === 'blush');
+    parts.freckles.forEach(function(f) { f.visible = (face === 'freckles' || face === 'all'); });
+    parts.blushL.visible = (face === 'blush' || face === 'all');
+    parts.blushR.visible = (face === 'blush' || face === 'all');
+    var oc = appearance.outfitColor;
+    if (oc === '0xrainbow') {
+      parts.body.material.color.setHex(0xff6b6b);
+      parts.legL.material.color.setHex(0x845ef7);
+      parts.legR.material.color.setHex(0x51cf66);
+    } else {
+      var numColor = parseInt(oc, 10);
+      if (isNaN(numColor)) numColor = 0x3d5a99;
+      parts.body.material.color.setHex(numColor);
+      parts.legL.material.color.setHex(numColor);
+      parts.legR.material.color.setHex(numColor);
+    }
+    var outfit = appearance.outfitStyle;
+    if (outfit === 'uniform') {
+      parts.bodyOverlay.visible = true;
+      parts.bodyOverlay.material.color.setHex(0xffffff);
+    } else if (outfit === 'overalls') {
+      parts.bodyOverlay.visible = true;
+      parts.bodyOverlay.material.color.setHex(0x3d5a99);
+    } else {
+      parts.bodyOverlay.visible = false;
+    }
+    rebuildAccessories();
+    rebuildPet();
+    saveAll();
+  }
+  applyAppearance();
+  log('8. Personaje OK');
+
+  // ================================================================
+  // ESTADO Y CONTROLES
+  // ================================================================
+  var state = {
+    x: 0, z: 5, speed: 9,
+    keys: {}, nearHouse: null, nearNPC: null, nearBoss: false,
+    walkCycle: 0, stepTimer: 0, celebrating: 0, customizing: false,
+    timeOfDay: 0.35, daySpeed: 0.008, questionStartTime: 0
+  };
+
+  var modalOpen = false;
+  var currentTopic = null;
+  var answeredCorrectly = false;
+  var bossModalOpen = false;
+  var bossIndex = 0;
+  var bossResults = [];
+
+  window.addEventListener('keydown', function(e) {
+    if (modalOpen) {
+      if (e.key === 'Enter') { e.preventDefault(); checkAnswer(); }
+      if (e.key === 'Escape') closeModal();
+      return;
+    }
+    if (bossModalOpen) {
+      if (e.key === 'Enter') { e.preventDefault(); bossAttack(); }
+      if (e.key === 'Escape') closeBossModal();
+      return;
+    }
+    if (state.customizing) {
+      if (e.key === 'Escape') closeCustomize();
+      return;
+    }
+    var k = e.key.toLowerCase();
+    if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' ', 'w', 'a', 's', 'd', 'q', 'e'].indexOf(k) !== -1) {
+      e.preventDefault();
+    }
+    state.keys[k] = true;
+    if (k === ' ' || k === 'e') tryOpenNearbyHouse();
+    if (k === 'q') tryTalkToNPC();
+  });
+  window.addEventListener('keyup', function(e) {
+    state.keys[e.key.toLowerCase()] = false;
+  });
+
+  function bindTouch(id, key) {
+    var el = document.getElementById(id);
+    el.addEventListener('touchstart', function(e) { e.preventDefault(); state.keys[key] = true; }, { passive: false });
+    el.addEventListener('touchend', function(e) { e.preventDefault(); state.keys[key] = false; });
+    el.addEventListener('touchcancel', function(e) { e.preventDefault(); state.keys[key] = false; });
+    el.addEventListener('mousedown', function(e) { e.preventDefault(); state.keys[key] = true; });
+    el.addEventListener('mouseup', function(e) { e.preventDefault(); state.keys[key] = false; });
+    el.addEventListener('mouseleave', function(e) { e.preventDefault(); state.keys[key] = false; });
+  }
+  bindTouch('t-up', 'arrowup');
+  bindTouch('t-down', 'arrowdown');
+  bindTouch('t-left', 'arrowleft');
+  bindTouch('t-right', 'arrowright');
+
+  document.getElementById('btn-enter').addEventListener('click', tryOpenNearbyHouse);
+  document.getElementById('btn-talk').addEventListener('click', tryTalkToNPC);
+  document.getElementById('btn-boss').addEventListener('click', openBossModal);
+  document.getElementById('reset-btn').addEventListener('click', function() {
+    if (!confirm('Borrar todo el progreso?')) return;
+    localStorage.clear();
+    location.reload();
+  });
+  document.body.addEventListener('click', function() {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }, { once: true });
+  window.addEventListener('resize', function() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  // MODALES
+  var modalEl = document.getElementById('modal');
+  var starCounterEl = document.getElementById('star-counter');
+
+  function openModal(topic) {
+    if (modalOpen) return;
+    modalOpen = true;
+    currentTopic = topic;
+    answeredCorrectly = false;
+    state.questionStartTime = performance.now();
+    document.getElementById('modal-title').textContent = topic.name;
+    document.getElementById('question-text').textContent = topic.question;
+    var ai = document.getElementById('answer-input');
+    ai.value = '';
+    ai.disabled = false;
+    ai.focus();
+    document.getElementById('feedback').textContent = '';
+    document.getElementById('feedback').className = 'feedback';
+    document.getElementById('stars-earned').textContent = '';
+    document.getElementById('check-btn').disabled = false;
+    modalEl.classList.add('show');
+    Sounds.open();
+  }
+  function closeModal() {
+    modalEl.classList.remove('show');
+    modalOpen = false;
+    currentTopic = null;
+  }
+  function checkAnswer() {
+    if (!currentTopic || answeredCorrectly) return;
+    var user = document.getElementById('answer-input').value.trim().replace(/\s/g, '').toLowerCase().replace(',', '.');
+    var correct = currentTopic.answer.trim().replace(/\s/g, '').toLowerCase().replace(',', '.');
+    var isCorrect = false;
+    var uN = parseFloat(user);
+    var cN = parseFloat(correct);
+    if (!isNaN(uN) && !isNaN(cN)) {
+      isCorrect = Math.abs(uN - cN) < 0.001;
+    } else {
+      isCorrect = user === correct;
+    }
+    if (!isCorrect && correct.indexOf('/') !== -1) {
+      var parts1 = correct.split('/');
+      var n = parseFloat(parts1[0]);
+      var d = parseFloat(parts1[1]);
+      if (!isNaN(n) && !isNaN(d) && d !== 0 && !isNaN(uN)) {
+        isCorrect = Math.abs(uN - n / d) < 0.001;
+      }
+    }
+    if (!isCorrect && user.indexOf('/') !== -1) {
+      var parts2 = user.split('/');
+      var n2 = parseFloat(parts2[0]);
+      var d2 = parseFloat(parts2[1]);
+      if (!isNaN(n2) && !isNaN(d2) && d2 !== 0 && !isNaN(cN)) {
+        isCorrect = Math.abs(n2 / d2 - cN) < 0.001;
+      }
+    }
+
+    var fb = document.getElementById('feedback');
+    var se = document.getElementById('stars-earned');
+
+    if (isCorrect) {
+      var el = (performance.now() - state.questionStartTime) / 1000;
+      if (el < 5) {
+        var a = achievements.find(function(x) { return x.id === 'fast_math'; });
+        if (a && !a.unlocked) {
+          a.unlocked = true;
+          showAchievementToast(a);
+          Sounds.achievement();
+          saveAll();
+        }
+      }
+      fb.textContent = 'Correcto!';
+      fb.className = 'feedback success';
+      trackDaily('answersToday');
+      if (currentTopic.stars < currentTopic.maxStars) {
+        var wasComplete = currentTopic.stars === currentTopic.maxStars - 1;
+        currentTopic.stars++;
+        totalStars = topics.reduce(function(a, t) { return a + t.stars; }, 0);
+        starCounterEl.textContent = totalStars;
+        trackDaily('starsToday');
+        if (wasComplete) trackDaily('themesCompletedToday');
+        saveAll();
+        answeredCorrectly = true;
+        document.getElementById('check-btn').disabled = true;
+        document.getElementById('answer-input').disabled = true;
+        state.celebrating = 2.5;
+        if (currentTopic.stars === currentTopic.maxStars) {
+          se.textContent = 'Nivel completado!';
+          var h = houses.find(function(x) { return x.topic.id === currentTopic.id; });
+          if (h) h.roofMat.color.setHex(0xffd700);
+          Sounds.complete();
+        } else {
+          se.textContent = '+1 estrella (' + currentTopic.stars + '/' + currentTopic.maxStars + ')';
+          Sounds.correct();
+        }
+        checkAchievements();
+        updateMissions();
+      } else {
+        se.textContent = 'Nivel ya completado!';
+      }
+    } else {
+      fb.textContent = 'Intentalo de nuevo';
+      fb.className = 'feedback error';
+      Sounds.wrong();
+    }
+  }
+  document.getElementById('check-btn').addEventListener('click', checkAnswer);
+  document.getElementById('close-btn').addEventListener('click', closeModal);
+  document.getElementById('answer-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); checkAnswer(); }
+  });
+  modalEl.addEventListener('click', function(e) {
+    if (e.target === modalEl) closeModal();
+  });
+
+  // JEFE
+  var bossQuestions = [
+    { q: '7 x 8?', a: '56' },
+    { q: '144 / 12?', a: '12' },
+    { q: 'MCM de 4 y 6', a: '12' },
+    { q: '3/4 + 1/4 (ej: 1)', a: '1' },
+    { q: '25% de 80', a: '20' },
+    { q: '2^3 + 3^2', a: '17' },
+    { q: '(-8) + 5', a: '-3' },
+    { q: '4x=32, x?', a: '8' },
+    { q: 'cm en 0,75 m', a: '75' },
+    { q: 'Media de 5, 10, 15', a: '10' }
+  ];
+  function isBossUnlocked() { return totalStars >= 40; }
+  function openBossModal() {
+    if (!isBossUnlocked()) { alert('Necesitas 40 estrellas para el jefe.'); return; }
+    if (!state.nearBoss) { alert('Acercate a la cueva del jefe.'); return; }
+    bossModalOpen = true;
+    bossIndex = 0;
+    bossResults = [];
+    renderBossQuestion();
+    document.getElementById('boss-modal').classList.add('show');
+    Sounds.bossRoar();
+  }
+  function closeBossModal() {
+    document.getElementById('boss-modal').classList.remove('show');
+    bossModalOpen = false;
+  }
+  function renderBossQuestion() {
+    if (bossIndex >= bossQuestions.length) { finishBoss(true); return; }
+    var q = bossQuestions[bossIndex];
+    document.getElementById('boss-question').textContent = q.q;
+    var ai = document.getElementById('boss-answer-input');
+    ai.value = '';
+    ai.focus();
+    document.getElementById('boss-feedback').textContent = '';
+    document.getElementById('boss-feedback').className = 'feedback';
+    var hp = ((bossQuestions.length - bossIndex) / bossQuestions.length) * 100;
+    document.getElementById('boss-hp-fill').style.width = hp + '%';
+    document.getElementById('boss-hp-text').textContent = (bossQuestions.length - bossIndex) + ' / ' + bossQuestions.length;
+    var pe = document.getElementById('boss-progress');
+    pe.innerHTML = '';
+    bossResults.forEach(function(r, i) {
+      var d = document.createElement('div');
+      d.className = 'punto ' + (r ? 'correct' : 'wrong');
+      d.textContent = i + 1;
+      pe.appendChild(d);
+    });
+    var cur = document.createElement('div');
+    cur.className = 'punto current';
+    cur.textContent = bossIndex + 1;
+    pe.appendChild(cur);
+  }
+  function bossAttack() {
+    if (!bossModalOpen) return;
+    var q = bossQuestions[bossIndex];
+    var user = document.getElementById('boss-answer-input').value.trim().replace(/\s/g, '').replace(',', '.').toLowerCase();
+    var correct = q.a.replace(/\s/g, '').replace(',', '.').toLowerCase();
+    var isCorrect = false;
+    var uN = parseFloat(user);
+    var cN = parseFloat(correct);
+    if (!isNaN(uN) && !isNaN(cN)) {
+      isCorrect = Math.abs(uN - cN) < 0.001;
+    } else {
+      isCorrect = user === correct;
+    }
+    bossResults.push(isCorrect);
+    if (isCorrect) {
+      document.getElementById('boss-feedback').textContent = 'Golpe!';
+      document.getElementById('boss-feedback').className = 'feedback success';
+      Sounds.bossHit();
+      bossIndex++;
+      setTimeout(function() {
+        if (bossIndex >= bossQuestions.length) finishBoss(true);
+        else renderBossQuestion();
+      }, 700);
+    } else {
+      document.getElementById('boss-feedback').textContent = 'Fallaste! Era ' + q.a;
+      document.getElementById('boss-feedback').className = 'feedback error';
+      Sounds.wrong();
+      setTimeout(function() { finishBoss(false); }, 1500);
+    }
+  }
+  function finishBoss(win) {
+    bossModalOpen = false;
+    document.getElementById('boss-modal').classList.remove('show');
+    if (win) {
+      Sounds.bossWin();
+      totalStars += 5;
+      starCounterEl.textContent = totalStars;
+      var a = achievements.find(function(x) { return x.id === 'boss_slayer'; });
+      if (a && !a.unlocked) {
+        a.unlocked = true;
+        showAchievementToast(a);
+        Sounds.achievement();
+      }
+      saveAll();
+      checkAchievements();
+      alert('Has derrotado al jefe! +5 estrellas');
+    } else {
+      alert('El jefe te vencio. Intentalo otra vez!');
+    }
+  }
+  document.getElementById('boss-check-btn').addEventListener('click', bossAttack);
+  document.getElementById('boss-close-btn').addEventListener('click', closeBossModal);
+  document.getElementById('boss-answer-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); bossAttack(); }
+  });
+  document.getElementById('boss-modal').addEventListener('click', function(e) {
+    if (e.target === document.getElementById('boss-modal')) closeBossModal();
+  });
+
+  // INTERACCION
+  function tryOpenNearbyHouse() {
+    if (modalOpen || state.customizing || bossModalOpen) return;
+    if (!state.nearHouse) return;
+    if (!isZoneUnlocked(state.nearHouse.zone)) {
+      alert(ZONES[state.nearHouse.zone].name + ' se desbloquea con ' + ZONES[state.nearHouse.zone].unlockStars + ' estrellas');
+      return;
+    }
+    openModal(state.nearHouse.topic);
+  }
+  function tryTalkToNPC() {
+    if (modalOpen || state.customizing || bossModalOpen) return;
+    if (!state.nearNPC) return;
+    var npc = state.nearNPC;
+    var nt = getNearestTopicToNPC(npc);
+    var hints = nt ? nt.hints : npc.hints;
+    var hint = hints[npc.hintIndex % hints.length];
+    npc.hintIndex++;
+    document.getElementById('npc-name').textContent = npc.name;
+    document.getElementById('npc-text').textContent = hint;
+    document.getElementById('npc-dialog').style.display = 'block';
+    trackDailyNPC(npc.name);
+    Sounds.talk();
+  }
+  document.getElementById('npc-close').addEventListener('click', function() {
+    document.getElementById('npc-dialog').style.display = 'none';
+  });
+  window.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') document.getElementById('npc-dialog').style.display = 'none';
+  });
+
+  // VESTIDOR
+  var skinColors = [0xffe0b2, 0xf1c27d, 0xd9a066, 0xa86a3d, 0x6b4226, 0xffdab9];
+  var hairColors = [0x4a2c17, 0x1a1a1a, 0x8b5a2b, 0xd4a373, 0xffd93d, 0xff6b6b, 0x9b59b6, 0x3498db];
+  var eyeColors = [0x222222, 0x4a2c17, 0x2e86de, 0x10ac84, 0x8e44ad, 0x6b4226, 0x576574];
+  var outfitColors = [0x3d5a99, 0xff6b6b, 0x4ecdc4, 0xffa94d, 0x845ef7, 0x51cf66, 0xf06595, 0xffd93d, 0xffffff, 0x2c2c2c, 0xffd700, 0xrainbow];
+
+  function buildOptions() {
+    var so = document.getElementById('skin-options');
+    so.innerHTML = '';
+    skinColors.forEach(function(c) {
+      var b = document.createElement('button');
+      b.className = 'color-swatch' + (appearance.skinColor === c ? ' selected' : '');
+      b.style.background = '#' + c.toString(16).padStart(6, '0');
+      b.onclick = function() { appearance.skinColor = c; applyAppearance(); buildOptions(); Sounds.change(); };
+      so.appendChild(b);
+    });
+    var hso = document.getElementById('hair-style-options');
+    hso.innerHTML = '';
+    [['short', 'Corto'], ['long', 'Largo'], ['ponytails', 'Coletas'], ['curly', 'Rizado']].forEach(function(pair) {
+      var b = document.createElement('button');
+      b.className = (appearance.hairStyle === pair[0] ? 'selected' : '');
+      b.textContent = pair[1];
+      b.onclick = function() { appearance.hairStyle = pair[0]; applyAppearance(); buildOptions(); Sounds.change(); };
+      hso.appendChild(b);
+    });
+    var hco = document.getElementById('hair-color-options');
+    hco.innerHTML = '';
+    hairColors.forEach(function(c) {
+      var b = document.createElement('button');
+      b.className = 'color-swatch' + (appearance.hairColor === c ? ' selected' : '');
+      b.style.background = '#' + c.toString(16).padStart(6, '0');
+      b.onclick = function() { appearance.hairColor = c; applyAppearance(); buildOptions(); Sounds.change(); };
+      hco.appendChild(b);
+    });
+    var eso = document.getElementById('eye-style-options');
+    eso.innerHTML = '';
+    [['round', 'Redondos'], ['happy', 'Felices'], ['sparkle', 'Brillantes'], ['sleepy', 'Dormilones']].forEach(function(pair) {
+      var b = document.createElement('button');
+      b.className = (appearance.eyeStyle === pair[0] ? 'selected' : '');
+      b.textContent = pair[1];
+      b.onclick = function() { appearance.eyeStyle = pair[0]; applyAppearance(); buildOptions(); Sounds.change(); };
+      eso.appendChild(b);
+    });
+    var eco = document.getElementById('eye-color-options');
+    eco.innerHTML = '';
+    eyeColors.forEach(function(c) {
+      var b = document.createElement('button');
+      b.className = 'color-swatch' + (appearance.eyeColor === c ? ' selected' : '');
+      b.style.background = '#' + c.toString(16).padStart(6, '0');
+      b.onclick = function() { appearance.eyeColor = c; applyAppearance(); buildOptions(); Sounds.change(); };
+      eco.appendChild(b);
+    });
+    var fo = document.getElementById('face-options');
+    fo.innerHTML = '';
+    [['smile', 'Sonrisa'], ['freckles', 'Pecas'], ['blush', 'Mofletes'], ['all', 'Todo']].forEach(function(pair) {
+      var b = document.createElement('button');
+      b.className = (appearance.face === pair[0] ? 'selected' : '');
+      b.textContent = pair[1];
+      b.onclick = function() { appearance.face = pair[0]; applyAppearance(); buildOptions(); Sounds.change(); };
+      fo.appendChild(b);
+    });
+    var oso = document.getElementById('outfit-style-options');
+    oso.innerHTML = '';
+    [['dress', 'Vestido'], ['tshirt', 'Camiseta'], ['uniform', 'Uniforme'], ['overalls', 'Peto']].forEach(function(pair) {
+      var unlocked = isUnlocked('outfits', pair[0]);
+      var b = document.createElement('button');
+      b.className = (appearance.outfitStyle === pair[0] ? 'selected' : '') + (unlocked ? '' : ' locked');
+      b.textContent = pair[1] + (unlocked ? '' : ' (' + UNLOCKS.outfits[pair[0]] + ' estrellas)');
+      b.onclick = function() { if (!unlocked) return; appearance.outfitStyle = pair[0]; applyAppearance(); buildOptions(); Sounds.change(); };
+      oso.appendChild(b);
+    });
+    var oco = document.getElementById('outfit-color-options');
+    oco.innerHTML = '';
+    outfitColors.forEach(function(c) {
+      var key = String(c);
+      var unlocked = c === '0xrainbow' ? totalStars >= UNLOCKS.outfitColors['0xrainbow'] : isUnlocked('outfitColors', key);
+      var b = document.createElement('button');
+      var cls = 'color-swatch';
+      if (String(appearance.outfitColor) === key) cls += ' selected';
+      if (!unlocked) cls += ' locked';
+      if (key === '0xffd700') cls += ' golden';
+      if (key === '0xrainbow') cls += ' rainbow';
+      b.className = cls;
+      if (key !== '0xffd700' && key !== '0xrainbow') {
+        b.style.background = '#' + c.toString(16).padStart(6, '0');
+      }
+      b.onclick = function() { if (!unlocked) return; appearance.outfitColor = key; applyAppearance(); buildOptions(); Sounds.change(); };
+      oco.appendChild(b);
+    });
+    document.getElementById('outfit-lock-info').textContent = totalStars + ' estrellas';
+    var ao = document.getElementById('accessory-options');
+    ao.innerHTML = '';
+    [['none', 'Ninguno'], ['cap', 'Gorra'], ['glasses', 'Gafas'], ['backpack', 'Mochila'], ['all', 'Todo']].forEach(function(pair) {
+      var unlocked = isUnlocked('accessories', pair[0]);
+      var b = document.createElement('button');
+      b.className = (appearance.accessory === pair[0] ? 'selected' : '') + (unlocked ? '' : ' locked');
+      b.textContent = pair[1] + (unlocked ? '' : ' (' + UNLOCKS.accessories[pair[0]] + ' estrellas)');
+      b.onclick = function() { if (!unlocked) return; appearance.accessory = pair[0]; applyAppearance(); buildOptions(); Sounds.change(); };
+      ao.appendChild(b);
+    });
+    var po = document.getElementById('pet-options');
+    po.innerHTML = '';
+    [['none', 'Ninguna'], ['cat', 'Gato'], ['dog', 'Perro'], ['bird', 'Pajaro']].forEach(function(pair) {
+      var unlocked = isUnlocked('pets', pair[0]);
+      var b = document.createElement('button');
+      b.className = (appearance.pet === pair[0] ? 'selected' : '') + (unlocked ? '' : ' locked');
+      b.textContent = pair[1] + (unlocked ? '' : ' (' + UNLOCKS.pets[pair[0]] + ' estrellas)');
+      b.onclick = function() { if (!unlocked) return; appearance.pet = pair[0]; applyAppearance(); buildOptions(); Sounds.change(); };
+      po.appendChild(b);
+    });
+  }
+  function openCustomize() {
+    state.customizing = true;
+    state.keys = {};
+    buildOptions();
+    document.getElementById('customize-modal').classList.add('show');
+  }
+  function closeCustomize() {
+    state.customizing = false;
+    document.getElementById('customize-modal').classList.remove('show');
+    saveAll();
+  }
+  document.getElementById('customize-btn').addEventListener('click', openCustomize);
+  document.getElementById('customize-close').addEventListener('click', closeCustomize);
+  document.getElementById('customize-modal').addEventListener('click', function(e) {
+    if (e.target === document.getElementById('customize-modal')) closeCustomize();
+  });
+
+  // LOGROS MODAL
+  document.getElementById('achievements-btn').addEventListener('click', function() {
+    var list = document.getElementById('achievements-list');
+    list.innerHTML = '';
+    achievements.forEach(function(a) {
+      var d = document.createElement('div');
+      d.className = 'ach-item ' + (a.unlocked ? 'unlocked' : 'locked');
+      d.innerHTML = '<div class="ach-icon">' + a.icon + '</div>' +
+        '<div class="ach-info"><div class="ach-name">' + a.name + (a.unlocked ? ' OK' : ' - bloqueado') + '</div>' +
+        '<div class="ach-desc">' + a.desc + '</div></div>';
+      list.appendChild(d);
+    });
+    document.getElementById('achievements-modal').classList.add('show');
+  });
+  document.getElementById('achievements-close').addEventListener('click', function() {
+    document.getElementById('achievements-modal').classList.remove('show');
+  });
+  document.getElementById('achievements-modal').addEventListener('click', function(e) {
+    if (e.target === document.getElementById('achievements-modal')) document.getElementById('achievements-modal').classList.remove('show');
+  });
+
+  // MISIONES MODAL
+  document.getElementById('missions-btn').addEventListener('click', function() {
+    renderMissions();
+    document.getElementById('missions-modal').classList.add('show');
+  });
+  document.getElementById('missions-close').addEventListener('click', function() {
+    document.getElementById('missions-modal').classList.remove('show');
+  });
+  document.getElementById('missions-modal').addEventListener('click', function(e) {
+    if (e.target === document.getElementById('missions-modal')) document.getElementById('missions-modal').classList.remove('show');
+  });
+
+  // FOTO
+  document.getElementById('photo-btn').addEventListener('click', function() {
+    if (modalOpen || state.customizing || bossModalOpen) return;
+    Sounds.photo();
+    var flash = document.getElementById('photo-flash');
+    flash.style.opacity = '0.85';
+    var ids = ['hud', 'top-buttons', 'touch-controls', 'action-buttons', 'hint'];
+    var els = ids.map(function(id) { return document.getElementById(id); });
+    var vis = els.map(function(e) { return e.style.visibility; });
+    els.forEach(function(e) { e.style.visibility = 'hidden'; });
+    setTimeout(function() {
+      renderer.render(scene, camera);
+      var dataURL = renderer.domElement.toDataURL('image/png');
+      var link = document.createElement('a');
+      var ts = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+      link.download = 'expedicion-matematica-' + ts + '.png';
+      link.href = dataURL;
+      link.click();
+      flash.style.opacity = '0';
+      var toast = document.getElementById('photo-toast');
+      toast.classList.add('show');
+      setTimeout(function() { toast.classList.remove('show'); }, 3000);
+      els.forEach(function(e, i) { e.style.visibility = vis[i]; });
+    }, 200);
+  });
+
+  // MUSICA
+  var musicBtn = document.getElementById('music-btn');
+  function updateMusicButton() {
+    musicBtn.textContent = Music.playing ? 'Musica: ON' : 'Musica: OFF';
+    musicBtn.className = Music.playing ? 'music-on' : 'music-off';
+  }
+  musicBtn.addEventListener('click', function() {
+    if (Music.playing) Music.stop();
+    else Music.start();
+    updateMusicButton();
+  });
+  updateMusicButton();
+
+  // DIA/NOCHE
+  function updateDayNight(dt) {
+    state.timeOfDay = (state.timeOfDay + state.daySpeed * dt) % 1;
+    var t = state.timeOfDay;
+    var sa = (t - 0.25) * Math.PI * 2;
+    sun.position.set(Math.cos(sa) * 50, Math.sin(sa) * 60 + 5, Math.sin(sa) * 25);
+    var df = Math.max(0, Math.sin((t - 0.25) * Math.PI * 2) * 0.5 + 0.5);
+    sun.intensity = Math.max(0, df * 1.5 - 0.1);
+    hemi.intensity = 0.15 + df * 0.75;
+    var sky = new THREE.Color().lerpColors(NIGHT_BG, DAY_BG, df);
+    scene.background.copy(sky);
+    scene.fog.color.copy(sky);
+    var lampOn = Math.max(0, 1 - df * 3);
+    lampposts.forEach(function(lp) {
+      lp.light.intensity = lampOn * 12;
+      lp.lampMat.emissiveIntensity = lampOn * 1.2;
+    });
+  }
+
+  // CAMARA INICIAL
+  camera.position.set(0, 6, 15);
+  camera.lookAt(0, 1.5, 5);
+
+  // LOOP
+  var clock = new THREE.Clock();
+  var camOffset = new THREE.Vector3(0, 4.5, -8);
+  var camLookAtOffset = new THREE.Vector3(0, 1.5, 0);
+  var tempCamPos = new THREE.Vector3();
+  var tempLookAt = new THREE.Vector3();
+  var frames = 0;
+
+  function animate() {
+    requestAnimationFrame(animate);
+    var dt = Math.min(clock.getDelta(), 0.1);
+    var el = clock.elapsedTime;
+
+    updateDayNight(dt);
+    waterBall.position.y = 2.2 + Math.sin(el * 3) * 0.15;
+
+    if (state.customizing) {
+      player.rotation.y += dt * 1.2;
+      tempCamPos.set(state.x, 2.5, state.z).add(new THREE.Vector3(0, 1.5, 6));
+      camera.position.lerp(tempCamPos, 5 * dt);
+      tempLookAt.set(state.x, 1.5, state.z);
+      camera.lookAt(tempLookAt);
+      parts.legL.rotation.x *= 0.9;
+      parts.legR.rotation.x *= 0.9;
+      parts.armL.rotation.x *= 0.9;
+      parts.armR.rotation.x *= 0.9;
+      renderer.render(scene, camera);
+      return;
+    }
+
+    var mx = 0;
+    var mz = 0;
+    if (state.keys['arrowup'] || state.keys['w']) mz -= 1;
+    if (state.keys['arrowdown'] || state.keys['s']) mz += 1;
+    if (state.keys['arrowleft'] || state.keys['a']) mx -= 1;
+    if (state.keys['arrowright'] || state.keys['d']) mx += 1;
+
+    if (state.celebrating > 0) {
+      state.celebrating -= dt;
+      player.rotation.y += dt * 8;
+      parts.armL.rotation.x = Math.sin(el * 20) * 1.2;
+      parts.armR.rotation.x = -Math.sin(el * 20) * 1.2;
+      parts.legL.rotation.x = Math.sin(el * 20) * 0.6;
+      parts.legR.rotation.x = -Math.sin(el * 20) * 0.6;
+      player.position.y = Math.max(0, Math.sin(el * 12) * 0.15);
+    } else if (mx !== 0 || mz !== 0) {
+      var len = Math.hypot(mx, mz);
+      mx /= len;
+      mz /= len;
+      state.x += mx * state.speed * dt;
+      state.z += mz * state.speed * dt;
+      var ta = Math.atan2(mx, mz);
+      var d = ta - player.rotation.y;
+      while (d > Math.PI) d -= Math.PI * 2;
+      while (d < -Math.PI) d += Math.PI * 2;
+      player.rotation.y += d * 10 * dt;
+      state.walkCycle += dt * 12;
+      parts.legL.rotation.x = Math.sin(state.walkCycle) * 0.5;
+      parts.legR.rotation.x = -Math.sin(state.walkCycle) * 0.5;
+      parts.armL.rotation.x = -Math.sin(state.walkCycle) * 0.5;
+      parts.armR.rotation.x = Math.sin(state.walkCycle) * 0.5;
+      state.stepTimer += dt;
+      if (state.stepTimer > 0.35) { state.stepTimer = 0; Sounds.step(); }
+      player.position.y = 0;
+    } else {
+      parts.legL.rotation.x *= 0.85;
+      parts.legR.rotation.x *= 0.85;
+      parts.armL.rotation.x *= 0.85;
+      parts.armR.rotation.x *= 0.85;
+      state.stepTimer = 0.35;
+      player.position.y = 0;
+    }
+
+    state.x = Math.max(-50, Math.min(90, state.x));
+    state.z = Math.max(-90, Math.min(50, state.z));
+    player.position.x = state.x;
+    player.position.z = state.z;
+
+    var petTarget = new THREE.Vector3(state.x + 1.3, 0, state.z - 0.8);
+    parts.petGroup.position.lerp(petTarget, 3 * dt);
+    parts.petGroup.lookAt(state.x, 0, state.z);
+
+    var nh = null;
+    var mh = 5;
+    houses.forEach(function(h) {
+      var d = Math.hypot(state.x - h.x, state.z - h.z);
+      if (d < mh) { mh = d; nh = h; }
+    });
+    state.nearHouse = nh;
+
+    var nn = null;
+    var mn = 3.5;
+    npcs.forEach(function(n) {
+      var d = Math.hypot(state.x - n.x, state.z - n.z);
+      if (d < mn) { mn = d; nn = n; }
+    });
+    state.nearNPC = nn;
+
+    state.nearBoss = Math.hypot(state.x - bossPos.x, state.z - bossPos.z) < 7;
+
+    document.getElementById('btn-enter').disabled = !nh;
+    document.getElementById('btn-talk').disabled = !nn;
+    document.getElementById('btn-boss').disabled = !state.nearBoss || !isBossUnlocked();
+
+    var hintEl = document.getElementById('hint');
+    if (state.nearBoss) {
+      hintEl.innerHTML = isBossUnlocked() ? 'Cueva del Jefe! Pulsa DESAFIAR' : 'Cueva: 40 estrellas (tienes ' + totalStars + ')';
+      hintEl.style.opacity = '1';
+    } else if (nh) {
+      var z = ZONES[nh.zone];
+      hintEl.innerHTML = isZoneUnlocked(nh.zone)
+        ? nh.topic.name + ' - ESPACIO'
+        : z.name + ': ' + z.unlockStars + ' estrellas';
+      hintEl.style.opacity = '1';
+    } else if (nn) {
+      hintEl.innerHTML = nn.name + ' - Pulsa Q';
+      hintEl.style.opacity = '1';
+    } else {
+      hintEl.innerHTML = 'WASD/flechas - Bosque: 10 - Montana: 30';
+      hintEl.style.opacity = '0.9';
+    }
+
+    if (state.celebrating <= 0) {
+      var a = player.rotation.y;
+      var ro = camOffset.clone().applyAxisAngle(new THREE.Vector3(0, 1, 0), a);
+      tempCamPos.set(state.x, 0, state.z).add(ro);
+      camera.position.lerp(tempCamPos, 5 * dt);
+    } else {
+      var ca = el * 1.5;
+      tempCamPos.set(state.x + Math.cos(ca) * 6, 3.5, state.z + Math.sin(ca) * 6);
+      camera.position.lerp(tempCamPos, 5 * dt);
+    }
+    tempLookAt.set(state.x, 1.5, state.z).add(camLookAtOffset);
+    camera.lookAt(tempLookAt);
+
+    renderer.render(scene, camera);
+
+    frames++;
+    if (frames === 30) log('Todo OK - ' + houses.length + ' casas - ' + totalStars + ' estrellas');
+  }
+
+  starCounterEl.textContent = totalStars;
+  document.getElementById('star-max').textContent = MAX_TOTAL_STARS;
+  updateMissionsBadge();
+  animate();
+
+} catch (err) {
+  log('ERROR: ' + err.message, true);
+  console.error(err);
+  console.error(err.stack);
+}
+</script>
+</body>
+</html>
