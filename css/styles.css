@@ -1,0 +1,1184 @@
+/* ==========================================================================
+   EXPEDICION MATEMATICA 3D - ESTILOS
+   ========================================================================== */
+
+* {
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Comic Sans MS', 'Segoe UI', sans-serif;
+  background: #87ceeb;
+}
+
+#canvas-container {
+  width: 100vw;
+  height: 100vh;
+  display: block;
+}
+
+/* ============ DEBUG ============ */
+#debug {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  background: rgba(0,0,0,0.75);
+  color: #0f0;
+  padding: 6px 10px;
+  font-family: monospace;
+  font-size: 11px;
+  border-radius: 6px;
+  z-index: 9999;
+  max-width: 320px;
+  white-space: pre-wrap;
+  line-height: 1.3;
+  pointer-events: none;
+  display: none;
+}
+#debug.error {
+  color: #ff6b6b;
+  display: block;
+}
+
+/* ==========================================================================
+   PANTALLA DE PERFILES
+   ========================================================================== */
+#profiles-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: linear-gradient(160deg, #ffe0ee 0%, #c8f0ff 50%, #ffe0ee 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+#profiles-screen h1 {
+  font-size: 2.8rem;
+  color: #1a1a1a;
+  text-shadow: 4px 4px 0 #ffd966, 6px 6px 0 #1a1a1a;
+  margin: 0 0 8px;
+  text-align: center;
+  transform: rotate(-2deg);
+}
+
+#profiles-screen .subtitle {
+  font-size: 1.1rem;
+  color: #1a1a1a;
+  margin-bottom: 30px;
+  background: #fff;
+  padding: 8px 20px;
+  border: 3px solid #1a1a1a;
+  border-radius: 50px;
+  box-shadow: 3px 3px 0 #1a1a1a;
+  font-weight: 800;
+}
+
+#profiles-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  justify-content: center;
+  margin-bottom: 30px;
+  max-width: 900px;
+}
+
+.profile-card {
+  background: #fff;
+  border: 4px solid #1a1a1a;
+  border-radius: 24px;
+  padding: 20px 24px;
+  width: 180px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 6px 6px 0 #1a1a1a;
+  transition: transform 0.1s;
+  position: relative;
+}
+.profile-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0 #1a1a1a;
+}
+.profile-card:active {
+  transform: translate(3px, 3px);
+  box-shadow: 3px 3px 0 #1a1a1a;
+}
+.profile-card .avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffd966, #ffb3d9);
+  border: 4px solid #1a1a1a;
+  margin: 0 auto 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #1a1a1a;
+}
+.profile-card .pname {
+  font-weight: 800;
+  color: #1a1a1a;
+  font-size: 1.15rem;
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+.profile-card .page {
+  font-size: 0.85rem;
+  color: #8b6f4c;
+  font-weight: 700;
+}
+.profile-card .pstars {
+  margin-top: 8px;
+  background: #ffd966;
+  border: 2px solid #1a1a1a;
+  border-radius: 50px;
+  padding: 3px 8px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  display: inline-block;
+}
+.profile-card .delete-profile {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #ff4757;
+  border: 3px solid #1a1a1a;
+  color: white;
+  font-weight: 900;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 2px 2px 0 #1a1a1a;
+}
+
+.new-profile-card {
+  background: #fef7e0;
+  border: 4px dashed #1a1a1a;
+  border-radius: 24px;
+  padding: 20px 24px;
+  width: 180px;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s;
+  box-shadow: 6px 6px 0 #1a1a1a;
+}
+.new-profile-card:hover {
+  transform: translate(-2px, -2px);
+}
+.new-profile-card .plus {
+  font-size: 4rem;
+  line-height: 1;
+  color: #1a1a1a;
+  font-weight: 300;
+  margin-bottom: 8px;
+}
+.new-profile-card .label {
+  font-weight: 800;
+  color: #1a1a1a;
+  font-size: 1rem;
+}
+
+/* ============ MODAL CREAR PERFIL ============ */
+#create-profile-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2100;
+  background: rgba(0,0,0,0.7);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+#create-profile-modal.show {
+  display: flex;
+}
+#create-profile-modal .card {
+  background: #fef7e0;
+  border: 6px solid #1a1a1a;
+  border-radius: 40px;
+  padding: 30px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 10px 10px 0 rgba(0,0,0,0.5);
+  text-align: center;
+}
+#create-profile-modal h2 {
+  font-size: 1.8rem;
+  margin: 0 0 20px;
+  color: #1a1a1a;
+}
+#create-profile-modal label {
+  display: block;
+  text-align: left;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin-bottom: 6px;
+  font-size: 1rem;
+}
+#create-profile-modal input[type="text"] {
+  width: 100%;
+  font-size: 1.3rem;
+  padding: 10px 16px;
+  border-radius: 20px;
+  border: 4px solid #1a1a1a;
+  font-family: inherit;
+  font-weight: 700;
+  background: white;
+  margin-bottom: 16px;
+}
+#create-profile-modal .age-options {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+#create-profile-modal .age-options button {
+  flex: 1;
+  background: #fff;
+  border: 4px solid #1a1a1a;
+  border-radius: 20px;
+  padding: 16px;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 1.1rem;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 #1a1a1a;
+  transition: 0.05s;
+  color: #1a1a1a;
+}
+#create-profile-modal .age-options button.selected {
+  background: #ffd966;
+}
+#create-profile-modal .age-options button:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 #1a1a1a;
+}
+#create-profile-modal .age-options button .age-num {
+  display: block;
+  font-size: 2rem;
+  margin-bottom: 4px;
+}
+#create-profile-modal .btns {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+#create-profile-modal button.primary {
+  background: #51cf66;
+  color: white;
+  border: 3px solid #1a1a1a;
+  border-radius: 40px;
+  padding: 14px 32px;
+  font-weight: 800;
+  font-size: 1.1rem;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 #1a1a1a;
+  font-family: inherit;
+}
+#create-profile-modal button.secondary {
+  background: #ffd966;
+  border: 3px solid #1a1a1a;
+  border-radius: 40px;
+  padding: 14px 32px;
+  font-weight: 800;
+  font-size: 1.1rem;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 #1a1a1a;
+  font-family: inherit;
+}
+
+/* ==========================================================================
+   HUD
+   ========================================================================== */
+#hud {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  pointer-events: none;
+  z-index: 10;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.panel {
+  background: rgba(254,247,224,0.95);
+  border: 3px solid #1a1a1a;
+  border-radius: 100px;
+  padding: 8px 20px;
+  box-shadow: 4px 4px 0 #1a1a1a;
+  font-weight: 800;
+  color: #1a1a1a;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: auto;
+}
+.stars-total {
+  background: #ffd966;
+}
+.stars-total .num {
+  font-size: 1.4rem;
+}
+
+/* ============ BOTONES SUPERIORES ============ */
+#top-buttons {
+  position: fixed;
+  top: 70px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 11;
+}
+#top-buttons button {
+  background: rgba(255,255,255,0.95);
+  border: 3px solid #1a1a1a;
+  border-radius: 40px;
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+  color: #1a1a1a;
+  box-shadow: 3px 3px 0 #1a1a1a;
+  transition: 0.05s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  font-family: inherit;
+}
+#top-buttons button:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 #1a1a1a;
+}
+#top-buttons .customize { background: #ffb3d9; }
+#top-buttons .achievements { background: #ffe066; }
+#top-buttons .missions { background: #ffd1a3; }
+#top-buttons .music-on { background: #9be0ff; }
+#top-buttons .music-off { background: #ddd; opacity: 0.7; }
+#top-buttons .photo { background: #c8f7c5; }
+#top-buttons .profiles { background: #c8b6ff; }
+#top-buttons .badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #ff4757;
+  color: white;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  font-weight: 900;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+}
+
+/* ============ HINT INFERIOR ============ */
+#hint {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(254,247,224,0.95);
+  border: 3px solid #1a1a1a;
+  border-radius: 50px;
+  padding: 10px 24px;
+  font-weight: 800;
+  color: #1a1a1a;
+  box-shadow: 4px 4px 0 #1a1a1a;
+  z-index: 10;
+  text-align: center;
+  font-size: 0.9rem;
+  pointer-events: none;
+  max-width: 90vw;
+}
+
+/* ============ BOTONES DE ACCION ============ */
+#action-buttons {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 15;
+}
+#action-buttons button {
+  background: #ffd966;
+  border: 3px solid #1a1a1a;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  padding: 14px 22px;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 #1a1a1a;
+  transition: 0.05s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+}
+#action-buttons button:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 #1a1a1a;
+}
+#action-buttons button:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+#action-buttons .talk-btn { background: #9be0ff; }
+#action-buttons .boss-btn { background: #ff7675; color: white; }
+#action-buttons .home-btn { background: #ffd1e8; }
+#action-buttons .exit-btn { background: #c8f7c5; }
+
+/* ============ CONTROLES TACTILES ============ */
+#touch-controls {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 60px);
+  grid-template-rows: repeat(3, 60px);
+  gap: 6px;
+  z-index: 15;
+}
+#touch-controls button {
+  background: #ffd966;
+  border: 3px solid #1a1a1a;
+  border-radius: 14px;
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: #1a1a1a;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: 0.05s;
+  font-family: inherit;
+}
+#touch-controls button:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 #1a1a1a;
+}
+#touch-controls .empty {
+  visibility: hidden;
+}
+
+/* ============ DIALOGO NPC ============ */
+#npc-dialog {
+  display: none;
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fef7e0;
+  border: 4px solid #1a1a1a;
+  border-radius: 24px;
+  padding: 16px 22px;
+  max-width: 520px;
+  width: 90vw;
+  box-shadow: 6px 6px 0 rgba(0,0,0,0.4);
+  z-index: 50;
+  font-weight: 700;
+  color: #1a1a1a;
+  font-size: 1.05rem;
+}
+#npc-dialog .npc-name {
+  font-weight: 800;
+  color: #b47c2e;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+#npc-dialog .close-dialog {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #1a1a1a;
+  font-weight: 900;
+}
+
+/* ==========================================================================
+   MODALES GENERICOS
+   ========================================================================== */
+.modal-bg {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  padding: 16px;
+  overflow-y: auto;
+}
+.modal-bg.show {
+  display: flex;
+}
+.card {
+  background: #fef7e0;
+  border-radius: 40px;
+  padding: 28px 24px;
+  max-width: 560px;
+  width: 100%;
+  border: 6px solid #1a1a1a;
+  box-shadow: 10px 10px 0 rgba(0,0,0,0.5);
+  text-align: center;
+  max-height: 92vh;
+  overflow-y: auto;
+}
+.card h2 {
+  font-size: 1.7rem;
+  margin: 0 0 8px;
+  color: #1a1a1a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+.card .question {
+  font-size: 1.6rem;
+  font-weight: 700;
+  background: #e6d5b8;
+  padding: 18px;
+  border-radius: 30px;
+  margin: 16px 0;
+  border: 3px solid #1a1a1a;
+  word-break: break-word;
+}
+.card input {
+  font-size: 1.7rem;
+  width: 160px;
+  text-align: center;
+  padding: 8px;
+  border-radius: 30px;
+  border: 4px solid #1a1a1a;
+  font-weight: 700;
+  background: white;
+  font-family: inherit;
+}
+.card input:focus {
+  outline: 3px solid #ffb347;
+}
+.card .btns {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.card button {
+  background: #ffd966;
+  border: 3px solid #1a1a1a;
+  font-weight: 800;
+  font-size: 1.05rem;
+  padding: 12px 24px;
+  border-radius: 40px;
+  cursor: pointer;
+  color: #1a1a1a;
+  box-shadow: 4px 4px 0 #1a1a1a;
+  font-family: inherit;
+  transition: 0.05s;
+}
+.card button:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 #1a1a1a;
+}
+.card button:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ============ FEEDBACK ============ */
+.feedback {
+  font-size: 1.3rem;
+  font-weight: 800;
+  min-height: 2rem;
+  margin: 6px 0;
+}
+.success { color: #2e7d32; }
+.error { color: #c0392b; }
+.stars-earned {
+  font-size: 1.3rem;
+  color: #b47c2e;
+  min-height: 1.6rem;
+  font-weight: 800;
+}
+
+/* ============ BLOQUES DE TEORIA ============ */
+.theory-block {
+  border-radius: 20px;
+  padding: 14px 18px;
+  margin: 14px 0;
+  text-align: left;
+}
+.theory-block .block-title {
+  font-weight: 800;
+  font-size: 1.05rem;
+  margin-bottom: 8px;
+}
+.theory-block .block-content {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: #1a1a1a;
+}
+#theory-explanation {
+  background: #e6d5b8;
+  border: 3px solid #1a1a1a;
+}
+#theory-example-block {
+  background: #fff5cc;
+  border: 3px solid #1a1a1a;
+}
+#start-practice-btn {
+  background: #51cf66;
+  color: white;
+}
+#theory-icon-big {
+  font-size: 3.5rem;
+  margin: 4px 0 8px;
+}
+
+/* ==========================================================================
+   VESTIDOR CON VISTA PREVIA
+   ========================================================================== */
+#customize-modal .card {
+  max-width: 900px;
+  text-align: left;
+}
+#customize-modal h2 {
+  text-align: center;
+}
+#customize-modal .subtitle {
+  text-align: center;
+  color: #8b6f4c;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+.customize-layout {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.customize-options {
+  flex: 1;
+  min-width: 280px;
+}
+.customize-preview {
+  flex: 0 0 320px;
+  background: linear-gradient(180deg, #ffe0ee, #c8f0ff);
+  border: 4px solid #1a1a1a;
+  border-radius: 24px;
+  overflow: hidden;
+  position: relative;
+  min-height: 400px;
+}
+#customize-preview-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.customize-preview .preview-label {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border: 3px solid #1a1a1a;
+  border-radius: 50px;
+  padding: 4px 14px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: #1a1a1a;
+  box-shadow: 3px 3px 0 #1a1a1a;
+}
+.custom-section {
+  background: #f1e3c8;
+  border: 3px solid #1a1a1a;
+  border-radius: 20px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+.custom-section .label {
+  font-weight: 800;
+  color: #1a1a1a;
+  font-size: 0.95rem;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: space-between;
+}
+.custom-section .label .lock-info {
+  font-size: 0.75rem;
+  color: #1a1a1a;
+  background: #ffd966;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-weight: 800;
+  border: 2px solid #1a1a1a;
+}
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.options button {
+  background: white;
+  border: 3px solid #1a1a1a;
+  border-radius: 14px;
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 #1a1a1a;
+  transition: 0.05s;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.options button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 #1a1a1a;
+}
+.options button.selected {
+  background: #ffd966;
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 #1a1a1a;
+}
+.options button.locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: #e0d5c0;
+}
+.options button.locked::after {
+  content: " (bloqueado)";
+  font-size: 0.7rem;
+  color: #b47c2e;
+}
+.color-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid #1a1a1a;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 #1a1a1a;
+  padding: 0;
+  transition: 0.05s;
+  position: relative;
+}
+.color-swatch.selected {
+  transform: scale(1.15);
+  box-shadow: 3px 3px 0 #1a1a1a, 0 0 0 3px #ffd966;
+}
+.color-swatch.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.color-swatch.golden {
+  background: linear-gradient(135deg, #ffd700, #ffb300, #ffecb3) !important;
+}
+.color-swatch.rainbow {
+  background: linear-gradient(135deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3) !important;
+}
+
+#customize-close,
+#achievements-close,
+#missions-close,
+#home-close-btn {
+  display: block;
+  margin: 18px auto 0;
+  background: #ffd966;
+  border: 3px solid #1a1a1a;
+  font-weight: 800;
+  font-size: 1.1rem;
+  padding: 14px 40px;
+  border-radius: 40px;
+  cursor: pointer;
+  color: #1a1a1a;
+  box-shadow: 4px 4px 0 #1a1a1a;
+  font-family: inherit;
+  transition: 0.05s;
+}
+#customize-close:active,
+#achievements-close:active,
+#missions-close:active,
+#home-close-btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 #1a1a1a;
+}
+
+/* ==========================================================================
+   LOGROS
+   ========================================================================== */
+#achievements-modal .card {
+  text-align: left;
+}
+.ach-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f1e3c8;
+  border: 3px solid #1a1a1a;
+  border-radius: 20px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.ach-item.locked { opacity: 0.55; }
+.ach-item.unlocked {
+  background: #fff2b8;
+  border-color: #ffb300;
+}
+.ach-icon {
+  font-size: 2.2rem;
+  min-width: 50px;
+  text-align: center;
+}
+.ach-info { flex: 1; }
+.ach-name {
+  font-weight: 800;
+  color: #1a1a1a;
+  font-size: 1rem;
+}
+.ach-desc {
+  font-size: 0.8rem;
+  color: #8b6f4c;
+  margin-top: 2px;
+}
+
+/* ==========================================================================
+   MISIONES
+   ========================================================================== */
+#missions-modal .card {
+  text-align: left;
+}
+#missions-modal .date-info {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #8b6f4c;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+.mission-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f1e3c8;
+  border: 3px solid #1a1a1a;
+  border-radius: 20px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.mission-item.done {
+  background: #d4f5d4;
+  border-color: #4caf50;
+}
+.mission-icon {
+  font-size: 2rem;
+  min-width: 44px;
+  text-align: center;
+}
+.mission-info { flex: 1; }
+.mission-name {
+  font-weight: 800;
+  color: #1a1a1a;
+  font-size: 0.95rem;
+}
+.mission-desc {
+  font-size: 0.8rem;
+  color: #8b6f4c;
+  margin: 2px 0 4px;
+}
+.mission-progress {
+  height: 8px;
+  background: #d9c9a8;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 4px;
+  border: 2px solid #1a1a1a;
+}
+.mission-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #ffd966, #ffb300);
+  transition: width 0.3s;
+}
+.mission-reward {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #b47c2e;
+  margin-top: 3px;
+}
+.mission-claim-btn {
+  background: #51cf66;
+  color: white;
+  border: 2px solid #1a1a1a;
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-weight: 800;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-family: inherit;
+}
+
+/* ==========================================================================
+   NOTIFICACIONES
+   ========================================================================== */
+#achievement-toast,
+#mission-toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100px);
+  border: 4px solid #1a1a1a;
+  border-radius: 24px;
+  padding: 14px 24px;
+  box-shadow: 6px 6px 0 rgba(0,0,0,0.5);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: transform 0.4s;
+  font-weight: 800;
+  color: #1a1a1a;
+  pointer-events: none;
+}
+#achievement-toast {
+  background: linear-gradient(135deg, #ffd700, #ffb300);
+}
+#mission-toast {
+  background: linear-gradient(135deg, #a8e6cf, #7fccba);
+  top: 90px;
+}
+#achievement-toast.show,
+#mission-toast.show {
+  transform: translateX(-50%) translateY(0);
+}
+#achievement-toast .toast-icon,
+#mission-toast .toast-icon {
+  font-size: 2rem;
+}
+#achievement-toast .toast-title,
+#mission-toast .toast-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #8b3a00;
+}
+#mission-toast .toast-title {
+  color: #1e5a4a;
+}
+#achievement-toast .toast-name,
+#mission-toast .toast-name {
+  font-size: 1rem;
+}
+
+/* ==========================================================================
+   JEFE
+   ========================================================================== */
+#boss-modal .card {
+  background: linear-gradient(180deg, #4a1a1a, #fef7e0 30%);
+  border-color: #1a1a1a;
+}
+.boss-hp-bar {
+  width: 100%;
+  height: 22px;
+  background: #4a1a1a;
+  border-radius: 20px;
+  overflow: hidden;
+  margin: 10px 0 14px;
+  border: 3px solid #1a1a1a;
+  position: relative;
+}
+.boss-hp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff4757, #ff6b81);
+  transition: width 0.4s ease;
+  border-radius: 20px;
+}
+.boss-hp-bar .boss-hp-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.8rem;
+  font-weight: 900;
+  color: white;
+  text-shadow: 1px 1px 2px black;
+  z-index: 2;
+}
+.boss-progress {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: 10px 0;
+  flex-wrap: wrap;
+}
+.boss-progress .punto {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #d9c9a8;
+  border: 2px solid #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: #1a1a1a;
+}
+.boss-progress .punto.correct {
+  background: #51cf66;
+  color: white;
+}
+.boss-progress .punto.wrong {
+  background: #ff4757;
+  color: white;
+}
+.boss-progress .punto.current {
+  box-shadow: 0 0 0 3px #ffd966;
+}
+
+/* ==========================================================================
+   FOTO
+   ========================================================================== */
+#photo-flash {
+  position: fixed;
+  inset: 0;
+  background: white;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 400;
+  transition: opacity 0.15s;
+}
+#photo-toast {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%) translateY(60px);
+  background: #c8f7c5;
+  border: 4px solid #1a1a1a;
+  border-radius: 40px;
+  padding: 12px 24px;
+  font-weight: 800;
+  color: #1a1a1a;
+  box-shadow: 6px 6px 0 rgba(0,0,0,0.4);
+  z-index: 500;
+  opacity: 0;
+  transition: 0.3s;
+  pointer-events: none;
+}
+#photo-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ==========================================================================
+   LINEAS DE VELOCIDAD MANGA
+   ========================================================================== */
+#manga-lines {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  overflow: hidden;
+}
+.speed-line {
+  position: absolute;
+  background: linear-gradient(90deg, transparent, #1a1a1a);
+  height: 2px;
+  animation: dash 0.7s linear infinite;
+  opacity: 0.08;
+}
+@keyframes dash {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100vw); }
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 700px) {
+  #profiles-screen h1 {
+    font-size: 2rem;
+  }
+  .profile-card,
+  .new-profile-card {
+    width: 140px;
+    padding: 14px;
+  }
+  .profile-card .avatar {
+    width: 60px;
+    height: 60px;
+    font-size: 2rem;
+  }
+  .panel {
+    font-size: 0.85rem;
+    padding: 6px 12px;
+  }
+  .stars-total .num {
+    font-size: 1.1rem;
+  }
+  #touch-controls {
+    grid-template-columns: repeat(3, 48px);
+    grid-template-rows: repeat(3, 48px);
+  }
+  #touch-controls button {
+    font-size: 1.3rem;
+  }
+  #hint {
+    font-size: 0.75rem;
+    padding: 8px 14px;
+    bottom: 190px;
+  }
+  #action-buttons button {
+    padding: 10px 16px;
+    font-size: 0.8rem;
+  }
+  #top-buttons {
+    top: 60px;
+  }
+  #top-buttons button {
+    padding: 6px 10px;
+    font-size: 0.7rem;
+  }
+  .customize-preview {
+    flex: 0 0 100%;
+    min-height: 260px;
+  }
+}
