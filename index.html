@@ -486,7 +486,7 @@
 
   try {
     // ============================================================
-    // GRADIENT MAP para efecto TOON real (4 tonos)
+    // GRADIENT MAP + MATERIALES TOON
     // ============================================================
     function makeGradientMap(steps) {
       steps = steps || 4;
@@ -503,32 +503,36 @@
     }
     var TOON_GRADIENT = makeGradientMap(4);
 
-    // Material toon con gradient map (efecto cel-shading real)
     function toonMat(color) {
-      return new THREE.MeshToonMaterial({
-        color: color,
-        gradientMap: TOON_GRADIENT
-      });
+      return new THREE.MeshToonMaterial({ color: color, gradientMap: TOON_GRADIENT });
     }
 
-    // Material de contorno negro (para efecto manga)
+    // Contorno negro (para efecto manga)
     var OUTLINE_MAT = new THREE.MeshBasicMaterial({
       color: 0x1a1a1a,
       side: THREE.BackSide
     });
 
-    // Anade un contorno a un mesh
+    // Funcion addOutline blindada contra errores
     function addOutline(mesh, thickness) {
-      thickness = thickness || 1.05;
-      var outline = new THREE.Mesh(mesh.geometry, OUTLINE_MAT);
-      outline.scale.multiplyScalar(thickness);
-      outline.position.copy(mesh.position);
-      outline.rotation.copy(mesh.rotation);
-      outline.scale.multiply(mesh.scale);
-      if (mesh.parent) {
+      try {
+        if (!mesh) return null;
+        if (!mesh.geometry) return null;
+        if (!mesh.material) return null;
+        if (!mesh.parent) return null;
+        thickness = thickness || 1.05;
+        var outline = new THREE.Mesh(mesh.geometry, OUTLINE_MAT);
+        outline.position.copy(mesh.position);
+        outline.rotation.copy(mesh.rotation);
+        outline.scale.copy(mesh.scale);
+        outline.scale.multiplyScalar(thickness);
+        outline.castShadow = false;
+        outline.receiveShadow = false;
         mesh.parent.add(outline);
+        return outline;
+      } catch(e) {
+        return null;
       }
-      return outline;
     }
 
     // ============================================================
@@ -616,16 +620,11 @@
         ejemplo:'15 + 27 = <b>42</b>.',
         stars:0, maxStars:9, hints:['Suma por partes.'],
         ejercicios:[
-          { q:'Cuanto es 15 + 27?', a:'42' },
-          { q:'Cuanto es 48 - 19?', a:'29' },
-          { q:'Cuanto es 7 x 8?', a:'56' },
-          { q:'Cuanto es 63 / 7?', a:'9' },
-          { q:'Cuanto es 125 + 87?', a:'212' },
-          { q:'Cuanto es 300 - 145?', a:'155' },
-          { q:'Cuanto es 12 x 11?', a:'132' },
-          { q:'Cuanto es 144 / 12?', a:'12' },
-          { q:'Cuanto es 256 + 178?', a:'434' },
-          { q:'Cuanto es 25 x 4?', a:'100' }
+          { q:'Cuanto es 15 + 27?', a:'42' }, { q:'Cuanto es 48 - 19?', a:'29' },
+          { q:'Cuanto es 7 x 8?', a:'56' }, { q:'Cuanto es 63 / 7?', a:'9' },
+          { q:'Cuanto es 125 + 87?', a:'212' }, { q:'Cuanto es 300 - 145?', a:'155' },
+          { q:'Cuanto es 12 x 11?', a:'132' }, { q:'Cuanto es 144 / 12?', a:'12' },
+          { q:'Cuanto es 256 + 178?', a:'434' }, { q:'Cuanto es 25 x 4?', a:'100' }
         ]
       },
       { id:'divisibilidad', name:'Divisibilidad', icon:'2', color:0x4ecdc4, zone:'pueblo', position:{x:-7, z:-16},
@@ -803,26 +802,17 @@
     }
     function isZoneUnlocked(zoneId) { return totalStars >= ZONES[zoneId].unlockStars; }
 
-    // ============================================================
-    // SUELO CAMINABLE
-    // Zonas: cuadrados de 60x60 con margen 2
-    // Pueblo: x de -28 a 28, z de -28 a 28
-    // Bosque: x de -28 a 28, z de -98 a -42
-    // Montana: x de 42 a 98, z de -28 a 28
-    // Puentes:
-    //   PB: x de -1.5 a 1.5, z de -44 a -26 (cubre el hueco)
-    //   PM: x de 26 a 44, z de -1.5 a 1.5
-    // ============================================================
+    // Suelo caminable incluyendo puentes
+    // Pueblo: x[-28,28] z[-28,28]
+    // Bosque: x[-28,28] z[-98,-42]
+    // Montana: x[42,98] z[-28,28]
+    // Puente PB: x[-1.5,1.5] z[-44,-26]
+    // Puente PM: x[26,44] z[-1.5,1.5]
     function isOnWalkableGround(x, z) {
-      // Pueblo
       if (x >= -28 && x <= 28 && z >= -28 && z <= 28) return true;
-      // Bosque
       if (x >= -28 && x <= 28 && z >= -98 && z <= -42) return true;
-      // Montana
       if (x >= 42 && x <= 98 && z >= -28 && z <= 28) return true;
-      // Puente Pueblo-Bosque
       if (x >= -1.5 && x <= 1.5 && z >= -44 && z <= -26) return true;
-      // Puente Pueblo-Montana
       if (x >= 26 && x <= 44 && z >= -1.5 && z <= 1.5) return true;
       return false;
     }
@@ -862,7 +852,7 @@
       { id:'talk2', icon:'C', name:'Charlatana', desc:'Habla con 2 aldeanos', target:2, reward:1, field:'npcsTalkedToday' },
       { id:'oneTheme', icon:'H', name:'Especialista', desc:'Completa un tema hoy', target:1, reward:3, field:'themesCompletedToday' }
     ];
-    var DAILY_KEY = 'expedicion_matematica_daily_v14';
+    var DAILY_KEY = 'expedicion_matematica_daily_v15';
     function getTodayKey() {
       var d = new Date();
       return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
@@ -988,9 +978,9 @@
       return totalStars >= req;
     }
 
-    var STORAGE_KEY = 'expedicion_matematica_save_v14';
-    var APPEARANCE_KEY = 'expedicion_matematica_appearance_v14';
-    var ACHIEVEMENTS_KEY = 'expedicion_matematica_achievements_v14';
+    var STORAGE_KEY = 'expedicion_matematica_save_v15';
+    var APPEARANCE_KEY = 'expedicion_matematica_appearance_v15';
+    var ACHIEVEMENTS_KEY = 'expedicion_matematica_achievements_v15';
     function saveAll() {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify({ stars: topics.map(function(t) { return { id: t.id, stars: t.stars }; }), totalStars: totalStars }));
@@ -1076,7 +1066,7 @@
       mesh.position.set(zone.offset.x, 0, zone.offset.z);
       mesh.receiveShadow = true;
       scene.add(mesh);
-      // Borde negro (marco)
+
       var edgeGeo = new THREE.RingGeometry(29.7, 30.3, 64);
       var edgeMat = new THREE.MeshBasicMaterial({ color: 0x1a1a1a, side: THREE.DoubleSide });
       var edge = new THREE.Mesh(edgeGeo, edgeMat);
@@ -1085,7 +1075,6 @@
       scene.add(edge);
     });
 
-    // Camino circular
     var pathMesh = new THREE.Mesh(
       new THREE.RingGeometry(18, 21, 64),
       new THREE.MeshBasicMaterial({ color: 0xf0d8b8 })
@@ -1095,42 +1084,25 @@
     scene.add(pathMesh);
 
     // Fuente
-    var fountain = new THREE.Mesh(
-      new THREE.CylinderGeometry(2, 2.2, 0.6, 24),
-      toonMat(0xd0d0d0)
-    );
-    fountain.position.y = 0.3;
-    fountain.castShadow = true;
-    scene.add(fountain);
-    addOutline(fountain, 1.06);
+    var fountain = new THREE.Mesh(new THREE.CylinderGeometry(2, 2.2, 0.6, 24), toonMat(0xd0d0d0));
+    fountain.position.y = 0.3; fountain.castShadow = true;
+    scene.add(fountain); addOutline(fountain, 1.06);
 
-    var fountainTop = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.5, 0.5, 1.5, 16),
-      toonMat(0xb0b0b0)
-    );
-    fountainTop.position.y = 1.35;
-    fountainTop.castShadow = true;
-    scene.add(fountainTop);
-    addOutline(fountainTop, 1.1);
+    var fountainTop = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 1.5, 16), toonMat(0xb0b0b0));
+    fountainTop.position.y = 1.35; fountainTop.castShadow = true;
+    scene.add(fountainTop); addOutline(fountainTop, 1.1);
 
-    var waterBall = new THREE.Mesh(
-      new THREE.SphereGeometry(0.5, 16, 12),
-      toonMat(0x9be0ff)
-    );
+    var waterBall = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 12), toonMat(0x9be0ff));
     waterBall.position.y = 2.2;
-    scene.add(waterBall);
-    addOutline(waterBall, 1.08);
+    scene.add(waterBall); addOutline(waterBall, 1.08);
 
-    // Arboles con contorno
+    // Arboles
     function createTree(x, z, scale) {
       scale = scale || 1;
       var g = new THREE.Group();
-      var trunk = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.25, 0.35, 1.4, 8),
-        toonMat(0xa86b3b)
-      );
-      trunk.position.y = 0.7; trunk.castShadow = true; g.add(trunk);
-      addOutline(trunk, 1.15);
+      var trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.35, 1.4, 8), toonMat(0xa86b3b));
+      trunk.position.y = 0.7; trunk.castShadow = true;
+      g.add(trunk); addOutline(trunk, 1.15);
 
       for (var i = 0; i < 3; i++) {
         var l = new THREE.Mesh(
@@ -1139,8 +1111,7 @@
         );
         l.position.y = 1.9 + i * 0.75;
         l.castShadow = true;
-        g.add(l);
-        addOutline(l, 1.12);
+        g.add(l); addOutline(l, 1.12);
       }
       g.position.set(x, 0, z);
       g.rotation.y = Math.random() * Math.PI * 2;
@@ -1159,17 +1130,14 @@
       scene.add(createTree(bx, bz, 0.9 + Math.random() * 0.4));
     }
 
-    // Rocas con contorno
+    // Rocas
     for (var i = 0; i < 20; i++) {
       var mx = ZONES.montana.offset.x + (Math.random() - 0.5) * 50;
       var mz = ZONES.montana.offset.z + (Math.random() - 0.5) * 50;
       if (Math.hypot(mx - ZONES.montana.offset.x, mz - ZONES.montana.offset.z) < 14) continue;
-      var rockMat = toonMat(0xb0b0b0);
-      var r1 = new THREE.Mesh(new THREE.DodecahedronGeometry(0.7 + Math.random() * 0.4), rockMat);
-      r1.position.set(mx, 0.5, mz);
-      r1.castShadow = true;
-      scene.add(r1);
-      addOutline(r1, 1.15);
+      var r1 = new THREE.Mesh(new THREE.DodecahedronGeometry(0.7 + Math.random() * 0.4), toonMat(0xb0b0b0));
+      r1.position.set(mx, 0.5, mz); r1.castShadow = true;
+      scene.add(r1); addOutline(r1, 1.15);
     }
 
     // Flores
@@ -1178,37 +1146,25 @@
       var a = Math.random() * Math.PI * 2;
       var r = 24 + Math.random() * 14;
       var g = new THREE.Group();
-      var stem = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.04, 0.04, 0.5, 5),
-        toonMat(0x7ed87e)
-      );
+      var stem = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.5, 5), toonMat(0x7ed87e));
       stem.position.y = 0.25; g.add(stem);
       var c = flowerColors[Math.floor(Math.random() * flowerColors.length)];
-      var petals = new THREE.Mesh(
-        new THREE.SphereGeometry(0.15, 8, 6),
-        toonMat(c)
-      );
+      var petals = new THREE.Mesh(new THREE.SphereGeometry(0.15, 8, 6), toonMat(c));
       petals.position.y = 0.55; petals.scale.y = 0.6;
       g.add(petals);
       g.position.set(Math.cos(a) * r, 0, Math.sin(a) * r);
       scene.add(g);
     }
 
-    // Farolas (decorativas)
+    // Farolas
     function createLamppost(x, z) {
       var g = new THREE.Group();
-      var pole = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.1, 0.12, 4, 8),
-        toonMat(0x4a4a4a)
-      );
-      pole.position.y = 2; pole.castShadow = true; g.add(pole);
-      addOutline(pole, 1.15);
-      var lamp = new THREE.Mesh(
-        new THREE.BoxGeometry(0.5, 0.5, 0.5),
-        toonMat(0xffe066)
-      );
-      lamp.position.y = 4.2; g.add(lamp);
-      addOutline(lamp, 1.15);
+      var pole = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 4, 8), toonMat(0x4a4a4a));
+      pole.position.y = 2; pole.castShadow = true;
+      g.add(pole); addOutline(pole, 1.15);
+      var lamp = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), toonMat(0xffe066));
+      lamp.position.y = 4.2;
+      g.add(lamp); addOutline(lamp, 1.15);
       g.position.set(x, 0, z);
       return g;
     }
@@ -1230,56 +1186,39 @@
       if (nearHouse) continue;
       var r = 23;
       var fence = new THREE.Group();
-      var p = new THREE.Mesh(
-        new THREE.BoxGeometry(0.15, 1, 0.15),
-        toonMat(0xc9a77a)
-      );
+      var p = new THREE.Mesh(new THREE.BoxGeometry(0.15, 1, 0.15), toonMat(0xc9a77a));
       p.position.y = 0.5; p.castShadow = true; fence.add(p);
-      var bar = new THREE.Mesh(
-        new THREE.BoxGeometry(0.08, 0.1, 1),
-        toonMat(0xc9a77a)
-      );
+      var bar = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.1, 1), toonMat(0xc9a77a));
       bar.position.set(0, 0.7, -0.45); fence.add(bar);
       fence.position.set(Math.cos(a) * r, 0, Math.sin(a) * r);
       fence.rotation.y = -a + Math.PI / 2;
       scene.add(fence);
     }
 
-    // PUENTES bien conectados
+    // Puentes
     function createBridge(x1, z1, x2, z2) {
       var dx = x2 - x1;
       var dz = z2 - z1;
       var len = Math.hypot(dx, dz);
       var angle = Math.atan2(dx, dz);
       var g = new THREE.Group();
-      var deck = new THREE.Mesh(
-        new THREE.BoxGeometry(3, 0.3, len),
-        toonMat(0xd9a066)
-      );
+      var deck = new THREE.Mesh(new THREE.BoxGeometry(3, 0.3, len), toonMat(0xd9a066));
       deck.position.set(0, 0.15, len / 2);
       deck.receiveShadow = true;
-      g.add(deck);
-      addOutline(deck, 1.06);
+      g.add(deck); addOutline(deck, 1.06);
 
       var numPosts = Math.floor(len / 3);
       for (var i = 0; i <= numPosts; i++) {
         var pz = (i / numPosts) * len;
-        var postL = new THREE.Mesh(
-          new THREE.BoxGeometry(0.15, 1.1, 0.15),
-          toonMat(0x8b5a2b)
-        );
+        var postL = new THREE.Mesh(new THREE.BoxGeometry(0.15, 1.1, 0.15), toonMat(0x8b5a2b));
         postL.position.set(-1.4, 0.65, pz);
         postL.castShadow = true;
-        g.add(postL);
-        addOutline(postL, 1.15);
+        g.add(postL); addOutline(postL, 1.15);
         var postR = postL.clone();
         postR.position.x = 1.4;
         g.add(postR);
       }
-      var railL = new THREE.Mesh(
-        new THREE.BoxGeometry(0.12, 0.12, len),
-        toonMat(0x8b5a2b)
-      );
+      var railL = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, len), toonMat(0x8b5a2b));
       railL.position.set(-1.4, 1.2, len / 2);
       g.add(railL);
       var railR = railL.clone();
@@ -1291,51 +1230,33 @@
       scene.add(g);
       return g;
     }
-    // Puente Pueblo-Bosque: de (0,-26) a (0,-44)
     createBridge(0, -26, 0, -44);
-    // Puente Pueblo-Montana: de (26,0) a (44,0)
     createBridge(26, 0, 44, 0);
     log('Decoracion y puentes OK');
 
-    // CASITAS con contornos
+    // CASITAS
     var houses = [];
     topics.forEach(function(topic) {
       var wp = getWorldPosition(topic);
       var g = new THREE.Group();
 
-      var base = new THREE.Mesh(
-        new THREE.BoxGeometry(4, 3, 4),
-        toonMat(0xfff5e0)
-      );
-      base.position.y = 1.5;
-      base.castShadow = true;
-      base.receiveShadow = true;
-      g.add(base);
-      addOutline(base, 1.05);
+      var base = new THREE.Mesh(new THREE.BoxGeometry(4, 3, 4), toonMat(0xfff5e0));
+      base.position.y = 1.5; base.castShadow = true; base.receiveShadow = true;
+      g.add(base); addOutline(base, 1.05);
 
       var roofMat = toonMat(topic.color);
       var roof = new THREE.Mesh(new THREE.ConeGeometry(3.3, 2.2, 4), roofMat);
-      roof.position.y = 4.1;
-      roof.rotation.y = Math.PI / 4;
-      roof.castShadow = true;
-      g.add(roof);
-      addOutline(roof, 1.06);
+      roof.position.y = 4.1; roof.rotation.y = Math.PI / 4; roof.castShadow = true;
+      g.add(roof); addOutline(roof, 1.06);
 
-      var door = new THREE.Mesh(
-        new THREE.BoxGeometry(1.1, 1.8, 0.1),
-        toonMat(0x8b5a2b)
-      );
+      var door = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.8, 0.1), toonMat(0x8b5a2b));
       door.position.set(0, 0.9, 2.01);
       g.add(door);
 
-      var w1 = new THREE.Mesh(
-        new THREE.BoxGeometry(0.9, 0.9, 0.1),
-        toonMat(0x9be0ff)
-      );
+      var w1 = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.9, 0.1), toonMat(0x9be0ff));
       w1.position.set(-1.2, 1.7, 2.01);
       g.add(w1);
-      var w2 = w1.clone();
-      w2.position.x = 1.2;
+      var w2 = w1.clone(); w2.position.x = 1.2;
       g.add(w2);
 
       var cv = document.createElement('canvas');
@@ -1394,35 +1315,19 @@
     var homePos = { x: 8, z: 8 };
     {
       var homeGroup = new THREE.Group();
-
-      var hb = new THREE.Mesh(
-        new THREE.BoxGeometry(5, 3.5, 5),
-        toonMat(0xffd1e8)
-      );
+      var hb = new THREE.Mesh(new THREE.BoxGeometry(5, 3.5, 5), toonMat(0xffd1e8));
       hb.position.y = 1.75; hb.castShadow = true; hb.receiveShadow = true;
-      homeGroup.add(hb);
-      addOutline(hb, 1.05);
+      homeGroup.add(hb); addOutline(hb, 1.05);
 
-      var hr = new THREE.Mesh(
-        new THREE.ConeGeometry(4, 2.8, 4),
-        toonMat(0xff9ff3)
-      );
-      hr.position.y = 4.9; hr.rotation.y = Math.PI / 4;
-      hr.castShadow = true;
-      homeGroup.add(hr);
-      addOutline(hr, 1.06);
+      var hr = new THREE.Mesh(new THREE.ConeGeometry(4, 2.8, 4), toonMat(0xff9ff3));
+      hr.position.y = 4.9; hr.rotation.y = Math.PI / 4; hr.castShadow = true;
+      homeGroup.add(hr); addOutline(hr, 1.06);
 
-      var hd = new THREE.Mesh(
-        new THREE.BoxGeometry(1.3, 2.1, 0.1),
-        toonMat(0x8b5a2b)
-      );
+      var hd = new THREE.Mesh(new THREE.BoxGeometry(1.3, 2.1, 0.1), toonMat(0x8b5a2b));
       hd.position.set(0, 1.05, 2.51);
       homeGroup.add(hd);
 
-      var hw = new THREE.Mesh(
-        new THREE.BoxGeometry(1, 1, 0.1),
-        toonMat(0xfff5b0)
-      );
+      var hw = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 0.1), toonMat(0xfff5b0));
       hw.position.set(-1.5, 2, 2.51);
       homeGroup.add(hw);
       var hw2 = hw.clone(); hw2.position.x = 1.5;
@@ -1459,19 +1364,13 @@
     var npcs = [];
     function createNPC(x, z, color, name, hints) {
       var g = new THREE.Group();
-      var body = new THREE.Mesh(
-        new THREE.CapsuleGeometry(0.5, 0.7, 4, 12),
-        toonMat(color)
-      );
-      body.position.y = 1; body.castShadow = true; g.add(body);
-      addOutline(body, 1.08);
+      var body = new THREE.Mesh(new THREE.CapsuleGeometry(0.5, 0.7, 4, 12), toonMat(color));
+      body.position.y = 1; body.castShadow = true;
+      g.add(body); addOutline(body, 1.08);
 
-      var head = new THREE.Mesh(
-        new THREE.SphereGeometry(0.55, 16, 12),
-        toonMat(0xffe0b2)
-      );
-      head.position.y = 2; head.castShadow = true; g.add(head);
-      addOutline(head, 1.08);
+      var head = new THREE.Mesh(new THREE.SphereGeometry(0.55, 16, 12), toonMat(0xffe0b2));
+      head.position.y = 2; head.castShadow = true;
+      g.add(head); addOutline(head, 1.08);
 
       var hatMat = toonMat(0x4a2c17);
       var hat = new THREE.Mesh(new THREE.ConeGeometry(0.7, 0.6, 8), hatMat);
@@ -1507,13 +1406,9 @@
     var bossPos = { x: ZONES.montana.offset.x + 15, z: ZONES.montana.offset.z - 15 };
     {
       var g = new THREE.Group();
-      var big = new THREE.Mesh(
-        new THREE.DodecahedronGeometry(5),
-        toonMat(0x6a5a5a)
-      );
+      var big = new THREE.Mesh(new THREE.DodecahedronGeometry(5), toonMat(0x6a5a5a));
       big.position.y = 3; big.castShadow = true;
-      g.add(big);
-      addOutline(big, 1.04);
+      g.add(big); addOutline(big, 1.04);
 
       var ent = new THREE.Mesh(
         new THREE.CircleGeometry(1.6, 16),
@@ -1531,35 +1426,25 @@
     }
     log('NPCs y jefe OK');
 
-    // PERSONAJE con contornos
+    // PERSONAJE
     var player = new THREE.Group();
     scene.add(player);
     var parts = {};
 
-    var headMat = toonMat(appearance.skinColor);
-    var head = new THREE.Mesh(new THREE.SphereGeometry(0.55, 16, 12), headMat);
+    var head = new THREE.Mesh(new THREE.SphereGeometry(0.55, 16, 12), toonMat(appearance.skinColor));
     head.position.y = 2; head.castShadow = true;
-    player.add(head);
-    var headOutline = addOutline(head, 1.08);
+    player.add(head); addOutline(head, 1.08);
     parts.head = head;
-    parts.headOutline = headOutline;
 
-    var neck = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.18, 0.2, 0.2, 8),
-      toonMat(appearance.skinColor)
-    );
-    neck.position.y = 1.55; player.add(neck);
-    addOutline(neck, 1.15);
+    var neck = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.2, 0.2, 8), toonMat(appearance.skinColor));
+    neck.position.y = 1.55;
+    player.add(neck); addOutline(neck, 1.15);
+    parts.neck = neck;
 
-    var body = new THREE.Mesh(
-      new THREE.CapsuleGeometry(0.5, 0.7, 4, 12),
-      toonMat(0x3d5a99)
-    );
+    var body = new THREE.Mesh(new THREE.CapsuleGeometry(0.5, 0.7, 4, 12), toonMat(0x3d5a99));
     body.position.y = 1; body.castShadow = true;
-    player.add(body);
-    var bodyOutline = addOutline(body, 1.06);
+    player.add(body); addOutline(body, 1.06);
     parts.body = body;
-    parts.bodyOutline = bodyOutline;
 
     var hairGroup = new THREE.Group();
     player.add(hairGroup);
@@ -1605,24 +1490,18 @@
     blushR.position.set(0.3, 1.92, 0.51); blushR.visible = false; player.add(blushR);
     parts.blushL = blushL; parts.blushR = blushR;
 
-    var armMat = toonMat(appearance.skinColor);
-    var armL = new THREE.Mesh(new THREE.CapsuleGeometry(0.15, 0.5, 3, 8), armMat);
+    var armL = new THREE.Mesh(new THREE.CapsuleGeometry(0.15, 0.5, 3, 8), toonMat(appearance.skinColor));
     armL.position.set(-0.65, 1.05, 0); armL.castShadow = true;
-    player.add(armL);
-    addOutline(armL, 1.15);
+    player.add(armL); addOutline(armL, 1.15);
     var armR = armL.clone(); armR.position.x = 0.65;
-    player.add(armR);
-    addOutline(armR, 1.15);
+    player.add(armR); addOutline(armR, 1.15);
     parts.armL = armL; parts.armR = armR;
 
-    var legMat = toonMat(0x3d5a99);
-    var legL = new THREE.Mesh(new THREE.CapsuleGeometry(0.17, 0.5, 3, 8), legMat);
+    var legL = new THREE.Mesh(new THREE.CapsuleGeometry(0.17, 0.5, 3, 8), toonMat(0x3d5a99));
     legL.position.set(-0.22, 0.3, 0); legL.castShadow = true;
-    player.add(legL);
-    addOutline(legL, 1.15);
+    player.add(legL); addOutline(legL, 1.15);
     var legR = legL.clone(); legR.position.x = 0.22;
-    player.add(legR);
-    addOutline(legR, 1.15);
+    player.add(legR); addOutline(legR, 1.15);
     parts.legL = legL; parts.legR = legR;
 
     var accGroup = new THREE.Group();
@@ -1645,16 +1524,17 @@
       }
       var hm = toonMat(appearance.hairColor);
       var s = appearance.hairStyle;
+      var toOutline = [];
       if (s === 'short') {
         var h = new THREE.Mesh(new THREE.SphereGeometry(0.58, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.55), hm);
         h.position.y = 2.18;
         parts.hairGroup.add(h);
-        addOutline(h, 1.12);
+        toOutline.push({ mesh: h, t: 1.12 });
       } else if (s === 'long') {
         var cap = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.6), hm);
         cap.position.y = 2.15;
         parts.hairGroup.add(cap);
-        addOutline(cap, 1.1);
+        toOutline.push({ mesh: cap, t: 1.1 });
         var back = new THREE.Mesh(new THREE.BoxGeometry(0.85, 1.0, 0.4), hm);
         back.position.set(0, 1.55, -0.4);
         parts.hairGroup.add(back);
@@ -1662,20 +1542,20 @@
         var cap2 = new THREE.Mesh(new THREE.SphereGeometry(0.58, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.6), hm);
         cap2.position.y = 2.18;
         parts.hairGroup.add(cap2);
-        addOutline(cap2, 1.1);
+        toOutline.push({ mesh: cap2, t: 1.1 });
         var tL = new THREE.Mesh(new THREE.SphereGeometry(0.25, 10, 8), hm);
         tL.position.set(-0.65, 2.15, -0.1);
         parts.hairGroup.add(tL);
-        addOutline(tL, 1.15);
+        toOutline.push({ mesh: tL, t: 1.15 });
         var tR = tL.clone();
         tR.position.x = 0.65;
         parts.hairGroup.add(tR);
-        addOutline(tR, 1.15);
+        toOutline.push({ mesh: tR, t: 1.15 });
       } else if (s === 'curly') {
         var cap3 = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.65), hm);
         cap3.position.y = 2.18;
         parts.hairGroup.add(cap3);
-        addOutline(cap3, 1.1);
+        toOutline.push({ mesh: cap3, t: 1.1 });
         for (var i = 0; i < 8; i++) {
           var a = (i / 8) * Math.PI * 2;
           var cc = new THREE.Mesh(new THREE.SphereGeometry(0.16, 8, 6), hm);
@@ -1683,6 +1563,7 @@
           parts.hairGroup.add(cc);
         }
       }
+      toOutline.forEach(function(o) { addOutline(o.mesh, o.t); });
     }
     function rebuildAccessories() {
       while (parts.accessoriesGroup.children.length > 0) {
@@ -1692,12 +1573,13 @@
         if (c.material) c.material.dispose();
       }
       var a = appearance.accessory;
+      var toOutline = [];
       if (a === 'cap' || a === 'all') {
         var cm = toonMat(0xff6b6b);
         var cap = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 8, 0, Math.PI * 2, 0, Math.PI * 0.5), cm);
         cap.position.y = 2.35;
         parts.accessoriesGroup.add(cap);
-        addOutline(cap, 1.12);
+        toOutline.push({ mesh: cap, t: 1.12 });
         var v = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.08, 0.5), cm);
         v.position.set(0, 2.32, 0.45);
         parts.accessoriesGroup.add(v);
@@ -1720,6 +1602,7 @@
         pack.position.set(0, 1.1, -0.6);
         parts.accessoriesGroup.add(pack);
       }
+      toOutline.forEach(function(o) { addOutline(o.mesh, o.t); });
     }
     function rebuildPet() {
       while (parts.petGroup.children.length > 0) {
@@ -1729,28 +1612,39 @@
         if (c.material) c.material.dispose();
       }
       var p = appearance.pet;
+      var toOutline = [];
       if (p === 'cat') {
         var m = toonMat(0xffa94d);
         var b = new THREE.Mesh(new THREE.SphereGeometry(0.3, 12, 10), m);
         b.position.y = 0.35; b.castShadow = true;
         parts.petGroup.add(b);
-        addOutline(b, 1.12);
+        toOutline.push({ mesh: b, t: 1.12 });
         var h = new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 10), m);
         h.position.set(0, 0.6, 0.15);
         parts.petGroup.add(h);
+        toOutline.push({ mesh: h, t: 1.15 });
       } else if (p === 'dog') {
         var m2 = toonMat(0x8b5a2b);
         var b2 = new THREE.Mesh(new THREE.SphereGeometry(0.32, 12, 10), m2);
         b2.position.y = 0.35; b2.castShadow = true;
         parts.petGroup.add(b2);
-        addOutline(b2, 1.12);
+        toOutline.push({ mesh: b2, t: 1.12 });
+        var h2 = new THREE.Mesh(new THREE.SphereGeometry(0.24, 12, 10), m2);
+        h2.position.set(0, 0.62, 0.18);
+        parts.petGroup.add(h2);
+        toOutline.push({ mesh: h2, t: 1.15 });
       } else if (p === 'bird') {
         var m3 = toonMat(0x4ecdc4);
         var b3 = new THREE.Mesh(new THREE.SphereGeometry(0.25, 12, 10), m3);
         b3.position.y = 0.4; b3.castShadow = true;
         parts.petGroup.add(b3);
-        addOutline(b3, 1.15);
+        toOutline.push({ mesh: b3, t: 1.15 });
+        var h3 = new THREE.Mesh(new THREE.SphereGeometry(0.18, 12, 10), m3);
+        h3.position.set(0, 0.6, 0.1);
+        parts.petGroup.add(h3);
+        toOutline.push({ mesh: h3, t: 1.18 });
       }
+      toOutline.forEach(function(o) { addOutline(o.mesh, o.t); });
     }
     function applyAppearance() {
       parts.head.material.color.setHex(appearance.skinColor);
@@ -1796,7 +1690,7 @@
       saveAll();
     }
     applyAppearance();
-    log('Personaje OK con contornos');
+    log('Personaje OK');
 
     // ============================================================
     // ESTADO Y CONTROLES
@@ -1876,6 +1770,8 @@
 
     var modalEl = document.getElementById('modal');
     var starCounterEl = document.getElementById('star-counter');
+
+    function updateStarDisplay() { starCounterEl.textContent = totalStars; }
 
     function openModal(topic) {
       if (modalOpen) return;
