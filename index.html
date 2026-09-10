@@ -89,7 +89,7 @@
     overflow-y: auto; }
   .modal-bg.show { display: flex; }
   .card { background: #fef7e0; border-radius: 40px; padding: 28px 24px;
-    max-width: 520px; width: 100%; border: 6px solid #b98c5c;
+    max-width: 560px; width: 100%; border: 6px solid #b98c5c;
     box-shadow: 0 20px 40px black; text-align: center; max-height: 92vh;
     overflow-y: auto; }
   .card h2 { font-size: 1.7rem; margin: 0 0 8px; color: #3a2c1b;
@@ -104,17 +104,27 @@
   .card .btns { display: flex; gap: 14px; justify-content: center;
     margin-top: 20px; flex-wrap: wrap; }
   .card button { background: #ffd966; border: none; font-weight: 700;
-    font-size: 1.1rem; padding: 12px 26px; border-radius: 40px;
+    font-size: 1.05rem; padding: 12px 24px; border-radius: 40px;
     border-bottom: 6px solid #b98c5c; cursor: pointer; color: #2c1e0e;
     box-shadow: 0 6px 0 #8b6f4c; font-family: inherit; transition: 0.05s; }
   .card button:active { transform: translateY(4px); box-shadow: 0 2px 0 #8b6f4c; }
   .card button:disabled { opacity: 0.5; pointer-events: none; }
-  .feedback { font-size: 1.3rem; font-weight: 700; min-height: 2rem;
-    margin: 6px 0; }
+  .feedback { font-size: 1.3rem; font-weight: 700; min-height: 2rem; margin: 6px 0; }
   .success { color: #2e7d32; }
   .error { color: #c0392b; }
   .stars-earned { font-size: 1.3rem; color: #b47c2e; min-height: 1.6rem;
     font-weight: 700; }
+
+  .theory-block { border-radius: 20px; padding: 14px 18px; margin: 14px 0;
+    text-align: left; }
+  .theory-block .block-title { font-weight: 800; font-size: 1.05rem; margin-bottom: 8px; }
+  .theory-block .block-content { font-size: 1rem; line-height: 1.55; color: #3a2c1b; }
+  #theory-explanation { background: #e6d5b8; border: 2px solid #b98c5c; }
+  #theory-example-block { background: #fff5cc; border: 2px solid #ffb300; }
+  #theory-explanation .block-title { color: #3a2c1b; }
+  #theory-example-block .block-title { color: #8b3a00; }
+  #start-practice-btn { background: #51cf66; color: white; }
+  #theory-icon-big { font-size: 3.5rem; margin: 4px 0 8px; }
 
   #customize-modal .card { max-width: 660px; text-align: left; }
   #customize-modal h2 { text-align: center; }
@@ -312,17 +322,38 @@
 <div id="photo-flash"></div>
 <div id="photo-toast">Foto guardada!</div>
 
+<!-- MODAL DE TEORIA + EJERCICIO -->
 <div id="modal" class="modal-bg">
   <div class="card">
-    <h2 id="modal-title">Casita</h2>
-    <div id="question-text" class="question"></div>
-    <input type="text" id="answer-input" placeholder="?" autocomplete="off">
-    <div id="feedback" class="feedback"></div>
-    <div class="btns">
-      <button id="check-btn">Comprobar</button>
-      <button id="close-btn">Salir</button>
+    <div id="theory-view">
+      <h2 id="theory-title">Casita</h2>
+      <div id="theory-icon-big">1</div>
+      <div class="theory-block" id="theory-explanation">
+        <div class="block-title">Explicacion</div>
+        <div class="block-content" id="theory-text"></div>
+      </div>
+      <div class="theory-block" id="theory-example-block">
+        <div class="block-title">Ejemplo resuelto</div>
+        <div class="block-content" id="theory-example"></div>
+      </div>
+      <div class="btns">
+        <button id="start-practice-btn">Entendido, a practicar!</button>
+        <button id="theory-close-btn">Salir</button>
+      </div>
     </div>
-    <div id="stars-earned" class="stars-earned"></div>
+
+    <div id="practice-view" style="display:none;">
+      <h2 id="modal-title">Casita</h2>
+      <div id="question-text" class="question"></div>
+      <input type="text" id="answer-input" placeholder="?" autocomplete="off">
+      <div id="feedback" class="feedback"></div>
+      <div class="btns">
+        <button id="check-btn">Comprobar</button>
+        <button id="back-theory-btn">Ver teoria</button>
+        <button id="close-btn">Salir</button>
+      </div>
+      <div id="stars-earned" class="stars-earned"></div>
+    </div>
   </div>
 </div>
 
@@ -381,10 +412,8 @@
   </div>
 </div>
 
-<!-- Three.js como script normal (NO módulo) -->
 <script src="three.min.js"></script>
 
-<!-- El juego, también como script normal -->
 <script>
 (function() {
   var debugEl = document.getElementById('debug');
@@ -398,7 +427,6 @@
     log('ERROR: ' + msg + ' linea ' + line, true);
   };
 
-  // COMPROBAR THREE
   if (typeof THREE === 'undefined') {
     log('ERROR: No se ha cargado three.min.js. Asegurate de tenerlo en la misma carpeta.', true);
     return;
@@ -410,9 +438,8 @@
     // AUDIO
     // ============================================================
     var audioCtx = null;
-    try {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    } catch(e) { audioCtx = null; }
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch(e) { audioCtx = null; }
 
     function playTone(freq, duration, type, volume, delay) {
       if (!audioCtx) return;
@@ -490,20 +517,62 @@
     };
 
     var topics = [
-      { id:'numeros', name:'Numeros', icon:'1', color:0xff6b6b, zone:'pueblo', position:{x:-14, z:-14}, question:'Cuanto es 15 + 27?', answer:'42', stars:0, maxStars:9, hints:['15+20=35, +7.','Suma por partes.'] },
-      { id:'divisibilidad', name:'Divisibilidad', icon:'2', color:0x4ecdc4, zone:'pueblo', position:{x:-7, z:-16}, question:'MCD de 12 y 18', answer:'6', stars:0, maxStars:9, hints:['Mayor divisor comun.','12=2x2x3.'] },
-      { id:'fracciones', name:'Fracciones', icon:'3', color:0xffa94d, zone:'pueblo', position:{x:0, z:-16}, question:'1/2 + 1/4 (ej: 3/4)', answer:'3/4', stars:0, maxStars:9, hints:['Denominador comun.','1/2 = 2/4.'] },
-      { id:'decimales', name:'Decimales', icon:'4', color:0x845ef7, zone:'pueblo', position:{x:7, z:-16}, question:'2,5 + 1,75', answer:'4,25', stars:0, maxStars:9, hints:['Alinea las comas.','250+175=425.'] },
-      { id:'porcentajes', name:'Porcentajes', icon:'5', color:0xff922b, zone:'pueblo', position:{x:14, z:-14}, question:'20% de 150', answer:'30', stars:0, maxStars:9, hints:['20%=1/5.','150/5.'] },
-      { id:'geometria', name:'Geometria', icon:'6', color:0x51cf66, zone:'pueblo', position:{x:16, z:0}, question:'Area 8 x 5', answer:'40', stars:0, maxStars:9, hints:['base x altura.','8x5.'] },
-      { id:'medidas', name:'Medidas', icon:'7', color:0x22b8cf, zone:'pueblo', position:{x:16, z:12}, question:'cm en 3,5 m', answer:'350', stars:0, maxStars:9, hints:['1m = 100cm.','3,5 x 100.'] },
-      { id:'problemas', name:'Problemas', icon:'8', color:0xf06595, zone:'pueblo', position:{x:0, z:17}, question:'4 lapices a 0,75 euros', answer:'3', stars:0, maxStars:9, hints:['Multiplica.','0,75 x 4.'] },
-      { id:'estadistica', name:'Estadistica', icon:'9', color:0x748ffc, zone:'pueblo', position:{x:-14, z:14}, question:'Media de 4, 6, 8', answer:'6', stars:0, maxStars:9, hints:['Suma entre cuantos.','18/3.'] },
-      { id:'potencias', name:'Potencias', icon:'P', color:0xff7675, zone:'bosque', position:{x:-8, z:-12}, question:'2 elevado a 5', answer:'32', stars:0, maxStars:9, hints:['2x2x2x2x2.','5 veces.'] },
-      { id:'enteros', name:'Enteros', icon:'E', color:0x74b9ff, zone:'bosque', position:{x:0, z:-15}, question:'(-5) + 8', answer:'3', stars:0, maxStars:9, hints:['Desde -5 avanza 8.','-5+5=0, +3.'] },
-      { id:'algebra', name:'Algebra', icon:'A', color:0xa29bfe, zone:'bosque', position:{x:8, z:-12}, question:'x+5=12, x?', answer:'7', stars:0, maxStars:9, hints:['Resta 5.','12-5.'] },
-      { id:'ecuaciones', name:'Ecuaciones', icon:'X', color:0xfab1a0, zone:'montana', position:{x:-6, z:0}, question:'3x=21, x?', answer:'7', stars:0, maxStars:9, hints:['Divide entre 3.','21/3.'] },
-      { id:'probabilidad', name:'Probabilidad', icon:'D', color:0xffd93d, zone:'montana', position:{x:6, z:0}, question:'P(par)? 1/2', answer:'1/2', stars:0, maxStars:9, hints:['Pares: 2, 4, 6.','3 de 6.'] }
+      { id:'numeros', name:'Numeros', icon:'1', color:0xff6b6b, zone:'pueblo', position:{x:-14, z:-14},
+        explicacion:'Los numeros naturales sirven para contar y ordenar. Al sumar juntamos cantidades, al restar quitamos, al multiplicar sumamos varias veces lo mismo y al dividir repartimos en partes iguales.',
+        ejemplo:'Sumamos 15 + 27 paso a paso:<br>1. Descomponemos: 15 = 10 + 5, y 27 = 20 + 7.<br>2. Sumamos decenas: 10 + 20 = 30.<br>3. Sumamos unidades: 5 + 7 = 12.<br>4. Juntamos todo: 30 + 12 = <b>42</b>.',
+        question:'Cuanto es 15 + 27?', answer:'42', stars:0, maxStars:9, hints:['15+20=35, +7.','Suma por partes.'] },
+      { id:'divisibilidad', name:'Divisibilidad', icon:'2', color:0x4ecdc4, zone:'pueblo', position:{x:-7, z:-16},
+        explicacion:'Un divisor de un numero es el que lo divide exactamente, sin que sobre nada. El MCD (Maximo Comun Divisor) de dos numeros es el divisor mas grande que comparten.',
+        ejemplo:'MCD de 12 y 18:<br>1. Descomponemos en factores primos:<br>&nbsp;&nbsp;12 = 2 x 2 x 3<br>&nbsp;&nbsp;18 = 2 x 3 x 3<br>2. Cogemos los factores comunes con menor exponente: 2 y 3.<br>3. Los multiplicamos: 2 x 3 = <b>6</b>.',
+        question:'MCD de 12 y 18', answer:'6', stars:0, maxStars:9, hints:['Mayor divisor comun.','12=2x2x3.'] },
+      { id:'fracciones', name:'Fracciones', icon:'3', color:0xffa94d, zone:'pueblo', position:{x:0, z:-16},
+        explicacion:'Una fraccion representa partes de un todo. Para sumar o restar fracciones necesitamos el mismo denominador. Si no lo tienen, buscamos fracciones equivalentes con denominador comun.',
+        ejemplo:'1/2 + 1/4:<br>1. Buscamos denominador comun. El 4 sirve porque 4 es multiplo de 2.<br>2. Convertimos 1/2 en 2/4 (multiplicamos arriba y abajo por 2).<br>3. Ahora sumamos: 2/4 + 1/4 = 3/4.<br>Resultado: <b>3/4</b>.',
+        question:'1/2 + 1/4 (ej: 3/4)', answer:'3/4', stars:0, maxStars:9, hints:['Denominador comun.','1/2 = 2/4.'] },
+      { id:'decimales', name:'Decimales', icon:'4', color:0x845ef7, zone:'pueblo', position:{x:7, z:-16},
+        explicacion:'Los numeros decimales tienen una parte entera y una parte decimal separadas por una coma. Al sumar o restar hay que alinear las comas para que coincidan unidades con unidades, decimas con decimas, etc.',
+        ejemplo:'2,5 + 1,75:<br>1. Alineamos: <br>&nbsp;&nbsp;2,50<br>+&nbsp;1,75<br>2. Sumamos como si no hubiera coma: 250 + 175 = 425.<br>3. Ponemos la coma en su sitio: <b>4,25</b>.',
+        question:'2,5 + 1,75', answer:'4,25', stars:0, maxStars:9, hints:['Alinea las comas.','250+175=425.'] },
+      { id:'porcentajes', name:'Porcentajes', icon:'5', color:0xff922b, zone:'pueblo', position:{x:14, z:-14},
+        explicacion:'Un porcentaje es una fraccion con denominador 100. El 20% significa 20 de cada 100, que es lo mismo que 1/5. Para calcular un porcentaje, multiplicamos por el numero y dividimos entre 100.',
+        ejemplo:'20% de 150:<br>1. 20% = 20/100 = 1/5.<br>2. Dividimos 150 entre 5: 150 / 5 = <b>30</b>.<br>Tambien podemos hacer: 150 x 20 = 3000, y 3000 / 100 = 30.',
+        question:'20% de 150', answer:'30', stars:0, maxStars:9, hints:['20%=1/5.','150/5.'] },
+      { id:'geometria', name:'Geometria', icon:'6', color:0x51cf66, zone:'pueblo', position:{x:16, z:0},
+        explicacion:'El area de una figura es la cantidad de superficie que ocupa. Se mide en unidades cuadradas. Para el rectangulo, el area es base x altura.',
+        ejemplo:'Area de un rectangulo de 8 x 5:<br>1. Formula: Area = base x altura.<br>2. Sustituimos: Area = 8 x 5.<br>3. Resultado: <b>40</b> unidades cuadradas.',
+        question:'Area 8 x 5', answer:'40', stars:0, maxStars:9, hints:['base x altura.','8x5.'] },
+      { id:'medidas', name:'Medidas', icon:'7', color:0x22b8cf, zone:'pueblo', position:{x:16, z:12},
+        explicacion:'Las unidades de longitud se relacionan entre si. 1 metro = 100 centimetros. Para pasar de metros a centimetros multiplicamos por 100.',
+        ejemplo:'Cuantos cm hay en 3,5 m:<br>1. Sabemos que 1 m = 100 cm.<br>2. Multiplicamos: 3,5 x 100.<br>3. Resultado: <b>350 cm</b>.',
+        question:'cm en 3,5 m', answer:'350', stars:0, maxStars:9, hints:['1m = 100cm.','3,5 x 100.'] },
+      { id:'problemas', name:'Problemas', icon:'8', color:0xf06595, zone:'pueblo', position:{x:0, z:17},
+        explicacion:'Los problemas matematicos nos cuentan una situacion real que resolvemos con operaciones. Leemos con atencion, identificamos los datos y elegimos la operacion adecuada.',
+        ejemplo:'4 lapices a 0,75 euros:<br>1. Datos: 4 lapices, cada uno cuesta 0,75 euros.<br>2. Operacion: multiplicar 0,75 x 4.<br>3. Resultado: <b>3 euros</b>.',
+        question:'4 lapices a 0,75 euros', answer:'3', stars:0, maxStars:9, hints:['Multiplica.','0,75 x 4.'] },
+      { id:'estadistica', name:'Estadistica', icon:'9', color:0x748ffc, zone:'pueblo', position:{x:-14, z:14},
+        explicacion:'La media o promedio de varios numeros se calcula sumando todos y dividiendo entre cuantos hay. Nos da un valor representativo del conjunto.',
+        ejemplo:'Media de 4, 6 y 8:<br>1. Sumamos: 4 + 6 + 8 = 18.<br>2. Contamos cuantos numeros hay: 3.<br>3. Dividimos: 18 / 3 = <b>6</b>.',
+        question:'Media de 4, 6, 8', answer:'6', stars:0, maxStars:9, hints:['Suma entre cuantos.','18/3.'] },
+      { id:'potencias', name:'Potencias', icon:'P', color:0xff7675, zone:'bosque', position:{x:-8, z:-12},
+        explicacion:'Una potencia es una multiplicacion repetida. a elevado a n significa multiplicar a por si mismo n veces. El numero de abajo es la base y el de arriba el exponente.',
+        ejemplo:'2 elevado a 5:<br>1. Base = 2, exponente = 5.<br>2. Multiplicamos 2 por si mismo 5 veces: 2 x 2 x 2 x 2 x 2.<br>3. Resultado: <b>32</b>.',
+        question:'2 elevado a 5', answer:'32', stars:0, maxStars:9, hints:['2x2x2x2x2.','5 veces.'] },
+      { id:'enteros', name:'Enteros', icon:'E', color:0x74b9ff, zone:'bosque', position:{x:0, z:-15},
+        explicacion:'Los numeros enteros incluyen positivos, negativos y el cero. Al sumar un positivo avanzamos hacia la derecha en la recta numerica; al sumar un negativo, hacia la izquierda.',
+        ejemplo:'(-5) + 8:<br>1. Empezamos en -5 en la recta.<br>2. Avanzamos 8 pasos hacia la derecha.<br>3. Llegamos a <b>3</b>.',
+        question:'(-5) + 8', answer:'3', stars:0, maxStars:9, hints:['Desde -5 avanza 8.','-5+5=0, +3.'] },
+      { id:'algebra', name:'Algebra', icon:'A', color:0xa29bfe, zone:'bosque', position:{x:8, z:-12},
+        explicacion:'En algebra usamos letras para representar numeros desconocidos. Resolver una ecuacion es encontrar el valor de la letra que hace que la igualdad sea cierta.',
+        ejemplo:'x + 5 = 12:<br>1. Queremos dejar x sola.<br>2. Restamos 5 en los dos lados: x + 5 - 5 = 12 - 5.<br>3. Resultado: x = <b>7</b>.',
+        question:'x+5=12, x?', answer:'7', stars:0, maxStars:9, hints:['Resta 5.','12-5.'] },
+      { id:'ecuaciones', name:'Ecuaciones', icon:'X', color:0xfab1a0, zone:'montana', position:{x:-6, z:0},
+        explicacion:'Una ecuacion es una igualdad con una incognita. Para resolverla hacemos la operacion inversa en los dos lados hasta dejar la incognita sola.',
+        ejemplo:'3x = 21:<br>1. La x esta multiplicada por 3.<br>2. Hacemos la operacion inversa: dividir entre 3 los dos lados.<br>3. Resultado: x = 21 / 3 = <b>7</b>.',
+        question:'3x=21, x?', answer:'7', stars:0, maxStars:9, hints:['Divide entre 3.','21/3.'] },
+      { id:'probabilidad', name:'Probabilidad', icon:'D', color:0xffd93d, zone:'montana', position:{x:6, z:0},
+        explicacion:'La probabilidad mide las posibilidades de que ocurra un suceso. Se calcula dividiendo los casos favorables entre los casos posibles.',
+        ejemplo:'Probabilidad de sacar par en un dado:<br>1. Casos favorables: 2, 4, 6 -> 3 casos.<br>2. Casos posibles: 1, 2, 3, 4, 5, 6 -> 6 casos.<br>3. Probabilidad = 3/6 = <b>1/2</b>.',
+        question:'P(par)? 1/2', answer:'1/2', stars:0, maxStars:9, hints:['Pares: 2, 4, 6.','3 de 6.'] }
     ];
     var MAX_TOTAL_STARS = topics.length * 9;
     var totalStars = 0;
@@ -513,6 +582,23 @@
       return { x: topic.position.x + zone.offset.x, z: topic.position.z + zone.offset.z };
     }
     function isZoneUnlocked(zoneId) { return totalStars >= ZONES[zoneId].unlockStars; }
+
+    // Comprueba si una posicion (x,z) esta sobre suelo caminable
+    function isOnWalkableGround(x, z) {
+      var size = 60;
+      var margin = 2;
+      var half = size / 2 - margin;
+      var zoneIds = Object.keys(ZONES);
+      for (var i = 0; i < zoneIds.length; i++) {
+        var zn = ZONES[zoneIds[i]];
+        var dx = x - zn.offset.x;
+        var dz = z - zn.offset.z;
+        if (Math.abs(dx) <= half && Math.abs(dz) <= half) {
+          return true;
+        }
+      }
+      return false;
+    }
 
     // LOGROS
     var achievements = [
@@ -551,7 +637,7 @@
       { id:'talk2', icon:'C', name:'Charlatana', desc:'Habla con 2 aldeanos', target:2, reward:1, field:'npcsTalkedToday' },
       { id:'oneTheme', icon:'H', name:'Especialista', desc:'Completa un tema hoy', target:1, reward:3, field:'themesCompletedToday' }
     ];
-    var DAILY_KEY = 'expedicion_matematica_daily_v10';
+    var DAILY_KEY = 'expedicion_matematica_daily_v11';
     function getTodayKey() {
       var d = new Date();
       return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
@@ -685,9 +771,9 @@
     }
 
     // STORAGE
-    var STORAGE_KEY = 'expedicion_matematica_save_v10';
-    var APPEARANCE_KEY = 'expedicion_matematica_appearance_v10';
-    var ACHIEVEMENTS_KEY = 'expedicion_matematica_achievements_v10';
+    var STORAGE_KEY = 'expedicion_matematica_save_v11';
+    var APPEARANCE_KEY = 'expedicion_matematica_appearance_v11';
+    var ACHIEVEMENTS_KEY = 'expedicion_matematica_achievements_v11';
     function saveAll() {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify({ stars: topics.map(function(t) { return { id: t.id, stars: t.stars }; }), totalStars: totalStars }));
@@ -735,9 +821,9 @@
     var DAY_BG = new THREE.Color(0x87ceeb);
     var NIGHT_BG = new THREE.Color(0x0a0a2a);
     scene.background = DAY_BG.clone();
-    scene.fog = new THREE.Fog(0x87ceeb, 50, 150);
+    scene.fog = new THREE.Fog(0x87ceeb, 60, 180);
 
-    var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 500);
+    var camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 500);
     var renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -753,12 +839,12 @@
     sun.position.set(30, 50, 20);
     sun.castShadow = true;
     sun.shadow.mapSize.set(2048, 2048);
-    sun.shadow.camera.left = -80;
-    sun.shadow.camera.right = 80;
-    sun.shadow.camera.top = 80;
-    sun.shadow.camera.bottom = -80;
+    sun.shadow.camera.left = -90;
+    sun.shadow.camera.right = 90;
+    sun.shadow.camera.top = 90;
+    sun.shadow.camera.bottom = -90;
     sun.shadow.camera.near = 1;
-    sun.shadow.camera.far = 200;
+    sun.shadow.camera.far = 220;
     sun.shadow.bias = -0.0005;
     scene.add(sun);
 
@@ -773,6 +859,13 @@
       mesh.position.set(zone.offset.x, 0, zone.offset.z);
       mesh.receiveShadow = true;
       scene.add(mesh);
+      // Borde del suelo: un poco mas oscuro para marcar el limite
+      var edgeGeo = new THREE.PlaneGeometry(60.4, 60.4);
+      var edgeMat = new THREE.MeshStandardMaterial({ color: 0x2a3a2a, roughness: 1 });
+      var edge = new THREE.Mesh(edgeGeo, edgeMat);
+      edge.rotation.x = -Math.PI / 2;
+      edge.position.set(zone.offset.x, -0.05, zone.offset.z);
+      scene.add(edge);
     });
 
     var pathMesh = new THREE.Mesh(
@@ -827,20 +920,23 @@
       g.scale.set(scale, scale, scale);
       return g;
     }
-    for (var i = 0; i < 24; i++) {
-      var a = (i / 24) * Math.PI * 2;
-      var r = 28 + Math.random() * 4;
-      scene.add(createTree(Math.cos(a) * r, Math.sin(a) * r, 0.9 + Math.random() * 0.4));
+    // Arboles del pueblo (dentro del suelo de 60x60)
+    for (var i = 0; i < 16; i++) {
+      var a = (i / 16) * Math.PI * 2;
+      var r = 26 + Math.random() * 2;
+      scene.add(createTree(Math.cos(a) * r, Math.sin(a) * r, 0.9 + Math.random() * 0.3));
     }
+    // Arboles del bosque
     for (var i = 0; i < 30; i++) {
-      var bx = ZONES.bosque.offset.x + (Math.random() - 0.5) * 40;
-      var bz = ZONES.bosque.offset.z + (Math.random() - 0.5) * 40;
+      var bx = ZONES.bosque.offset.x + (Math.random() - 0.5) * 50;
+      var bz = ZONES.bosque.offset.z + (Math.random() - 0.5) * 50;
       if (Math.hypot(bx - ZONES.bosque.offset.x, bz - ZONES.bosque.offset.z) < 12) continue;
       scene.add(createTree(bx, bz, 0.9 + Math.random() * 0.4));
     }
+    // Rocas en montana
     for (var i = 0; i < 20; i++) {
-      var mx = ZONES.montana.offset.x + (Math.random() - 0.5) * 45;
-      var mz = ZONES.montana.offset.z + (Math.random() - 0.5) * 45;
+      var mx = ZONES.montana.offset.x + (Math.random() - 0.5) * 50;
+      var mz = ZONES.montana.offset.z + (Math.random() - 0.5) * 50;
       if (Math.hypot(mx - ZONES.montana.offset.x, mz - ZONES.montana.offset.z) < 14) continue;
       var gRock = new THREE.Group();
       var rockMat = new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 1, flatShading: true });
@@ -855,7 +951,7 @@
     var flowerColors = [0xff6b6b, 0xffd93d, 0xff9ff3, 0xffffff, 0xa29bfe, 0xffa94d];
     for (var i = 0; i < 80; i++) {
       var a = Math.random() * Math.PI * 2;
-      var r = 24 + Math.random() * 15;
+      var r = 24 + Math.random() * 14;
       var g = new THREE.Group();
       var stem = new THREE.Mesh(
         new THREE.CylinderGeometry(0.04, 0.04, 0.5, 5),
@@ -1491,16 +1587,12 @@
       currentTopic = topic;
       answeredCorrectly = false;
       state.questionStartTime = performance.now();
-      document.getElementById('modal-title').textContent = topic.name;
-      document.getElementById('question-text').textContent = topic.question;
-      var ai = document.getElementById('answer-input');
-      ai.value = '';
-      ai.disabled = false;
-      ai.focus();
-      document.getElementById('feedback').textContent = '';
-      document.getElementById('feedback').className = 'feedback';
-      document.getElementById('stars-earned').textContent = '';
-      document.getElementById('check-btn').disabled = false;
+      document.getElementById('theory-title').textContent = topic.name;
+      document.getElementById('theory-icon-big').textContent = topic.icon;
+      document.getElementById('theory-text').innerHTML = topic.explicacion || 'Sin explicacion disponible.';
+      document.getElementById('theory-example').innerHTML = topic.ejemplo || 'Sin ejemplo disponible.';
+      document.getElementById('theory-view').style.display = 'block';
+      document.getElementById('practice-view').style.display = 'none';
       modalEl.classList.add('show');
       Sounds.open();
     }
@@ -1508,6 +1600,31 @@
       modalEl.classList.remove('show');
       modalOpen = false;
       currentTopic = null;
+    }
+    function startPractice() {
+      if (!currentTopic) return;
+      document.getElementById('modal-title').textContent = currentTopic.name;
+      document.getElementById('question-text').textContent = currentTopic.question;
+      var ai = document.getElementById('answer-input');
+      ai.value = '';
+      ai.disabled = false;
+      document.getElementById('feedback').textContent = '';
+      document.getElementById('feedback').className = 'feedback';
+      document.getElementById('stars-earned').textContent = '';
+      document.getElementById('check-btn').disabled = false;
+      document.getElementById('theory-view').style.display = 'none';
+      document.getElementById('practice-view').style.display = 'block';
+      state.questionStartTime = performance.now();
+      ai.focus();
+    }
+    function backToTheory() {
+      if (!currentTopic) return;
+      document.getElementById('theory-title').textContent = currentTopic.name;
+      document.getElementById('theory-icon-big').textContent = currentTopic.icon;
+      document.getElementById('theory-text').innerHTML = currentTopic.explicacion || '';
+      document.getElementById('theory-example').innerHTML = currentTopic.ejemplo || '';
+      document.getElementById('theory-view').style.display = 'block';
+      document.getElementById('practice-view').style.display = 'none';
     }
     function checkAnswer() {
       if (!currentTopic || answeredCorrectly) return;
@@ -1589,6 +1706,9 @@
     }
     document.getElementById('check-btn').addEventListener('click', checkAnswer);
     document.getElementById('close-btn').addEventListener('click', closeModal);
+    document.getElementById('theory-close-btn').addEventListener('click', closeModal);
+    document.getElementById('start-practice-btn').addEventListener('click', startPractice);
+    document.getElementById('back-theory-btn').addEventListener('click', backToTheory);
     document.getElementById('answer-input').addEventListener('keydown', function(e) {
       if (e.key === 'Enter') { e.preventDefault(); checkAnswer(); }
     });
@@ -1951,11 +2071,11 @@
       });
     }
 
-    camera.position.set(0, 6, 15);
+    // CAMARA FIJA - posicion inicial
+    camera.position.set(8, 12, 17);
     camera.lookAt(0, 1.5, 5);
 
     var clock = new THREE.Clock();
-    var camOffset = new THREE.Vector3(0, 4.5, -8);
     var camLookAtOffset = new THREE.Vector3(0, 1.5, 0);
     var tempCamPos = new THREE.Vector3();
     var tempLookAt = new THREE.Vector3();
@@ -1971,7 +2091,7 @@
 
       if (state.customizing) {
         player.rotation.y += dt * 1.2;
-        tempCamPos.set(state.x, 2.5, state.z).add(new THREE.Vector3(0, 1.5, 6));
+        tempCamPos.set(state.x + 3, 3, state.z + 5);
         camera.position.lerp(tempCamPos, 5 * dt);
         tempLookAt.set(state.x, 1.5, state.z);
         camera.lookAt(tempLookAt);
@@ -2002,20 +2122,34 @@
         var len = Math.hypot(mx, mz);
         mx /= len;
         mz /= len;
-        state.x += mx * state.speed * dt;
-        state.z += mz * state.speed * dt;
-        var ta = Math.atan2(mx, mz);
-        var d = ta - player.rotation.y;
-        while (d > Math.PI) d -= Math.PI * 2;
-        while (d < -Math.PI) d += Math.PI * 2;
-        player.rotation.y += d * 10 * dt;
-        state.walkCycle += dt * 12;
-        parts.legL.rotation.x = Math.sin(state.walkCycle) * 0.5;
-        parts.legR.rotation.x = -Math.sin(state.walkCycle) * 0.5;
-        parts.armL.rotation.x = -Math.sin(state.walkCycle) * 0.5;
-        parts.armR.rotation.x = Math.sin(state.walkCycle) * 0.5;
-        state.stepTimer += dt;
-        if (state.stepTimer > 0.35) { state.stepTimer = 0; Sounds.step(); }
+        var newX = state.x + mx * state.speed * dt;
+        var newZ = state.z + mz * state.speed * dt;
+        var moved = false;
+        if (isOnWalkableGround(newX, newZ)) {
+          state.x = newX;
+          state.z = newZ;
+          moved = true;
+        } else if (isOnWalkableGround(newX, state.z)) {
+          state.x = newX;
+          moved = true;
+        } else if (isOnWalkableGround(state.x, newZ)) {
+          state.z = newZ;
+          moved = true;
+        }
+        if (moved) {
+          var ta = Math.atan2(mx, mz);
+          var d = ta - player.rotation.y;
+          while (d > Math.PI) d -= Math.PI * 2;
+          while (d < -Math.PI) d += Math.PI * 2;
+          player.rotation.y += d * 10 * dt;
+          state.walkCycle += dt * 12;
+          parts.legL.rotation.x = Math.sin(state.walkCycle) * 0.5;
+          parts.legR.rotation.x = -Math.sin(state.walkCycle) * 0.5;
+          parts.armL.rotation.x = -Math.sin(state.walkCycle) * 0.5;
+          parts.armR.rotation.x = Math.sin(state.walkCycle) * 0.5;
+          state.stepTimer += dt;
+          if (state.stepTimer > 0.35) { state.stepTimer = 0; Sounds.step(); }
+        }
         player.position.y = 0;
       } else {
         parts.legL.rotation.x *= 0.85;
@@ -2026,8 +2160,6 @@
         player.position.y = 0;
       }
 
-      state.x = Math.max(-50, Math.min(90, state.x));
-      state.z = Math.max(-90, Math.min(50, state.z));
       player.position.x = state.x;
       player.position.z = state.z;
 
@@ -2075,14 +2207,13 @@
         hintEl.style.opacity = '0.9';
       }
 
+      // CAMARA FIJA: siempre misma direccion respecto al mundo
       if (state.celebrating <= 0) {
-        var a = player.rotation.y;
-        var ro = camOffset.clone().applyAxisAngle(new THREE.Vector3(0, 1, 0), a);
-        tempCamPos.set(state.x, 0, state.z).add(ro);
+        tempCamPos.set(state.x + 8, 12, state.z + 12);
         camera.position.lerp(tempCamPos, 5 * dt);
       } else {
         var ca = el * 1.5;
-        tempCamPos.set(state.x + Math.cos(ca) * 6, 3.5, state.z + Math.sin(ca) * 6);
+        tempCamPos.set(state.x + Math.cos(ca) * 10, 8, state.z + Math.sin(ca) * 10);
         camera.position.lerp(tempCamPos, 5 * dt);
       }
       tempLookAt.set(state.x, 1.5, state.z).add(camLookAtOffset);
