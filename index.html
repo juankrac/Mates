@@ -7,7 +7,7 @@
 <style>
   * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
-    font-family: 'Segoe UI', Roboto, system-ui, sans-serif; background: #87ceeb; }
+    font-family: 'Comic Sans MS', 'Segoe UI', sans-serif; background: #87ceeb; }
   #canvas-container { width: 100vw; height: 100vh; display: block; }
   #debug { position: fixed; top: 8px; left: 8px; background: rgba(0,0,0,0.75); color: #0f0;
     padding: 6px 10px; font-family: monospace; font-size: 11px; border-radius: 6px;
@@ -20,7 +20,7 @@
     pointer-events: none; z-index: 10; gap: 10px; flex-wrap: wrap; }
   .panel { background: rgba(254,247,224,0.95); border: 3px solid #1a1a1a;
     border-radius: 100px; padding: 8px 20px;
-    box-shadow: 0 6px 0 #8b6f4c, 0 10px 20px rgba(0,0,0,0.3);
+    box-shadow: 4px 4px 0 #1a1a1a;
     font-weight: 800; color: #1a1a1a; font-size: 1.1rem;
     display: flex; align-items: center; gap: 10px; pointer-events: auto; }
   .stars-total { background: #ffd966; }
@@ -30,10 +30,10 @@
     display: flex; flex-direction: column; gap: 8px; z-index: 11; }
   #top-buttons button { background: rgba(255,255,255,0.95); border: 3px solid #1a1a1a;
     border-radius: 40px; padding: 8px 14px; font-size: 0.8rem; font-weight: 800;
-    cursor: pointer; color: #1a1a1a; box-shadow: 0 3px 0 #1a1a1a;
+    cursor: pointer; color: #1a1a1a; box-shadow: 3px 3px 0 #1a1a1a;
     transition: 0.05s; display: flex; align-items: center; gap: 6px;
     position: relative; font-family: inherit; }
-  #top-buttons button:active { transform: translateY(3px); box-shadow: 0 0 0 #1a1a1a; }
+  #top-buttons button:active { transform: translate(3px, 3px); box-shadow: 0 0 0 #1a1a1a; }
   #top-buttons .customize { background: #ffb3d9; }
   #top-buttons .achievements { background: #ffe066; }
   #top-buttons .missions { background: #ffd1a3; }
@@ -47,7 +47,7 @@
 
   #hint { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
     background: rgba(254,247,224,0.95); border: 3px solid #1a1a1a; border-radius: 50px;
-    padding: 10px 24px; font-weight: 800; color: #1a1a1a; box-shadow: 0 6px 0 #1a1a1a;
+    padding: 10px 24px; font-weight: 800; color: #1a1a1a; box-shadow: 4px 4px 0 #1a1a1a;
     z-index: 10; text-align: center; font-size: 0.9rem; transition: opacity 0.3s;
     pointer-events: none; max-width: 90vw; }
 
@@ -55,9 +55,9 @@
     display: flex; flex-direction: column; gap: 10px; z-index: 15; }
   #action-buttons button { background: #ffd966; border: 3px solid #1a1a1a;
     border-radius: 50px; font-size: 1rem; font-weight: 800; color: #1a1a1a;
-    padding: 14px 22px; cursor: pointer; box-shadow: 0 5px 0 #1a1a1a;
+    padding: 14px 22px; cursor: pointer; box-shadow: 4px 4px 0 #1a1a1a;
     transition: 0.05s; display: flex; align-items: center; gap: 8px; font-family: inherit; }
-  #action-buttons button:active { transform: translateY(4px); box-shadow: 0 1px 0 #1a1a1a; }
+  #action-buttons button:active { transform: translate(3px, 3px); box-shadow: 0 0 0 #1a1a1a; }
   #action-buttons button:disabled { opacity: 0.4; pointer-events: none; }
   #action-buttons .talk-btn { background: #9be0ff; }
   #action-buttons .boss-btn { background: #ff7675; color: white; }
@@ -68,16 +68,16 @@
     grid-template-rows: repeat(3, 60px); gap: 6px; z-index: 15; }
   #touch-controls button { background: #ffd966; border: 3px solid #1a1a1a;
     border-radius: 14px; font-size: 1.8rem; font-weight: 900; color: #1a1a1a;
-    cursor: pointer; box-shadow: 0 5px 0 #1a1a1a; display: flex;
+    cursor: pointer; box-shadow: 3px 3px 0 #1a1a1a; display: flex;
     align-items: center; justify-content: center; padding: 0;
     transition: 0.05s; font-family: inherit; }
-  #touch-controls button:active { transform: translateY(4px); box-shadow: 0 1px 0 #1a1a1a; }
+  #touch-controls button:active { transform: translate(3px, 3px); box-shadow: 0 0 0 #1a1a1a; }
   #touch-controls .empty { visibility: hidden; }
 
   #npc-dialog { display: none; position: fixed; bottom: 100px; left: 50%;
     transform: translateX(-50%); background: #fef7e0; border: 4px solid #1a1a1a;
     border-radius: 24px; padding: 16px 22px; max-width: 520px; width: 90vw;
-    box-shadow: 0 12px 24px rgba(0,0,0,0.4); z-index: 50; font-weight: 700;
+    box-shadow: 6px 6px 0 rgba(0,0,0,0.4); z-index: 50; font-weight: 700;
     color: #1a1a1a; font-size: 1.05rem; }
   #npc-dialog .npc-name { font-weight: 800; color: #b47c2e; margin-bottom: 6px;
     font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
@@ -91,7 +91,7 @@
   .modal-bg.show { display: flex; }
   .card { background: #fef7e0; border-radius: 40px; padding: 28px 24px;
     max-width: 560px; width: 100%; border: 6px solid #1a1a1a;
-    box-shadow: 0 20px 40px black; text-align: center; max-height: 92vh;
+    box-shadow: 10px 10px 0 rgba(0,0,0,0.5); text-align: center; max-height: 92vh;
     overflow-y: auto; }
   .card h2 { font-size: 1.7rem; margin: 0 0 8px; color: #1a1a1a;
     display: flex; justify-content: center; align-items: center; gap: 10px; }
@@ -107,8 +107,8 @@
   .card button { background: #ffd966; border: 3px solid #1a1a1a; font-weight: 800;
     font-size: 1.05rem; padding: 12px 24px; border-radius: 40px;
     cursor: pointer; color: #1a1a1a;
-    box-shadow: 0 6px 0 #1a1a1a; font-family: inherit; transition: 0.05s; }
-  .card button:active { transform: translateY(4px); box-shadow: 0 2px 0 #1a1a1a; }
+    box-shadow: 4px 4px 0 #1a1a1a; font-family: inherit; transition: 0.05s; }
+  .card button:active { transform: translate(3px, 3px); box-shadow: 0 0 0 #1a1a1a; }
   .card button:disabled { opacity: 0.5; pointer-events: none; }
   .feedback { font-size: 1.3rem; font-weight: 800; min-height: 2rem; margin: 6px 0; }
   .success { color: #2e7d32; }
@@ -140,31 +140,32 @@
   .options { display: flex; flex-wrap: wrap; gap: 8px; }
   .options button { background: white; border: 3px solid #1a1a1a;
     border-radius: 14px; padding: 8px 12px; font-size: 0.8rem; font-weight: 800;
-    color: #1a1a1a; cursor: pointer; box-shadow: 0 3px 0 #1a1a1a;
+    color: #1a1a1a; cursor: pointer; box-shadow: 3px 3px 0 #1a1a1a;
     transition: 0.05s; font-family: inherit; display: flex;
     align-items: center; gap: 6px; }
-  .options button:active { transform: translateY(2px); box-shadow: 0 1px 0 #1a1a1a; }
-  .options button.selected { background: #ffd966; transform: translateY(2px);
-    box-shadow: 0 1px 0 #1a1a1a; }
+  .options button:active { transform: translate(2px, 2px); box-shadow: 0 0 0 #1a1a1a; }
+  .options button.selected { background: #ffd966; transform: translate(2px, 2px);
+    box-shadow: 0 0 0 #1a1a1a; }
   .options button.locked { opacity: 0.55; cursor: not-allowed; background: #e0d5c0; }
   .options button.locked::after { content: " (bloqueado)"; font-size: 0.7rem; color: #b47c2e; }
   .color-swatch { width: 32px; height: 32px; border-radius: 50%;
-    border: 3px solid #1a1a1a; cursor: pointer; box-shadow: 0 3px 0 #1a1a1a;
+    border: 3px solid #1a1a1a; cursor: pointer; box-shadow: 3px 3px 0 #1a1a1a;
     padding: 0; transition: 0.05s; position: relative; }
-  .color-swatch.selected { border-color: #1a1a1a; transform: scale(1.15);
-    box-shadow: 0 3px 0 #1a1a1a, 0 0 0 3px #ffd966; }
+  .color-swatch.selected { transform: scale(1.15);
+    box-shadow: 3px 3px 0 #1a1a1a, 0 0 0 3px #ffd966; }
   .color-swatch.locked { opacity: 0.5; cursor: not-allowed; }
   .color-swatch.golden { background: linear-gradient(135deg, #ffd700, #ffb300, #ffecb3) !important; }
   .color-swatch.rainbow { background: linear-gradient(135deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3) !important; }
 
-  #customize-close, #achievements-close, #missions-close {
+  #customize-close, #achievements-close, #missions-close, #home-close-btn {
     display: block; margin: 18px auto 0; background: #ffd966; border: 3px solid #1a1a1a;
     font-weight: 800; font-size: 1.1rem; padding: 14px 40px;
     border-radius: 40px; cursor: pointer;
-    color: #1a1a1a; box-shadow: 0 6px 0 #1a1a1a; font-family: inherit;
+    color: #1a1a1a; box-shadow: 4px 4px 0 #1a1a1a; font-family: inherit;
     transition: 0.05s; }
-  #customize-close:active, #achievements-close:active, #missions-close:active {
-    transform: translateY(4px); box-shadow: 0 2px 0 #1a1a1a; }
+  #customize-close:active, #achievements-close:active, #missions-close:active,
+  #home-close-btn:active {
+    transform: translate(3px, 3px); box-shadow: 0 0 0 #1a1a1a; }
 
   #achievements-modal .card { text-align: left; }
   .ach-item { display: flex; align-items: center; gap: 12px;
@@ -201,7 +202,7 @@
   #achievement-toast, #mission-toast { position: fixed; top: 20px; left: 50%;
     transform: translateX(-50%) translateY(-100px); border: 4px solid #1a1a1a;
     border-radius: 24px; padding: 14px 24px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4); z-index: 500;
+    box-shadow: 6px 6px 0 rgba(0,0,0,0.5); z-index: 500;
     display: flex; align-items: center; gap: 14px;
     transition: transform 0.4s; font-weight: 800; color: #1a1a1a;
     pointer-events: none; }
@@ -241,11 +242,10 @@
   #photo-toast { position: fixed; bottom: 100px; left: 50%;
     transform: translateX(-50%) translateY(60px); background: #c8f7c5;
     border: 4px solid #1a1a1a; border-radius: 40px; padding: 12px 24px;
-    font-weight: 800; color: #1a1a1a; box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+    font-weight: 800; color: #1a1a1a; box-shadow: 6px 6px 0 rgba(0,0,0,0.4);
     z-index: 500; opacity: 0; transition: 0.3s; pointer-events: none; }
   #photo-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-  /* Lineas de velocidad manga */
   #manga-lines {
     position: fixed; inset: 0; pointer-events: none;
     z-index: 5; overflow: hidden;
@@ -253,9 +253,9 @@
   .speed-line {
     position: absolute;
     background: linear-gradient(90deg, transparent, #1a1a1a);
-    height: 3px;
+    height: 2px;
     animation: dash 0.7s linear infinite;
-    opacity: 0.15;
+    opacity: 0.08;
   }
   @keyframes dash {
     0% { transform: translateX(-100%); }
@@ -378,14 +378,12 @@
 <div id="home-modal" class="modal-bg">
   <div class="card">
     <h2>Mi casita</h2>
-    <div id="home-icon" style="font-size:4rem;margin:8px 0;">🏡</div>
+    <div style="font-size:4rem;margin:8px 0;">🏡</div>
     <div class="theory-block" style="background:#ffd1e8;border:3px solid #1a1a1a;">
       <div class="block-title">Bienvenida a casa</div>
-      <div class="block-content" id="home-text">
-        Aqui puedes descansar, mirar tus estadisticas y prepararte para la siguiente aventura.
-      </div>
+      <div class="block-content">Aqui puedes descansar y ver tus estadisticas.</div>
     </div>
-    <div id="home-stats" style="background:#f1e3c8;border:3px solid #1a1a1a;border-radius:20px;padding:14px;text-align:left;margin:14px 0;">
+    <div style="background:#f1e3c8;border:3px solid #1a1a1a;border-radius:20px;padding:14px;text-align:left;margin:14px 0;">
       <div style="font-weight:800;margin-bottom:8px;">Tus estadisticas:</div>
       <div id="home-stats-content" style="font-size:0.95rem;line-height:1.7;"></div>
     </div>
@@ -472,7 +470,7 @@
   }
   log('Three.js v' + THREE.REVISION + ' OK');
 
-  // Generar lineas de velocidad manga
+  // Lineas de velocidad manga
   (function() {
     var container = document.getElementById('manga-lines');
     for (var i = 0; i < 12; i++) {
@@ -487,6 +485,52 @@
   })();
 
   try {
+    // ============================================================
+    // GRADIENT MAP para efecto TOON real (4 tonos)
+    // ============================================================
+    function makeGradientMap(steps) {
+      steps = steps || 4;
+      var data = new Uint8Array(steps);
+      for (var i = 0; i < steps; i++) {
+        data[i] = Math.round((i / (steps - 1)) * 255);
+      }
+      var tex = new THREE.DataTexture(data, steps, 1, THREE.RedFormat);
+      tex.minFilter = THREE.NearestFilter;
+      tex.magFilter = THREE.NearestFilter;
+      tex.generateMipmaps = false;
+      tex.needsUpdate = true;
+      return tex;
+    }
+    var TOON_GRADIENT = makeGradientMap(4);
+
+    // Material toon con gradient map (efecto cel-shading real)
+    function toonMat(color) {
+      return new THREE.MeshToonMaterial({
+        color: color,
+        gradientMap: TOON_GRADIENT
+      });
+    }
+
+    // Material de contorno negro (para efecto manga)
+    var OUTLINE_MAT = new THREE.MeshBasicMaterial({
+      color: 0x1a1a1a,
+      side: THREE.BackSide
+    });
+
+    // Anade un contorno a un mesh
+    function addOutline(mesh, thickness) {
+      thickness = thickness || 1.05;
+      var outline = new THREE.Mesh(mesh.geometry, OUTLINE_MAT);
+      outline.scale.multiplyScalar(thickness);
+      outline.position.copy(mesh.position);
+      outline.rotation.copy(mesh.rotation);
+      outline.scale.multiply(mesh.scale);
+      if (mesh.parent) {
+        mesh.parent.add(outline);
+      }
+      return outline;
+    }
+
     // ============================================================
     // AUDIO
     // ============================================================
@@ -539,8 +583,7 @@
       start: function() {
         var self = this;
         if (self.playing) return;
-        self.playing = true;
-        self.step = 0;
+        self.playing = true; self.step = 0;
         function tick() {
           if (!self.playing) return;
           var idx = self.scale[(self.step * 3) % self.scale.length];
@@ -569,9 +612,9 @@
 
     var topics = [
       { id:'numeros', name:'Numeros', icon:'1', color:0xff6b6b, zone:'pueblo', position:{x:-14, z:-14},
-        explicacion:'Los numeros naturales sirven para contar y ordenar. Al sumar juntamos cantidades, al restar quitamos, al multiplicar sumamos varias veces lo mismo y al dividir repartimos en partes iguales.',
-        ejemplo:'Sumamos 15 + 27:<br>1. Descomponemos: 15 = 10+5, 27 = 20+7.<br>2. Decenas: 10+20 = 30.<br>3. Unidades: 5+7 = 12.<br>4. Total: 30+12 = <b>42</b>.',
-        stars:0, maxStars:9, hints:['Suma por partes.','Descompone en decenas y unidades.'],
+        explicacion:'Los numeros naturales sirven para contar y ordenar.',
+        ejemplo:'15 + 27 = <b>42</b>.',
+        stars:0, maxStars:9, hints:['Suma por partes.'],
         ejercicios:[
           { q:'Cuanto es 15 + 27?', a:'42' },
           { q:'Cuanto es 48 - 19?', a:'29' },
@@ -586,231 +629,166 @@
         ]
       },
       { id:'divisibilidad', name:'Divisibilidad', icon:'2', color:0x4ecdc4, zone:'pueblo', position:{x:-7, z:-16},
-        explicacion:'El MCD (Maximo Comun Divisor) de dos numeros es el divisor mas grande que comparten.',
-        ejemplo:'MCD de 12 y 18:<br>1. 12 = 2x2x3, 18 = 2x3x3.<br>2. Comunes: 2 y 3.<br>3. 2 x 3 = <b>6</b>.',
-        stars:0, maxStars:9, hints:['El mayor divisor comun.','Descompone en primos.'],
+        explicacion:'El MCD es el divisor mas grande que comparten dos numeros.',
+        ejemplo:'MCD(12,18) = <b>6</b>.',
+        stars:0, maxStars:9, hints:['Descompone en primos.'],
         ejercicios:[
-          { q:'MCD de 12 y 18', a:'6' },
-          { q:'MCD de 8 y 12', a:'4' },
-          { q:'MCD de 15 y 25', a:'5' },
-          { q:'MCM de 4 y 6', a:'12' },
-          { q:'MCM de 3 y 5', a:'15' },
-          { q:'MCM de 6 y 8', a:'24' },
-          { q:'Es 7 primo? (si/no)', a:'si' },
-          { q:'Es 15 primo? (si/no)', a:'no' },
-          { q:'MCD de 24 y 36', a:'12' },
-          { q:'MCM de 10 y 15', a:'30' }
+          { q:'MCD de 12 y 18', a:'6' }, { q:'MCD de 8 y 12', a:'4' },
+          { q:'MCD de 15 y 25', a:'5' }, { q:'MCM de 4 y 6', a:'12' },
+          { q:'MCM de 3 y 5', a:'15' }, { q:'MCM de 6 y 8', a:'24' },
+          { q:'Es 7 primo? (si/no)', a:'si' }, { q:'Es 15 primo? (si/no)', a:'no' },
+          { q:'MCD de 24 y 36', a:'12' }, { q:'MCM de 10 y 15', a:'30' }
         ]
       },
       { id:'fracciones', name:'Fracciones', icon:'3', color:0xffa94d, zone:'pueblo', position:{x:0, z:-16},
-        explicacion:'Una fraccion representa partes de un todo. Para sumar o restar necesitamos el mismo denominador.',
-        ejemplo:'1/2 + 1/4:<br>1. Denominador comun: 4.<br>2. 1/2 = 2/4.<br>3. 2/4 + 1/4 = <b>3/4</b>.',
-        stars:0, maxStars:9, hints:['Busca denominador comun.','Convierte a equivalentes.'],
+        explicacion:'Una fraccion representa partes de un todo.',
+        ejemplo:'1/2 + 1/4 = 2/4 + 1/4 = <b>3/4</b>.',
+        stars:0, maxStars:9, hints:['Denominador comun.'],
         ejercicios:[
-          { q:'1/2 + 1/4 (ej: 3/4)', a:'3/4' },
-          { q:'1/3 + 1/3 (ej: 2/3)', a:'2/3' },
-          { q:'3/5 - 1/5 (ej: 2/5)', a:'2/5' },
-          { q:'1/2 + 1/3 (ej: 5/6)', a:'5/6' },
-          { q:'2/3 + 1/6 (ej: 5/6)', a:'5/6' },
-          { q:'1/4 + 1/4 (ej: 1/2)', a:'1/2' },
-          { q:'3/4 - 1/4 (ej: 1/2)', a:'1/2' },
-          { q:'1/5 + 2/5 (ej: 3/5)', a:'3/5' },
-          { q:'5/6 - 1/6 (ej: 2/3)', a:'2/3' },
-          { q:'1/2 + 3/4 (ej: 5/4)', a:'5/4' }
+          { q:'1/2 + 1/4 (ej: 3/4)', a:'3/4' }, { q:'1/3 + 1/3 (ej: 2/3)', a:'2/3' },
+          { q:'3/5 - 1/5 (ej: 2/5)', a:'2/5' }, { q:'1/2 + 1/3 (ej: 5/6)', a:'5/6' },
+          { q:'2/3 + 1/6 (ej: 5/6)', a:'5/6' }, { q:'1/4 + 1/4 (ej: 1/2)', a:'1/2' },
+          { q:'3/4 - 1/4 (ej: 1/2)', a:'1/2' }, { q:'1/5 + 2/5 (ej: 3/5)', a:'3/5' },
+          { q:'5/6 - 1/6 (ej: 2/3)', a:'2/3' }, { q:'1/2 + 3/4 (ej: 5/4)', a:'5/4' }
         ]
       },
       { id:'decimales', name:'Decimales', icon:'4', color:0x845ef7, zone:'pueblo', position:{x:7, z:-16},
-        explicacion:'Los numeros decimales tienen parte entera y parte decimal separadas por coma.',
-        ejemplo:'2,5 + 1,75:<br>1. Alineamos: 2,50 + 1,75.<br>2. Sin coma: 250+175 = 425.<br>3. Resultado: <b>4,25</b>.',
-        stars:0, maxStars:9, hints:['Alinea las comas.','Suma sin coma.'],
+        explicacion:'Alinea las comas al sumar o restar.',
+        ejemplo:'2,5 + 1,75 = <b>4,25</b>.',
+        stars:0, maxStars:9, hints:['Alinea las comas.'],
         ejercicios:[
-          { q:'2,5 + 1,75', a:'4,25' },
-          { q:'3,4 + 2,6', a:'6' },
-          { q:'5,25 + 3,15', a:'8,4' },
-          { q:'7,8 - 3,2', a:'4,6' },
-          { q:'10,5 - 4,3', a:'6,2' },
-          { q:'1,5 x 2', a:'3' },
-          { q:'2,5 x 4', a:'10' },
-          { q:'8,4 / 2', a:'4,2' },
-          { q:'12,6 / 3', a:'4,2' },
-          { q:'0,5 + 0,75', a:'1,25' }
+          { q:'2,5 + 1,75', a:'4,25' }, { q:'3,4 + 2,6', a:'6' },
+          { q:'5,25 + 3,15', a:'8,4' }, { q:'7,8 - 3,2', a:'4,6' },
+          { q:'10,5 - 4,3', a:'6,2' }, { q:'1,5 x 2', a:'3' },
+          { q:'2,5 x 4', a:'10' }, { q:'8,4 / 2', a:'4,2' },
+          { q:'12,6 / 3', a:'4,2' }, { q:'0,5 + 0,75', a:'1,25' }
         ]
       },
       { id:'porcentajes', name:'Porcentajes', icon:'5', color:0xff922b, zone:'pueblo', position:{x:14, z:-14},
         explicacion:'Un porcentaje es una fraccion con denominador 100.',
-        ejemplo:'20% de 150:<br>1. 20% = 1/5.<br>2. 150/5 = <b>30</b>.',
-        stars:0, maxStars:9, hints:['20% = 1/5.','Divide entre 100.'],
+        ejemplo:'20% de 150 = 150/5 = <b>30</b>.',
+        stars:0, maxStars:9, hints:['20% = 1/5.'],
         ejercicios:[
-          { q:'20% de 150', a:'30' },
-          { q:'50% de 80', a:'40' },
-          { q:'25% de 200', a:'50' },
-          { q:'10% de 90', a:'9' },
-          { q:'75% de 100', a:'75' },
-          { q:'30% de 200', a:'60' },
-          { q:'15% de 200', a:'30' },
-          { q:'5% de 400', a:'20' },
-          { q:'40% de 250', a:'100' },
-          { q:'60% de 50', a:'30' }
+          { q:'20% de 150', a:'30' }, { q:'50% de 80', a:'40' },
+          { q:'25% de 200', a:'50' }, { q:'10% de 90', a:'9' },
+          { q:'75% de 100', a:'75' }, { q:'30% de 200', a:'60' },
+          { q:'15% de 200', a:'30' }, { q:'5% de 400', a:'20' },
+          { q:'40% de 250', a:'100' }, { q:'60% de 50', a:'30' }
         ]
       },
       { id:'geometria', name:'Geometria', icon:'6', color:0x51cf66, zone:'pueblo', position:{x:16, z:0},
-        explicacion:'El area de una figura es la superficie que ocupa.',
-        ejemplo:'Rectangulo 8x5:<br>1. Area = base x altura.<br>2. 8 x 5 = <b>40</b>.',
-        stars:0, maxStars:9, hints:['base x altura.','Triangulo: /2.'],
+        explicacion:'Area = base x altura (rectangulo).',
+        ejemplo:'8 x 5 = <b>40</b>.',
+        stars:0, maxStars:9, hints:['base x altura.'],
         ejercicios:[
-          { q:'Area rectangulo 8x5', a:'40' },
-          { q:'Area rectangulo 6x4', a:'24' },
-          { q:'Area cuadrado lado 7', a:'49' },
-          { q:'Area cuadrado lado 9', a:'81' },
-          { q:'Area triangulo 6x4', a:'12' },
-          { q:'Area triangulo 10x5', a:'25' },
-          { q:'Perimetro cuadrado lado 5', a:'20' },
-          { q:'Perimetro rectangulo 8x3', a:'22' },
-          { q:'Area rectangulo 12x5', a:'60' },
-          { q:'Area cuadrado lado 11', a:'121' }
+          { q:'Area rectangulo 8x5', a:'40' }, { q:'Area rectangulo 6x4', a:'24' },
+          { q:'Area cuadrado lado 7', a:'49' }, { q:'Area cuadrado lado 9', a:'81' },
+          { q:'Area triangulo 6x4', a:'12' }, { q:'Area triangulo 10x5', a:'25' },
+          { q:'Perimetro cuadrado lado 5', a:'20' }, { q:'Perimetro rectangulo 8x3', a:'22' },
+          { q:'Area rectangulo 12x5', a:'60' }, { q:'Area cuadrado lado 11', a:'121' }
         ]
       },
       { id:'medidas', name:'Medidas', icon:'7', color:0x22b8cf, zone:'pueblo', position:{x:16, z:12},
-        explicacion:'1 m = 100 cm, 1 km = 1000 m.',
-        ejemplo:'3,5 m a cm:<br>1. 1 m = 100 cm.<br>2. 3,5 x 100 = <b>350</b>.',
-        stars:0, maxStars:9, hints:['1m = 100cm.','Multiplica x100.'],
+        explicacion:'1 m = 100 cm.',
+        ejemplo:'3,5 m = <b>350 cm</b>.',
+        stars:0, maxStars:9, hints:['x100.'],
         ejercicios:[
-          { q:'cm en 3,5 m', a:'350' },
-          { q:'cm en 2 m', a:'200' },
-          { q:'cm en 0,5 m', a:'50' },
-          { q:'m en 500 cm', a:'5' },
-          { q:'cm en 1,25 m', a:'125' },
-          { q:'m en 1200 cm', a:'12' },
-          { q:'cm en 0,75 m', a:'75' },
-          { q:'m en 350 cm', a:'3,5' },
-          { q:'cm en 4 m', a:'400' },
-          { q:'cm en 1,8 m', a:'180' }
+          { q:'cm en 3,5 m', a:'350' }, { q:'cm en 2 m', a:'200' },
+          { q:'cm en 0,5 m', a:'50' }, { q:'m en 500 cm', a:'5' },
+          { q:'cm en 1,25 m', a:'125' }, { q:'m en 1200 cm', a:'12' },
+          { q:'cm en 0,75 m', a:'75' }, { q:'m en 350 cm', a:'3,5' },
+          { q:'cm en 4 m', a:'400' }, { q:'cm en 1,8 m', a:'180' }
         ]
       },
       { id:'problemas', name:'Problemas', icon:'8', color:0xf06595, zone:'pueblo', position:{x:0, z:17},
-        explicacion:'Los problemas nos cuentan una situacion real.',
-        ejemplo:'4 lapices a 0,75€:<br>0,75 x 4 = <b>3€</b>.',
-        stars:0, maxStars:9, hints:['Lee atento.','Elige operacion.'],
+        explicacion:'Lee, identifica datos y elige la operacion.',
+        ejemplo:'4 x 0,75 = <b>3 euros</b>.',
+        stars:0, maxStars:9, hints:['Elige operacion.'],
         ejercicios:[
-          { q:'4 lapices a 0,75€. Total?', a:'3' },
-          { q:'5 caramelos a 0,20€. Total?', a:'1' },
-          { q:'25€ menos 10€?', a:'15' },
-          { q:'3 cajas de 12 huevos. Total?', a:'36' },
-          { q:'4 libros a 15€?', a:'60' },
-          { q:'50€ menos 3 camisetas de 12€?', a:'14' },
-          { q:'40 plazas x 5 viajes?', a:'200' },
-          { q:'24 caramelos entre 6?', a:'4' },
-          { q:'3 kg manzanas a 2€/kg?', a:'6' },
-          { q:'80 km/h x 3 h?', a:'240' }
+          { q:'4 lapices a 0,75. Total?', a:'3' }, { q:'5 caramelos a 0,20. Total?', a:'1' },
+          { q:'25 - 10?', a:'15' }, { q:'3 cajas x 12 huevos?', a:'36' },
+          { q:'4 libros a 15?', a:'60' }, { q:'50 - 3x12?', a:'14' },
+          { q:'40 plazas x 5 viajes?', a:'200' }, { q:'24 caramelos entre 6?', a:'4' },
+          { q:'3 kg x 2 euros?', a:'6' }, { q:'80 km x 3 horas?', a:'240' }
         ]
       },
       { id:'estadistica', name:'Estadistica', icon:'9', color:0x748ffc, zone:'pueblo', position:{x:-14, z:14},
-        explicacion:'La media se calcula sumando y dividiendo entre cuantos hay.',
-        ejemplo:'Media de 4, 6, 8:<br>(4+6+8)/3 = 18/3 = <b>6</b>.',
-        stars:0, maxStars:9, hints:['Suma y divide.','Promedio.'],
+        explicacion:'Media = suma / cuantos.',
+        ejemplo:'(4+6+8)/3 = <b>6</b>.',
+        stars:0, maxStars:9, hints:['Suma y divide.'],
         ejercicios:[
-          { q:'Media de 4, 6, 8', a:'6' },
-          { q:'Media de 2, 4, 6', a:'4' },
-          { q:'Media de 10, 20, 30', a:'20' },
-          { q:'Media de 5, 5, 5', a:'5' },
-          { q:'Media de 1, 2, 3, 4', a:'2,5' },
-          { q:'Media de 8, 10', a:'9' },
-          { q:'Media de 7, 9, 11', a:'9' },
-          { q:'Media de 0, 10, 20', a:'10' },
-          { q:'Media de 6, 8, 10, 12', a:'9' },
-          { q:'Media de 3, 7, 5', a:'5' }
+          { q:'Media de 4, 6, 8', a:'6' }, { q:'Media de 2, 4, 6', a:'4' },
+          { q:'Media de 10, 20, 30', a:'20' }, { q:'Media de 5, 5, 5', a:'5' },
+          { q:'Media de 1, 2, 3, 4', a:'2,5' }, { q:'Media de 8, 10', a:'9' },
+          { q:'Media de 7, 9, 11', a:'9' }, { q:'Media de 0, 10, 20', a:'10' },
+          { q:'Media de 6, 8, 10, 12', a:'9' }, { q:'Media de 3, 7, 5', a:'5' }
         ]
       },
       { id:'potencias', name:'Potencias', icon:'P', color:0xff7675, zone:'bosque', position:{x:-8, z:-12},
-        explicacion:'Una potencia es multiplicacion repetida.',
-        ejemplo:'2^5 = 2x2x2x2x2 = <b>32</b>.',
-        stars:0, maxStars:9, hints:['Multiplica la base.','Exponente = veces.'],
+        explicacion:'Multiplicacion repetida.',
+        ejemplo:'2^5 = <b>32</b>.',
+        stars:0, maxStars:9, hints:['Multiplica la base.'],
         ejercicios:[
-          { q:'2 elevado a 5', a:'32' },
-          { q:'3 elevado a 3', a:'27' },
-          { q:'5 elevado a 2', a:'25' },
-          { q:'4 elevado a 2', a:'16' },
-          { q:'10 elevado a 3', a:'1000' },
-          { q:'2 elevado a 4', a:'16' },
-          { q:'6 elevado a 2', a:'36' },
-          { q:'2 elevado a 6', a:'64' },
-          { q:'3 elevado a 4', a:'81' },
-          { q:'7 elevado a 2', a:'49' }
+          { q:'2 elevado a 5', a:'32' }, { q:'3 elevado a 3', a:'27' },
+          { q:'5 elevado a 2', a:'25' }, { q:'4 elevado a 2', a:'16' },
+          { q:'10 elevado a 3', a:'1000' }, { q:'2 elevado a 4', a:'16' },
+          { q:'6 elevado a 2', a:'36' }, { q:'2 elevado a 6', a:'64' },
+          { q:'3 elevado a 4', a:'81' }, { q:'7 elevado a 2', a:'49' }
         ]
       },
       { id:'enteros', name:'Enteros', icon:'E', color:0x74b9ff, zone:'bosque', position:{x:0, z:-15},
-        explicacion:'Los enteros incluyen positivos, negativos y el cero.',
+        explicacion:'Positivos, negativos y cero.',
         ejemplo:'(-5) + 8 = <b>3</b>.',
-        stars:0, maxStars:9, hints:['Recta numerica.','Negativos a la izquierda.'],
+        stars:0, maxStars:9, hints:['Recta numerica.'],
         ejercicios:[
-          { q:'(-5) + 8', a:'3' },
-          { q:'(-3) + 7', a:'4' },
-          { q:'5 - 8', a:'-3' },
-          { q:'(-2) + (-4)', a:'-6' },
-          { q:'(-10) + 15', a:'5' },
-          { q:'8 - 12', a:'-4' },
-          { q:'(-7) + 7', a:'0' },
-          { q:'(-6) - 2', a:'-8' },
-          { q:'3 - 10', a:'-7' },
-          { q:'(-1) + 9', a:'8' }
+          { q:'(-5) + 8', a:'3' }, { q:'(-3) + 7', a:'4' },
+          { q:'5 - 8', a:'-3' }, { q:'(-2) + (-4)', a:'-6' },
+          { q:'(-10) + 15', a:'5' }, { q:'8 - 12', a:'-4' },
+          { q:'(-7) + 7', a:'0' }, { q:'(-6) - 2', a:'-8' },
+          { q:'3 - 10', a:'-7' }, { q:'(-1) + 9', a:'8' }
         ]
       },
       { id:'algebra', name:'Algebra', icon:'A', color:0xa29bfe, zone:'bosque', position:{x:8, z:-12},
-        explicacion:'Usamos letras para numeros desconocidos.',
-        ejemplo:'x + 5 = 12 -> x = 12 - 5 = <b>7</b>.',
-        stars:0, maxStars:9, hints:['Operacion inversa.','Deja la x sola.'],
+        explicacion:'Letras para numeros desconocidos.',
+        ejemplo:'x+5=12 -> x = <b>7</b>.',
+        stars:0, maxStars:9, hints:['Operacion inversa.'],
         ejercicios:[
-          { q:'x + 5 = 12, x?', a:'7' },
-          { q:'x + 3 = 10, x?', a:'7' },
-          { q:'x - 4 = 6, x?', a:'10' },
-          { q:'x + 8 = 15, x?', a:'7' },
-          { q:'x - 2 = 9, x?', a:'11' },
-          { q:'x + 10 = 20, x?', a:'10' },
-          { q:'x - 5 = 5, x?', a:'10' },
-          { q:'x + 1 = 8, x?', a:'7' },
-          { q:'x - 7 = 3, x?', a:'10' },
-          { q:'x + 6 = 14, x?', a:'8' }
+          { q:'x + 5 = 12, x?', a:'7' }, { q:'x + 3 = 10, x?', a:'7' },
+          { q:'x - 4 = 6, x?', a:'10' }, { q:'x + 8 = 15, x?', a:'7' },
+          { q:'x - 2 = 9, x?', a:'11' }, { q:'x + 10 = 20, x?', a:'10' },
+          { q:'x - 5 = 5, x?', a:'10' }, { q:'x + 1 = 8, x?', a:'7' },
+          { q:'x - 7 = 3, x?', a:'10' }, { q:'x + 6 = 14, x?', a:'8' }
         ]
       },
       { id:'ecuaciones', name:'Ecuaciones', icon:'X', color:0xfab1a0, zone:'montana', position:{x:-6, z:0},
-        explicacion:'Hacemos operaciones hasta dejar la incognita sola.',
-        ejemplo:'3x = 21 -> x = 21/3 = <b>7</b>.',
-        stars:0, maxStars:9, hints:['Divide los dos lados.','Aisla la x.'],
+        explicacion:'Operacion inversa hasta aislar la x.',
+        ejemplo:'3x = 21 -> x = <b>7</b>.',
+        stars:0, maxStars:9, hints:['Divide.'],
         ejercicios:[
-          { q:'3x = 21, x?', a:'7' },
-          { q:'2x = 10, x?', a:'5' },
-          { q:'4x = 20, x?', a:'5' },
-          { q:'5x = 45, x?', a:'9' },
-          { q:'6x = 36, x?', a:'6' },
-          { q:'2x = 18, x?', a:'9' },
-          { q:'7x = 49, x?', a:'7' },
-          { q:'8x = 64, x?', a:'8' },
-          { q:'3x = 27, x?', a:'9' },
-          { q:'9x = 81, x?', a:'9' }
+          { q:'3x = 21, x?', a:'7' }, { q:'2x = 10, x?', a:'5' },
+          { q:'4x = 20, x?', a:'5' }, { q:'5x = 45, x?', a:'9' },
+          { q:'6x = 36, x?', a:'6' }, { q:'2x = 18, x?', a:'9' },
+          { q:'7x = 49, x?', a:'7' }, { q:'8x = 64, x?', a:'8' },
+          { q:'3x = 27, x?', a:'9' }, { q:'9x = 81, x?', a:'9' }
         ]
       },
       { id:'probabilidad', name:'Probabilidad', icon:'D', color:0xffd93d, zone:'montana', position:{x:6, z:0},
-        explicacion:'Casos favorables entre casos posibles.',
-        ejemplo:'P(par) en dado:<br>3 favorables / 6 posibles = <b>1/2</b>.',
-        stars:0, maxStars:9, hints:['Favorables/posibles.','Simplifica.'],
+        explicacion:'Favorables entre posibles.',
+        ejemplo:'P(par) = 3/6 = <b>1/2</b>.',
+        stars:0, maxStars:9, hints:['Favorables/posibles.'],
         ejercicios:[
-          { q:'P(par) en dado (ej: 1/2)', a:'1/2' },
-          { q:'P(sacar 3) (ej: 1/6)', a:'1/6' },
-          { q:'P(sacar 6) (ej: 1/6)', a:'1/6' },
-          { q:'P(cara) (ej: 1/2)', a:'1/2' },
-          { q:'P(impar) (ej: 1/2)', a:'1/2' },
-          { q:'P(>4) (ej: 1/3)', a:'1/3' },
-          { q:'P(<3) (ej: 1/3)', a:'1/3' },
-          { q:'P(sacar 1) (ej: 1/6)', a:'1/6' },
-          { q:'P(2 o 4) (ej: 1/3)', a:'1/3' },
-          { q:'P(cruz) (ej: 1/2)', a:'1/2' }
+          { q:'P(par) (ej: 1/2)', a:'1/2' }, { q:'P(sacar 3) (ej: 1/6)', a:'1/6' },
+          { q:'P(sacar 6) (ej: 1/6)', a:'1/6' }, { q:'P(cara) (ej: 1/2)', a:'1/2' },
+          { q:'P(impar) (ej: 1/2)', a:'1/2' }, { q:'P(>4) (ej: 1/3)', a:'1/3' },
+          { q:'P(<3) (ej: 1/3)', a:'1/3' }, { q:'P(sacar 1) (ej: 1/6)', a:'1/6' },
+          { q:'P(2 o 4) (ej: 1/3)', a:'1/3' }, { q:'P(cruz) (ej: 1/2)', a:'1/2' }
         ]
       }
     ];
     var MAX_TOTAL_STARS = topics.length * 9;
     var totalStars = 0;
-
     var ejercicioIndexPorTema = {};
+
     function getSiguienteEjercicio(topic) {
       if (!topic.ejercicios || topic.ejercicios.length === 0) return { q: 'Sin ejercicios', a: '' };
       var idx = ejercicioIndexPorTema[topic.id] || 0;
@@ -826,38 +804,30 @@
     function isZoneUnlocked(zoneId) { return totalStars >= ZONES[zoneId].unlockStars; }
 
     // ============================================================
-    // SUELO CAMINABLE (incluye puentes)
+    // SUELO CAMINABLE
+    // Zonas: cuadrados de 60x60 con margen 2
+    // Pueblo: x de -28 a 28, z de -28 a 28
+    // Bosque: x de -28 a 28, z de -98 a -42
+    // Montana: x de 42 a 98, z de -28 a 28
+    // Puentes:
+    //   PB: x de -1.5 a 1.5, z de -44 a -26 (cubre el hueco)
+    //   PM: x de 26 a 44, z de -1.5 a 1.5
     // ============================================================
-    // Puentes: definidos como rectangulos alargados
-    // Puente Pueblo-Bosque: x entre -1.5 y 1.5, z entre -40 y -30
-    // Puente Pueblo-Montana: z entre -1.5 y 1.5, x entre 30 y 40
-    var BRIDGES = [
-      { x1: -1.5, x2: 1.5, z1: -40, z2: -30 },
-      { x1: 30, x2: 40, z1: -1.5, z2: 1.5 }
-    ];
-
     function isOnWalkableGround(x, z) {
-      var size = 60;
-      var margin = 2;
-      var half = size / 2 - margin;
-      var zoneIds = Object.keys(ZONES);
-      for (var i = 0; i < zoneIds.length; i++) {
-        var zn = ZONES[zoneIds[i]];
-        var dx = x - zn.offset.x;
-        var dz = z - zn.offset.z;
-        if (Math.abs(dx) <= half && Math.abs(dz) <= half) return true;
-      }
-      // Comprobar puentes
-      for (var j = 0; j < BRIDGES.length; j++) {
-        var b = BRIDGES[j];
-        if (x >= b.x1 && x <= b.x2 && z >= b.z1 && z <= b.z2) return true;
-      }
+      // Pueblo
+      if (x >= -28 && x <= 28 && z >= -28 && z <= 28) return true;
+      // Bosque
+      if (x >= -28 && x <= 28 && z >= -98 && z <= -42) return true;
+      // Montana
+      if (x >= 42 && x <= 98 && z >= -28 && z <= 28) return true;
+      // Puente Pueblo-Bosque
+      if (x >= -1.5 && x <= 1.5 && z >= -44 && z <= -26) return true;
+      // Puente Pueblo-Montana
+      if (x >= 26 && x <= 44 && z >= -1.5 && z <= 1.5) return true;
       return false;
     }
 
-    // ============================================================
     // LOGROS
-    // ============================================================
     var achievements = [
       { id:'first_star', icon:'*', name:'Primera estrella', desc:'Consigue 1 estrella', check: function(){ return totalStars >= 1; }, unlocked: false },
       { id:'ten_stars', icon:'*', name:'Coleccionista', desc:'10 estrellas', check: function(){ return totalStars >= 10; }, unlocked: false },
@@ -866,7 +836,6 @@
       { id:'explorer', icon:'T', name:'Exploradora', desc:'Desbloquea el Bosque', check: function(){ return totalStars >= 10; }, unlocked: false },
       { id:'mountaineer', icon:'M', name:'Montanera', desc:'Desbloquea la Montana', check: function(){ return totalStars >= 30; }, unlocked: false },
       { id:'boss_slayer', icon:'B', name:'Cazadora de Jefes', desc:'Derrota al jefe', check: function(){ return false; }, unlocked: false },
-      { id:'town_complete', icon:'P', name:'Pueblo completo', desc:'9 temas del Pueblo', check: function(){ return topics.filter(function(t){ return t.zone === 'pueblo'; }).every(function(t){ return t.stars >= t.maxStars; }); }, unlocked: false },
       { id:'all_stars', icon:'*', name:'Maestria total', desc:'Todas las estrellas', check: function(){ return totalStars >= MAX_TOTAL_STARS; }, unlocked: false }
     ];
 
@@ -887,14 +856,13 @@
       });
     }
 
-    // MISIONES
     var MISSION_TEMPLATES = [
       { id:'answer5', icon:'E', name:'Estudiosa', desc:'Responde 5 preguntas', target:5, reward:2, field:'answersToday' },
       { id:'stars3', icon:'*', name:'Cazadora estrellas', desc:'Gana 3 estrellas hoy', target:3, reward:2, field:'starsToday' },
       { id:'talk2', icon:'C', name:'Charlatana', desc:'Habla con 2 aldeanos', target:2, reward:1, field:'npcsTalkedToday' },
       { id:'oneTheme', icon:'H', name:'Especialista', desc:'Completa un tema hoy', target:1, reward:3, field:'themesCompletedToday' }
     ];
-    var DAILY_KEY = 'expedicion_matematica_daily_v13';
+    var DAILY_KEY = 'expedicion_matematica_daily_v14';
     function getTodayKey() {
       var d = new Date();
       return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
@@ -926,8 +894,7 @@
       var nuevos = false;
       MISSION_TEMPLATES.forEach(function(m) {
         if (getMissionProgress(m.field) >= m.target && dailyData.completed.indexOf(m.id) === -1) {
-          dailyData.completed.push(m.id);
-          nuevos = true;
+          dailyData.completed.push(m.id); nuevos = true;
         }
       });
       if (nuevos) { saveDailyData(); updateMissionsBadge(); }
@@ -938,16 +905,13 @@
       dailyData.rewarded.push(mission.id);
       totalStars += mission.reward;
       updateStarDisplay();
-      saveAll();
-      saveDailyData();
+      saveAll(); saveDailyData();
       var toast = document.getElementById('mission-toast');
       document.getElementById('mission-toast-name').textContent = mission.name + ' (+' + mission.reward + ')';
       toast.classList.add('show');
       setTimeout(function() { toast.classList.remove('show'); }, 3200);
       Sounds.mission();
-      checkAchievements();
-      updateMissionsBadge();
-      renderMissions();
+      checkAchievements(); updateMissionsBadge(); renderMissions();
     }
     function updateMissionsBadge() {
       var badge = document.getElementById('missions-badge');
@@ -970,13 +934,13 @@
         div.className = 'mission-item' + (done ? ' done' : '');
         var boton = '';
         if (done && !rewarded) boton = ' - <button class="mission-claim-btn" data-mission="' + m.id + '">RECLAMAR!</button>';
-        else if (rewarded) boton = ' - OK Reclamada';
+        else if (rewarded) boton = ' - OK';
         div.innerHTML = '<div class="mission-icon">' + m.icon + '</div>' +
           '<div class="mission-info">' +
           '<div class="mission-name">' + m.name + (done ? ' OK' : '') + '</div>' +
           '<div class="mission-desc">' + m.desc + '</div>' +
           '<div class="mission-progress"><div class="mission-progress-bar" style="width:' + pct + '%"></div></div>' +
-          '<div class="mission-reward">' + prog + '/' + m.target + ' - +' + m.reward + ' estrellas' + boton + '</div>' +
+          '<div class="mission-reward">' + prog + '/' + m.target + ' - +' + m.reward + boton + '</div>' +
           '</div>';
         list.appendChild(div);
       });
@@ -992,19 +956,16 @@
       val = val || 1;
       if (field === 'npcsTalkedToday') return;
       dailyData.progress[field] = (dailyData.progress[field] || 0) + val;
-      updateMissions();
-      saveDailyData();
+      updateMissions(); saveDailyData();
     }
     function trackDailyNPC(npcName) {
       if (dailyData.progress.npcsSeen.indexOf(npcName) === -1) {
         dailyData.progress.npcsSeen.push(npcName);
-        updateMissions();
-        saveDailyData();
+        updateMissions(); saveDailyData();
       }
     }
     loadDailyData();
 
-    // APARIENCIA
     var defaultAppearance = {
       skinColor: 0xffe0b2, hairStyle: 'short', hairColor: 0x4a2c17,
       eyeStyle: 'round', eyeColor: 0x222222, face: 'smile',
@@ -1027,10 +988,9 @@
       return totalStars >= req;
     }
 
-    // STORAGE
-    var STORAGE_KEY = 'expedicion_matematica_save_v13';
-    var APPEARANCE_KEY = 'expedicion_matematica_appearance_v13';
-    var ACHIEVEMENTS_KEY = 'expedicion_matematica_achievements_v13';
+    var STORAGE_KEY = 'expedicion_matematica_save_v14';
+    var APPEARANCE_KEY = 'expedicion_matematica_appearance_v14';
+    var ACHIEVEMENTS_KEY = 'expedicion_matematica_achievements_v14';
     function saveAll() {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify({ stars: topics.map(function(t) { return { id: t.id, stars: t.stars }; }), totalStars: totalStars }));
@@ -1075,11 +1035,9 @@
     // ============================================================
     var container = document.getElementById('canvas-container');
     var scene = new THREE.Scene();
-    // Cielo pastel tipo manga (atardecer suave)
-    var SKY_COLOR = new THREE.Color(0xffc9d6);
-    var SKY_TOP = new THREE.Color(0xa8d8ff);
+    var SKY_COLOR = new THREE.Color(0xffe0ee);
     scene.background = SKY_COLOR.clone();
-    scene.fog = new THREE.Fog(0xf8e0ec, 80, 200);
+    scene.fog = new THREE.Fog(0xffd0e0, 90, 220);
 
     var camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 500);
     var renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
@@ -1091,11 +1049,10 @@
     container.appendChild(renderer.domElement);
     log('Escena OK');
 
-    // Luces tipo manga: colores calidos y saturados
-    scene.add(new THREE.AmbientLight(0xfff0f5, 0.7));
-    var hemi = new THREE.HemisphereLight(0xfff5e0, 0xb0e0c0, 0.9);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    var hemi = new THREE.HemisphereLight(0xfff5e0, 0xb0e0c0, 0.6);
     scene.add(hemi);
-    var sun = new THREE.DirectionalLight(0xfff2c0, 1.6);
+    var sun = new THREE.DirectionalLight(0xfff2c0, 1.0);
     sun.position.set(40, 60, 30);
     sun.castShadow = true;
     sun.shadow.mapSize.set(2048, 2048);
@@ -1108,86 +1065,82 @@
     sun.shadow.bias = -0.0005;
     scene.add(sun);
 
-    // Segunda luz de relleno
-    var fill = new THREE.DirectionalLight(0xffd0e0, 0.4);
-    fill.position.set(-30, 20, -20);
-    scene.add(fill);
-
-    // Estilo manga: material con contornos
-    function mangaMat(color, opts) {
-      opts = opts || {};
-      return new THREE.MeshToonMaterial({
-        color: color,
-        gradientMap: null
-      });
-    }
-
-    // Suelos por zona (colores pastel)
+    // Suelos por zona con borde negro estilo manga
     Object.keys(ZONES).forEach(function(id) {
       var zone = ZONES[id];
-      var color = id === 'bosque' ? 0xa8e6a8 : (id === 'montana' ? 0xd4b896 : 0xc8f0b0);
+      var color = id === 'bosque' ? 0xb8f0b8 : (id === 'montana' ? 0xe0c8a8 : 0xc8f0c0);
       var geo = new THREE.PlaneGeometry(60, 60);
-      var mat = new THREE.MeshToonMaterial({ color: color });
+      var mat = new THREE.MeshBasicMaterial({ color: color });
       var mesh = new THREE.Mesh(geo, mat);
       mesh.rotation.x = -Math.PI / 2;
       mesh.position.set(zone.offset.x, 0, zone.offset.z);
       mesh.receiveShadow = true;
       scene.add(mesh);
-      // Borde
-      var edgeGeo = new THREE.PlaneGeometry(60.4, 60.4);
-      var edgeMat = new THREE.MeshBasicMaterial({ color: 0x1a1a1a });
+      // Borde negro (marco)
+      var edgeGeo = new THREE.RingGeometry(29.7, 30.3, 64);
+      var edgeMat = new THREE.MeshBasicMaterial({ color: 0x1a1a1a, side: THREE.DoubleSide });
       var edge = new THREE.Mesh(edgeGeo, edgeMat);
       edge.rotation.x = -Math.PI / 2;
-      edge.position.set(zone.offset.x, -0.05, zone.offset.z);
+      edge.position.set(zone.offset.x, 0.05, zone.offset.z);
       scene.add(edge);
     });
 
     // Camino circular
     var pathMesh = new THREE.Mesh(
       new THREE.RingGeometry(18, 21, 64),
-      new THREE.MeshToonMaterial({ color: 0xf0d8b8 })
+      new THREE.MeshBasicMaterial({ color: 0xf0d8b8 })
     );
     pathMesh.rotation.x = -Math.PI / 2;
     pathMesh.position.y = 0.02;
-    pathMesh.receiveShadow = true;
     scene.add(pathMesh);
 
     // Fuente
     var fountain = new THREE.Mesh(
       new THREE.CylinderGeometry(2, 2.2, 0.6, 24),
-      new THREE.MeshToonMaterial({ color: 0xd0d0d0 })
+      toonMat(0xd0d0d0)
     );
     fountain.position.y = 0.3;
     fountain.castShadow = true;
     scene.add(fountain);
+    addOutline(fountain, 1.06);
+
     var fountainTop = new THREE.Mesh(
       new THREE.CylinderGeometry(0.5, 0.5, 1.5, 16),
-      new THREE.MeshToonMaterial({ color: 0xb0b0b0 })
+      toonMat(0xb0b0b0)
     );
     fountainTop.position.y = 1.35;
     fountainTop.castShadow = true;
     scene.add(fountainTop);
+    addOutline(fountainTop, 1.1);
+
     var waterBall = new THREE.Mesh(
       new THREE.SphereGeometry(0.5, 16, 12),
-      new THREE.MeshToonMaterial({ color: 0x9be0ff })
+      toonMat(0x9be0ff)
     );
     waterBall.position.y = 2.2;
     scene.add(waterBall);
+    addOutline(waterBall, 1.08);
 
+    // Arboles con contorno
     function createTree(x, z, scale) {
       scale = scale || 1;
       var g = new THREE.Group();
       var trunk = new THREE.Mesh(
         new THREE.CylinderGeometry(0.25, 0.35, 1.4, 8),
-        new THREE.MeshToonMaterial({ color: 0xa86b3b })
+        toonMat(0xa86b3b)
       );
       trunk.position.y = 0.7; trunk.castShadow = true; g.add(trunk);
-      var lm = new THREE.MeshToonMaterial({ color: 0x7ed87e });
+      addOutline(trunk, 1.15);
+
       for (var i = 0; i < 3; i++) {
-        var l = new THREE.Mesh(new THREE.ConeGeometry(1.3 - i * 0.3, 1.6 - i * 0.3, 8), lm);
+        var l = new THREE.Mesh(
+          new THREE.ConeGeometry(1.3 - i * 0.3, 1.6 - i * 0.3, 8),
+          toonMat(0x7ed87e)
+        );
         l.position.y = 1.9 + i * 0.75;
         l.castShadow = true;
         g.add(l);
+        addOutline(l, 1.12);
       }
       g.position.set(x, 0, z);
       g.rotation.y = Math.random() * Math.PI * 2;
@@ -1205,20 +1158,21 @@
       if (Math.hypot(bx - ZONES.bosque.offset.x, bz - ZONES.bosque.offset.z) < 12) continue;
       scene.add(createTree(bx, bz, 0.9 + Math.random() * 0.4));
     }
+
+    // Rocas con contorno
     for (var i = 0; i < 20; i++) {
       var mx = ZONES.montana.offset.x + (Math.random() - 0.5) * 50;
       var mz = ZONES.montana.offset.z + (Math.random() - 0.5) * 50;
       if (Math.hypot(mx - ZONES.montana.offset.x, mz - ZONES.montana.offset.z) < 14) continue;
-      var gRock = new THREE.Group();
-      var rockMat = new THREE.MeshToonMaterial({ color: 0xb0b0b0 });
+      var rockMat = toonMat(0xb0b0b0);
       var r1 = new THREE.Mesh(new THREE.DodecahedronGeometry(0.7 + Math.random() * 0.4), rockMat);
-      r1.position.y = 0.5;
+      r1.position.set(mx, 0.5, mz);
       r1.castShadow = true;
-      gRock.add(r1);
-      gRock.position.set(mx, 0, mz);
-      scene.add(gRock);
+      scene.add(r1);
+      addOutline(r1, 1.15);
     }
 
+    // Flores
     var flowerColors = [0xff9ff3, 0xffd93d, 0xff8fa3, 0xffffff, 0xc89bff, 0xffb347];
     for (var i = 0; i < 100; i++) {
       var a = Math.random() * Math.PI * 2;
@@ -1226,34 +1180,35 @@
       var g = new THREE.Group();
       var stem = new THREE.Mesh(
         new THREE.CylinderGeometry(0.04, 0.04, 0.5, 5),
-        new THREE.MeshToonMaterial({ color: 0x7ed87e })
+        toonMat(0x7ed87e)
       );
-      stem.position.y = 0.25;
-      g.add(stem);
+      stem.position.y = 0.25; g.add(stem);
       var c = flowerColors[Math.floor(Math.random() * flowerColors.length)];
       var petals = new THREE.Mesh(
         new THREE.SphereGeometry(0.15, 8, 6),
-        new THREE.MeshToonMaterial({ color: c })
+        toonMat(c)
       );
-      petals.position.y = 0.55;
-      petals.scale.y = 0.6;
+      petals.position.y = 0.55; petals.scale.y = 0.6;
       g.add(petals);
       g.position.set(Math.cos(a) * r, 0, Math.sin(a) * r);
       scene.add(g);
     }
 
-    // Farolas decorativas (sin luz, siempre dia)
+    // Farolas (decorativas)
     function createLamppost(x, z) {
       var g = new THREE.Group();
-      var poleMat = new THREE.MeshToonMaterial({ color: 0x4a4a4a });
-      var pole = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 4, 8), poleMat);
-      pole.position.y = 2;
-      pole.castShadow = true;
-      g.add(pole);
-      var lampMat = new THREE.MeshToonMaterial({ color: 0xffe066 });
-      var lamp = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), lampMat);
-      lamp.position.y = 4.2;
-      g.add(lamp);
+      var pole = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.1, 0.12, 4, 8),
+        toonMat(0x4a4a4a)
+      );
+      pole.position.y = 2; pole.castShadow = true; g.add(pole);
+      addOutline(pole, 1.15);
+      var lamp = new THREE.Mesh(
+        new THREE.BoxGeometry(0.5, 0.5, 0.5),
+        toonMat(0xffe066)
+      );
+      lamp.position.y = 4.2; g.add(lamp);
+      addOutline(lamp, 1.15);
       g.position.set(x, 0, z);
       return g;
     }
@@ -1262,6 +1217,7 @@
       scene.add(createLamppost(Math.cos(a) * 19.5, Math.sin(a) * 19.5));
     }
 
+    // Vallas
     for (var i = 0; i < 60; i++) {
       var a = (i / 60) * Math.PI * 2;
       var deg = (i / 60) * 360;
@@ -1274,62 +1230,74 @@
       if (nearHouse) continue;
       var r = 23;
       var fence = new THREE.Group();
-      var woodMat = new THREE.MeshToonMaterial({ color: 0xc9a77a });
-      var p = new THREE.Mesh(new THREE.BoxGeometry(0.15, 1, 0.15), woodMat);
+      var p = new THREE.Mesh(
+        new THREE.BoxGeometry(0.15, 1, 0.15),
+        toonMat(0xc9a77a)
+      );
       p.position.y = 0.5; p.castShadow = true; fence.add(p);
-      var bar = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.1, 1), woodMat);
+      var bar = new THREE.Mesh(
+        new THREE.BoxGeometry(0.08, 0.1, 1),
+        toonMat(0xc9a77a)
+      );
       bar.position.set(0, 0.7, -0.45); fence.add(bar);
       fence.position.set(Math.cos(a) * r, 0, Math.sin(a) * r);
       fence.rotation.y = -a + Math.PI / 2;
       scene.add(fence);
     }
 
-    // PUENTES caminables
+    // PUENTES bien conectados
     function createBridge(x1, z1, x2, z2) {
       var dx = x2 - x1;
       var dz = z2 - z1;
       var len = Math.hypot(dx, dz);
       var angle = Math.atan2(dx, dz);
       var g = new THREE.Group();
-      var plankMat = new THREE.MeshToonMaterial({ color: 0xd9a066 });
-      var deck = new THREE.Mesh(new THREE.BoxGeometry(3, 0.3, len), plankMat);
+      var deck = new THREE.Mesh(
+        new THREE.BoxGeometry(3, 0.3, len),
+        toonMat(0xd9a066)
+      );
       deck.position.set(0, 0.15, len / 2);
       deck.receiveShadow = true;
       g.add(deck);
-      var railMat = new THREE.MeshToonMaterial({ color: 0x8b5a2b });
+      addOutline(deck, 1.06);
+
       var numPosts = Math.floor(len / 3);
       for (var i = 0; i <= numPosts; i++) {
         var pz = (i / numPosts) * len;
-        var postL = new THREE.Mesh(new THREE.BoxGeometry(0.15, 1.1, 0.15), railMat);
+        var postL = new THREE.Mesh(
+          new THREE.BoxGeometry(0.15, 1.1, 0.15),
+          toonMat(0x8b5a2b)
+        );
         postL.position.set(-1.4, 0.65, pz);
         postL.castShadow = true;
         g.add(postL);
+        addOutline(postL, 1.15);
         var postR = postL.clone();
         postR.position.x = 1.4;
         g.add(postR);
       }
-      var railL = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, len), railMat);
+      var railL = new THREE.Mesh(
+        new THREE.BoxGeometry(0.12, 0.12, len),
+        toonMat(0x8b5a2b)
+      );
       railL.position.set(-1.4, 1.2, len / 2);
       g.add(railL);
       var railR = railL.clone();
       railR.position.x = 1.4;
       g.add(railR);
-      var midL = railL.clone();
-      midL.position.y = 0.7;
-      g.add(midL);
-      var midR = railR.clone();
-      midR.position.y = 0.7;
-      g.add(midR);
+
       g.position.set(x1, 0, z1);
       g.rotation.y = angle;
       scene.add(g);
       return g;
     }
-    createBridge(0, -40, 0, -30);
-    createBridge(30, 0, 40, 0);
+    // Puente Pueblo-Bosque: de (0,-26) a (0,-44)
+    createBridge(0, -26, 0, -44);
+    // Puente Pueblo-Montana: de (26,0) a (44,0)
+    createBridge(26, 0, 44, 0);
     log('Decoracion y puentes OK');
 
-    // CASITAS
+    // CASITAS con contornos
     var houses = [];
     topics.forEach(function(topic) {
       var wp = getWorldPosition(topic);
@@ -1337,29 +1305,33 @@
 
       var base = new THREE.Mesh(
         new THREE.BoxGeometry(4, 3, 4),
-        new THREE.MeshToonMaterial({ color: 0xfff5e0 })
+        toonMat(0xfff5e0)
       );
       base.position.y = 1.5;
       base.castShadow = true;
       base.receiveShadow = true;
       g.add(base);
+      addOutline(base, 1.05);
 
-      var roofMat = new THREE.MeshToonMaterial({ color: topic.color });
+      var roofMat = toonMat(topic.color);
       var roof = new THREE.Mesh(new THREE.ConeGeometry(3.3, 2.2, 4), roofMat);
       roof.position.y = 4.1;
       roof.rotation.y = Math.PI / 4;
       roof.castShadow = true;
       g.add(roof);
+      addOutline(roof, 1.06);
 
       var door = new THREE.Mesh(
         new THREE.BoxGeometry(1.1, 1.8, 0.1),
-        new THREE.MeshToonMaterial({ color: 0x8b5a2b })
+        toonMat(0x8b5a2b)
       );
       door.position.set(0, 0.9, 2.01);
       g.add(door);
 
-      var wm = new THREE.MeshToonMaterial({ color: 0x9be0ff });
-      var w1 = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.9, 0.1), wm);
+      var w1 = new THREE.Mesh(
+        new THREE.BoxGeometry(0.9, 0.9, 0.1),
+        toonMat(0x9be0ff)
+      );
       w1.position.set(-1.2, 1.7, 2.01);
       g.add(w1);
       var w2 = w1.clone();
@@ -1382,8 +1354,7 @@
       ctx.fillStyle = '#1a1a1a';
       ctx.fillText(topic.icon, 128, 140);
       var tex = new THREE.CanvasTexture(cv);
-      var spriteMat = new THREE.SpriteMaterial({ map: tex, depthTest: false });
-      var sprite = new THREE.Sprite(spriteMat);
+      var sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false }));
       sprite.scale.set(2.2, 2.2, 2.2);
       sprite.position.y = 6.2;
       g.add(sprite);
@@ -1405,8 +1376,7 @@
       var name = topic.name.length > 20 ? topic.name.slice(0, 18) + '...' : topic.name;
       lctx.fillText(name, 256, 50);
       var ltex = new THREE.CanvasTexture(lc);
-      var lmat = new THREE.SpriteMaterial({ map: ltex, depthTest: false });
-      var lsprite = new THREE.Sprite(lmat);
+      var lsprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: ltex, depthTest: false }));
       lsprite.scale.set(5, 0.95, 1);
       lsprite.position.y = 7.4;
       g.add(lsprite);
@@ -1420,54 +1390,44 @@
     });
     log(houses.length + ' casitas OK');
 
-    // CASA DE LA NIÑA (en el centro del pueblo, al lado de la fuente)
+    // CASA DE LA NIÑA
     var homePos = { x: 8, z: 8 };
-    var homeGroup = new THREE.Group();
     {
-      var base = new THREE.Mesh(
+      var homeGroup = new THREE.Group();
+
+      var hb = new THREE.Mesh(
         new THREE.BoxGeometry(5, 3.5, 5),
-        new THREE.MeshToonMaterial({ color: 0xffd1e8 })
+        toonMat(0xffd1e8)
       );
-      base.position.y = 1.75; base.castShadow = true; base.receiveShadow = true;
-      homeGroup.add(base);
+      hb.position.y = 1.75; hb.castShadow = true; hb.receiveShadow = true;
+      homeGroup.add(hb);
+      addOutline(hb, 1.05);
 
-      var roof = new THREE.Mesh(
+      var hr = new THREE.Mesh(
         new THREE.ConeGeometry(4, 2.8, 4),
-        new THREE.MeshToonMaterial({ color: 0xff9ff3 })
+        toonMat(0xff9ff3)
       );
-      roof.position.y = 4.9; roof.rotation.y = Math.PI / 4;
-      roof.castShadow = true;
-      homeGroup.add(roof);
+      hr.position.y = 4.9; hr.rotation.y = Math.PI / 4;
+      hr.castShadow = true;
+      homeGroup.add(hr);
+      addOutline(hr, 1.06);
 
-      var door = new THREE.Mesh(
+      var hd = new THREE.Mesh(
         new THREE.BoxGeometry(1.3, 2.1, 0.1),
-        new THREE.MeshToonMaterial({ color: 0x8b5a2b })
+        toonMat(0x8b5a2b)
       );
-      door.position.set(0, 1.05, 2.51);
-      homeGroup.add(door);
+      hd.position.set(0, 1.05, 2.51);
+      homeGroup.add(hd);
 
-      var wm = new THREE.MeshToonMaterial({ color: 0xfff5b0 });
-      var w1 = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 0.1), wm);
-      w1.position.set(-1.5, 2, 2.51);
-      homeGroup.add(w1);
-      var w2 = w1.clone(); w2.position.x = 1.5;
-      homeGroup.add(w2);
+      var hw = new THREE.Mesh(
+        new THREE.BoxGeometry(1, 1, 0.1),
+        toonMat(0xfff5b0)
+      );
+      hw.position.set(-1.5, 2, 2.51);
+      homeGroup.add(hw);
+      var hw2 = hw.clone(); hw2.position.x = 1.5;
+      homeGroup.add(hw2);
 
-      // Corazon en el tejado
-      var heartCv = document.createElement('canvas');
-      heartCv.width = 128; heartCv.height = 128;
-      var hctx = heartCv.getContext('2d');
-      hctx.font = 'bold 100px Arial';
-      hctx.textAlign = 'center';
-      hctx.textBaseline = 'middle';
-      hctx.fillText('H', 64, 70);
-      var heartTex = new THREE.CanvasTexture(heartCv);
-      var heartSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: heartTex, depthTest: false }));
-      heartSprite.scale.set(1.5, 1.5, 1.5);
-      heartSprite.position.y = 6.5;
-      homeGroup.add(heartSprite);
-
-      // Etiqueta "MI CASA"
       var lc = document.createElement('canvas');
       lc.width = 512; lc.height = 96;
       var lctx = lc.getContext('2d');
@@ -1501,35 +1461,40 @@
       var g = new THREE.Group();
       var body = new THREE.Mesh(
         new THREE.CapsuleGeometry(0.5, 0.7, 4, 12),
-        new THREE.MeshToonMaterial({ color: color })
+        toonMat(color)
       );
       body.position.y = 1; body.castShadow = true; g.add(body);
+      addOutline(body, 1.08);
+
       var head = new THREE.Mesh(
         new THREE.SphereGeometry(0.55, 16, 12),
-        new THREE.MeshToonMaterial({ color: 0xffe0b2 })
+        toonMat(0xffe0b2)
       );
       head.position.y = 2; head.castShadow = true; g.add(head);
-      var hatMat = new THREE.MeshToonMaterial({ color: 0x4a2c17 });
+      addOutline(head, 1.08);
+
+      var hatMat = toonMat(0x4a2c17);
       var hat = new THREE.Mesh(new THREE.ConeGeometry(0.7, 0.6, 8), hatMat);
       hat.position.y = 2.55; g.add(hat);
       var brim = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.7, 0.05, 12), hatMat);
       brim.position.y = 2.3; g.add(brim);
-      var em = new THREE.MeshToonMaterial({ color: 0x1a1a1a });
+
+      var em = new THREE.MeshBasicMaterial({ color: 0x1a1a1a });
       var e1 = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 8), em);
       e1.position.set(-0.18, 2.05, 0.48); g.add(e1);
       var e2 = e1.clone(); e2.position.x = 0.18; g.add(e2);
+
       g.position.set(x, 0, z);
       g.rotation.y = Math.random() * Math.PI * 2;
       scene.add(g);
       npcs.push({ mesh: g, x: x, z: z, name: name, hints: hints, hintIndex: 0 });
     }
-    createNPC(-5, 5, 0xff6b6b, 'Maestro Ramon', ['Descompone: 15+20=35, +7.', 'Dibuja si dudas.']);
-    createNPC(7, -3, 0x4ecdc4, 'Dona Marta', ['Busca denominador comun.', 'El 50% es la mitad.']);
-    createNPC(2, 10, 0xffa94d, 'Pequeno Leo', ['Area = lado x lado.', '1 m = 100 cm.']);
+    createNPC(-5, 5, 0xff6b6b, 'Maestro Ramon', ['Descompone: 15+20=35, +7.']);
+    createNPC(7, -3, 0x4ecdc4, 'Dona Marta', ['Busca denominador comun.']);
+    createNPC(2, 10, 0xffa94d, 'Pequeno Leo', ['Area = lado x lado.']);
 
     function getNearestTopicToNPC(npc) {
-      var best = null;
-      var bd = Infinity;
+      var best = null, bd = Infinity;
       topics.forEach(function(t) {
         var wp = getWorldPosition(t);
         var d = Math.hypot(wp.x - npc.x, wp.z - npc.z);
@@ -1540,64 +1505,61 @@
 
     // JEFE
     var bossPos = { x: ZONES.montana.offset.x + 15, z: ZONES.montana.offset.z - 15 };
-    (function() {
+    {
       var g = new THREE.Group();
-      var rockMat = new THREE.MeshToonMaterial({ color: 0x6a5a5a });
-      var big = new THREE.Mesh(new THREE.DodecahedronGeometry(5), rockMat);
-      big.position.y = 3;
-      big.castShadow = true;
+      var big = new THREE.Mesh(
+        new THREE.DodecahedronGeometry(5),
+        toonMat(0x6a5a5a)
+      );
+      big.position.y = 3; big.castShadow = true;
       g.add(big);
+      addOutline(big, 1.04);
+
       var ent = new THREE.Mesh(
         new THREE.CircleGeometry(1.6, 16),
         new THREE.MeshBasicMaterial({ color: 0x0a0a0a, side: THREE.DoubleSide })
       );
-      ent.position.set(0, 1.8, 4.5);
-      g.add(ent);
+      ent.position.set(0, 1.8, 4.5); g.add(ent);
+
       var eyeMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
       var e1 = new THREE.Mesh(new THREE.SphereGeometry(0.25, 8, 8), eyeMat);
-      e1.position.set(-0.5, 2, 4.6);
-      g.add(e1);
+      e1.position.set(-0.5, 2, 4.6); g.add(e1);
       var e2 = e1.clone(); e2.position.x = 0.5; g.add(e2);
       g.position.set(bossPos.x, 0, bossPos.z);
       g.rotation.y = Math.PI;
       scene.add(g);
-    })();
+    }
     log('NPCs y jefe OK');
 
-    // PERSONAJE
+    // PERSONAJE con contornos
     var player = new THREE.Group();
     scene.add(player);
     var parts = {};
 
-    var headMat = new THREE.MeshToonMaterial({ color: appearance.skinColor });
+    var headMat = toonMat(appearance.skinColor);
     var head = new THREE.Mesh(new THREE.SphereGeometry(0.55, 16, 12), headMat);
     head.position.y = 2; head.castShadow = true;
     player.add(head);
+    var headOutline = addOutline(head, 1.08);
     parts.head = head;
+    parts.headOutline = headOutline;
 
     var neck = new THREE.Mesh(
       new THREE.CylinderGeometry(0.18, 0.2, 0.2, 8),
-      new THREE.MeshToonMaterial({ color: appearance.skinColor })
+      toonMat(appearance.skinColor)
     );
     neck.position.y = 1.55; player.add(neck);
-    parts.neck = neck;
+    addOutline(neck, 1.15);
 
     var body = new THREE.Mesh(
       new THREE.CapsuleGeometry(0.5, 0.7, 4, 12),
-      new THREE.MeshToonMaterial({ color: 0x3d5a99 })
+      toonMat(0x3d5a99)
     );
     body.position.y = 1; body.castShadow = true;
     player.add(body);
+    var bodyOutline = addOutline(body, 1.06);
     parts.body = body;
-
-    var overlay = new THREE.Mesh(
-      new THREE.BoxGeometry(0.7, 0.7, 0.05),
-      new THREE.MeshToonMaterial({ color: 0xffffff })
-    );
-    overlay.position.set(0, 1.15, 0.5);
-    overlay.visible = false;
-    player.add(overlay);
-    parts.bodyOverlay = overlay;
+    parts.bodyOutline = bodyOutline;
 
     var hairGroup = new THREE.Group();
     player.add(hairGroup);
@@ -1605,32 +1567,26 @@
 
     var eyeMat = new THREE.MeshBasicMaterial({ color: appearance.eyeColor });
     var eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.09, 10, 10), eyeMat);
-    eyeL.position.set(-0.18, 2.05, 0.48);
-    player.add(eyeL);
-    var eyeR = eyeL.clone();
-    eyeR.position.x = 0.18;
-    player.add(eyeR);
+    eyeL.position.set(-0.18, 2.05, 0.48); player.add(eyeL);
+    var eyeR = eyeL.clone(); eyeR.position.x = 0.18; player.add(eyeR);
     parts.eyeL = eyeL; parts.eyeR = eyeR;
 
     var pupilMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
     var pupilL = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), pupilMat);
-    pupilL.position.set(-0.18, 2.08, 0.55);
-    player.add(pupilL);
-    var pupilR = pupilL.clone();
-    pupilR.position.x = 0.18;
-    player.add(pupilR);
+    pupilL.position.set(-0.18, 2.08, 0.55); player.add(pupilL);
+    var pupilR = pupilL.clone(); pupilR.position.x = 0.18; player.add(pupilR);
     parts.pupilL = pupilL; parts.pupilR = pupilR;
 
     var smile = new THREE.Mesh(
       new THREE.TorusGeometry(0.13, 0.025, 6, 12, Math.PI),
-      new THREE.MeshToonMaterial({ color: 0x8b3a1f })
+      new THREE.MeshBasicMaterial({ color: 0x8b3a1f })
     );
     smile.position.set(0, 1.85, 0.5);
     smile.rotation.x = Math.PI; smile.rotation.z = Math.PI;
     player.add(smile);
     parts.smile = smile;
 
-    var freckleMat = new THREE.MeshToonMaterial({ color: 0x8b5a2b });
+    var freckleMat = new THREE.MeshBasicMaterial({ color: 0x8b5a2b });
     parts.freckles = [];
     for (var i = 0; i < 6; i++) {
       var f = new THREE.Mesh(new THREE.SphereGeometry(0.025, 6, 6), freckleMat);
@@ -1642,29 +1598,31 @@
       parts.freckles.push(f);
     }
 
-    var blushMat = new THREE.MeshToonMaterial({ color: 0xff8fa3, transparent: true, opacity: 0.7 });
+    var blushMat = new THREE.MeshBasicMaterial({ color: 0xff8fa3, transparent: true, opacity: 0.7 });
     var blushL = new THREE.Mesh(new THREE.CircleGeometry(0.09, 12), blushMat);
-    blushL.position.set(-0.3, 1.92, 0.51); blushL.visible = false;
-    player.add(blushL);
+    blushL.position.set(-0.3, 1.92, 0.51); blushL.visible = false; player.add(blushL);
     var blushR = new THREE.Mesh(new THREE.CircleGeometry(0.09, 12), blushMat);
-    blushR.position.set(0.3, 1.92, 0.51); blushR.visible = false;
-    player.add(blushR);
+    blushR.position.set(0.3, 1.92, 0.51); blushR.visible = false; player.add(blushR);
     parts.blushL = blushL; parts.blushR = blushR;
 
-    var armMat = new THREE.MeshToonMaterial({ color: appearance.skinColor });
+    var armMat = toonMat(appearance.skinColor);
     var armL = new THREE.Mesh(new THREE.CapsuleGeometry(0.15, 0.5, 3, 8), armMat);
     armL.position.set(-0.65, 1.05, 0); armL.castShadow = true;
     player.add(armL);
+    addOutline(armL, 1.15);
     var armR = armL.clone(); armR.position.x = 0.65;
     player.add(armR);
+    addOutline(armR, 1.15);
     parts.armL = armL; parts.armR = armR;
 
-    var legMat = new THREE.MeshToonMaterial({ color: 0x3d5a99 });
+    var legMat = toonMat(0x3d5a99);
     var legL = new THREE.Mesh(new THREE.CapsuleGeometry(0.17, 0.5, 3, 8), legMat);
     legL.position.set(-0.22, 0.3, 0); legL.castShadow = true;
     player.add(legL);
+    addOutline(legL, 1.15);
     var legR = legL.clone(); legR.position.x = 0.22;
     player.add(legR);
+    addOutline(legR, 1.15);
     parts.legL = legL; parts.legR = legR;
 
     var accGroup = new THREE.Group();
@@ -1685,16 +1643,18 @@
         if (c.geometry) c.geometry.dispose();
         if (c.material) c.material.dispose();
       }
-      var hm = new THREE.MeshToonMaterial({ color: appearance.hairColor });
+      var hm = toonMat(appearance.hairColor);
       var s = appearance.hairStyle;
       if (s === 'short') {
         var h = new THREE.Mesh(new THREE.SphereGeometry(0.58, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.55), hm);
         h.position.y = 2.18;
         parts.hairGroup.add(h);
+        addOutline(h, 1.12);
       } else if (s === 'long') {
         var cap = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.6), hm);
         cap.position.y = 2.15;
         parts.hairGroup.add(cap);
+        addOutline(cap, 1.1);
         var back = new THREE.Mesh(new THREE.BoxGeometry(0.85, 1.0, 0.4), hm);
         back.position.set(0, 1.55, -0.4);
         parts.hairGroup.add(back);
@@ -1702,16 +1662,20 @@
         var cap2 = new THREE.Mesh(new THREE.SphereGeometry(0.58, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.6), hm);
         cap2.position.y = 2.18;
         parts.hairGroup.add(cap2);
+        addOutline(cap2, 1.1);
         var tL = new THREE.Mesh(new THREE.SphereGeometry(0.25, 10, 8), hm);
         tL.position.set(-0.65, 2.15, -0.1);
         parts.hairGroup.add(tL);
+        addOutline(tL, 1.15);
         var tR = tL.clone();
         tR.position.x = 0.65;
         parts.hairGroup.add(tR);
+        addOutline(tR, 1.15);
       } else if (s === 'curly') {
         var cap3 = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.65), hm);
         cap3.position.y = 2.18;
         parts.hairGroup.add(cap3);
+        addOutline(cap3, 1.1);
         for (var i = 0; i < 8; i++) {
           var a = (i / 8) * Math.PI * 2;
           var cc = new THREE.Mesh(new THREE.SphereGeometry(0.16, 8, 6), hm);
@@ -1729,17 +1693,18 @@
       }
       var a = appearance.accessory;
       if (a === 'cap' || a === 'all') {
-        var cm = new THREE.MeshToonMaterial({ color: 0xff6b6b });
+        var cm = toonMat(0xff6b6b);
         var cap = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 8, 0, Math.PI * 2, 0, Math.PI * 0.5), cm);
         cap.position.y = 2.35;
         parts.accessoriesGroup.add(cap);
+        addOutline(cap, 1.12);
         var v = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.08, 0.5), cm);
         v.position.set(0, 2.32, 0.45);
         parts.accessoriesGroup.add(v);
       }
       if (a === 'glasses' || a === 'all') {
-        var fm = new THREE.MeshToonMaterial({ color: 0x1a1a1a });
-        var lm = new THREE.MeshToonMaterial({ color: 0x88ccff, transparent: true, opacity: 0.5 });
+        var fm = new THREE.MeshBasicMaterial({ color: 0x1a1a1a });
+        var lm = new THREE.MeshBasicMaterial({ color: 0x88ccff, transparent: true, opacity: 0.5 });
         [-0.18, 0.18].forEach(function(x) {
           var l = new THREE.Mesh(new THREE.CircleGeometry(0.14, 16), lm);
           l.position.set(x, 2.05, 0.57);
@@ -1750,7 +1715,7 @@
         });
       }
       if (a === 'backpack' || a === 'all') {
-        var pm = new THREE.MeshToonMaterial({ color: 0x8b5a2b });
+        var pm = toonMat(0x8b5a2b);
         var pack = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.8, 0.35), pm);
         pack.position.set(0, 1.1, -0.6);
         parts.accessoriesGroup.add(pack);
@@ -1765,29 +1730,26 @@
       }
       var p = appearance.pet;
       if (p === 'cat') {
-        var m = new THREE.MeshToonMaterial({ color: 0xffa94d });
+        var m = toonMat(0xffa94d);
         var b = new THREE.Mesh(new THREE.SphereGeometry(0.3, 12, 10), m);
         b.position.y = 0.35; b.castShadow = true;
         parts.petGroup.add(b);
+        addOutline(b, 1.12);
         var h = new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 10), m);
         h.position.set(0, 0.6, 0.15);
         parts.petGroup.add(h);
       } else if (p === 'dog') {
-        var m2 = new THREE.MeshToonMaterial({ color: 0x8b5a2b });
+        var m2 = toonMat(0x8b5a2b);
         var b2 = new THREE.Mesh(new THREE.SphereGeometry(0.32, 12, 10), m2);
         b2.position.y = 0.35; b2.castShadow = true;
         parts.petGroup.add(b2);
-        var h2 = new THREE.Mesh(new THREE.SphereGeometry(0.24, 12, 10), m2);
-        h2.position.set(0, 0.62, 0.18);
-        parts.petGroup.add(h2);
+        addOutline(b2, 1.12);
       } else if (p === 'bird') {
-        var m3 = new THREE.MeshToonMaterial({ color: 0x4ecdc4 });
+        var m3 = toonMat(0x4ecdc4);
         var b3 = new THREE.Mesh(new THREE.SphereGeometry(0.25, 12, 10), m3);
         b3.position.y = 0.4; b3.castShadow = true;
         parts.petGroup.add(b3);
-        var h3 = new THREE.Mesh(new THREE.SphereGeometry(0.18, 12, 10), m3);
-        h3.position.set(0, 0.6, 0.1);
-        parts.petGroup.add(h3);
+        addOutline(b3, 1.15);
       }
     }
     function applyAppearance() {
@@ -1829,22 +1791,12 @@
         parts.legL.material.color.setHex(0x845ef7);
         parts.legR.material.color.setHex(0x51cf66);
       }
-      var outfit = appearance.outfitStyle;
-      if (outfit === 'uniform') {
-        parts.bodyOverlay.visible = true;
-        parts.bodyOverlay.material.color.setHex(0xffffff);
-      } else if (outfit === 'overalls') {
-        parts.bodyOverlay.visible = true;
-        parts.bodyOverlay.material.color.setHex(0x3d5a99);
-      } else {
-        parts.bodyOverlay.visible = false;
-      }
       rebuildAccessories();
       rebuildPet();
       saveAll();
     }
     applyAppearance();
-    log('Personaje OK');
+    log('Personaje OK con contornos');
 
     // ============================================================
     // ESTADO Y CONTROLES
@@ -1999,9 +1951,7 @@
         var el = (performance.now() - state.questionStartTime) / 1000;
         if (el < 5) {
           var a = achievements.find(function(x) { return x.id === 'fast_math'; });
-          if (a && !a.unlocked) {
-            a.unlocked = true; showAchievementToast(a); Sounds.achievement(); saveAll();
-          }
+          if (a && !a.unlocked) { a.unlocked = true; showAchievementToast(a); Sounds.achievement(); saveAll(); }
         }
         fb.textContent = 'Correcto!';
         fb.className = 'feedback success';
@@ -2059,8 +2009,8 @@
       stats.innerHTML =
         '<b>Estrellas totales:</b> ' + totalStars + ' / ' + MAX_TOTAL_STARS + '<br>' +
         '<b>Temas completos:</b> ' + completos + ' / ' + topics.length + '<br>' +
-        '<b>Logros desbloqueados:</b> ' + achievements.filter(function(a) { return a.unlocked; }).length + ' / ' + achievements.length + '<br>' +
-        '<b>Misiones completadas hoy:</b> ' + dailyData.completed.length + ' / ' + MISSION_TEMPLATES.length;
+        '<b>Logros:</b> ' + achievements.filter(function(a) { return a.unlocked; }).length + ' / ' + achievements.length + '<br>' +
+        '<b>Misiones hoy:</b> ' + dailyData.completed.length + ' / ' + MISSION_TEMPLATES.length;
       document.getElementById('home-modal').classList.add('show');
       Sounds.home();
     }
@@ -2072,7 +2022,6 @@
       if (e.target === document.getElementById('home-modal')) closeHome();
     });
     document.getElementById('home-sleep-btn').addEventListener('click', function() {
-      // Animacion de "descansar"
       state.celebrating = 2;
       closeHome();
     });
@@ -2398,12 +2347,6 @@
     });
     updateMusicButton();
 
-    // Sin ciclo dia/noche: siempre dia. Solo animamos el agua.
-    function updateSky(dt) {
-      // Cielo pastel fijo tipo manga
-      scene.background.copy(SKY_COLOR);
-    }
-
     camera.position.set(8, 12, 17);
     camera.lookAt(0, 1.5, 5);
 
@@ -2418,7 +2361,6 @@
       var dt = Math.min(clock.getDelta(), 0.1);
       var el = clock.elapsedTime;
 
-      updateSky(dt);
       waterBall.position.y = 2.2 + Math.sin(el * 3) * 0.15;
 
       if (state.customizing) {
@@ -2493,8 +2435,7 @@
       parts.petGroup.position.lerp(petTarget, 3 * dt);
       parts.petGroup.lookAt(state.x, 0, state.z);
 
-      var nh = null;
-      var mh = 5;
+      var nh = null, mh = 5;
       houses.forEach(function(h) {
         var d = Math.hypot(state.x - h.x, state.z - h.z);
         if (d < mh) { mh = d; nh = h; }
@@ -2504,8 +2445,7 @@
       var distHome = Math.hypot(state.x - homePos.x, state.z - homePos.z);
       state.nearHome = distHome < 5;
 
-      var nn = null;
-      var mn = 3.5;
+      var nn = null, mn = 3.5;
       npcs.forEach(function(n) {
         var d = Math.hypot(state.x - n.x, state.z - n.z);
         if (d < mn) { mn = d; nn = n; }
@@ -2521,7 +2461,7 @@
 
       var hintEl = document.getElementById('hint');
       if (state.nearHome) {
-        hintEl.innerHTML = 'MI CASA - Pulsa ESPACIO o el boton';
+        hintEl.innerHTML = 'MI CASA - Pulsa ESPACIO';
         hintEl.style.opacity = '1';
       } else if (state.nearBoss) {
         hintEl.innerHTML = isBossUnlocked() ? 'Cueva del Jefe! Pulsa DESAFIAR' : 'Cueva: 40 estrellas (tienes ' + totalStars + ')';
@@ -2536,7 +2476,7 @@
         hintEl.innerHTML = nn.name + ' - Pulsa Q';
         hintEl.style.opacity = '1';
       } else {
-        hintEl.innerHTML = 'WASD/flechas - Cruza los puentes para cambiar de zona!';
+        hintEl.innerHTML = 'WASD/flechas - Cruza los puentes!';
         hintEl.style.opacity = '0.9';
       }
 
@@ -2554,7 +2494,7 @@
       renderer.render(scene, camera);
 
       frames++;
-      if (frames === 30) log('TODO OK - estilo manga - ' + totalStars + ' estrellas');
+      if (frames === 30) log('MANGA OK - ' + totalStars + ' estrellas');
     }
 
     starCounterEl.textContent = totalStars;
