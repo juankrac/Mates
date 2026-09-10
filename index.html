@@ -3,594 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Expedición Matemática 3D — Aventura Completa</title>
+<title>Expedición Matemática 3D — Prueba</title>
 <style>
-  * { box-sizing: border-box; user-select: none; }
-  html, body {
-    margin: 0; padding: 0; width: 100%; height: 100%;
-    overflow: hidden;
-    font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
-    background: #87ceeb;
-  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; overflow: hidden; height: 100%; font-family: sans-serif; }
   #canvas-container { width: 100vw; height: 100vh; display: block; }
-
-  #hud {
-    position: fixed; top: 16px; left: 16px; right: 16px;
-    display: flex; justify-content: space-between; align-items: flex-start;
-    pointer-events: none; z-index: 10;
-    gap: 10px; flex-wrap: wrap;
+  #debug {
+    position: fixed; top: 10px; left: 10px;
+    background: rgba(0,0,0,0.7); color: #0f0;
+    padding: 10px; font-family: monospace; font-size: 12px;
+    border-radius: 8px; z-index: 999; max-width: 400px;
+    white-space: pre-wrap;
   }
-  .panel {
-    background: rgba(254, 247, 224, 0.95);
-    border: 3px solid #b98c5c;
-    border-radius: 100px;
-    padding: 8px 20px;
-    box-shadow: 0 6px 0 #8b6f4c, 0 10px 20px rgba(0,0,0,0.3);
-    font-weight: 800; color: #3a2c1b;
-    font-size: 1.1rem;
-    display: flex; align-items: center; gap: 10px;
-    pointer-events: auto;
-  }
-  .stars-total { background: #ffd966; }
-  .stars-total .num { font-size: 1.4rem; }
-
-  #top-buttons {
-    position: fixed; top: 70px; right: 16px;
-    display: flex; flex-direction: column; gap: 8px;
-    z-index: 11;
-  }
-  #top-buttons button {
-    background: rgba(255,255,255,0.9);
-    border: 2px solid #8b6f4c;
-    border-radius: 40px;
-    padding: 8px 14px;
-    font-size: 0.8rem; font-weight: 700;
-    cursor: pointer; color: #3a2c1b;
-    box-shadow: 0 3px 0 #b98c5c;
-    transition: 0.05s;
-    display: flex; align-items: center; gap: 6px;
-    position: relative;
-  }
-  #top-buttons button:active { transform: translateY(3px); box-shadow: 0 0 0 #b98c5c; }
-  #top-buttons .customize { background: #ffb3d9; }
-  #top-buttons .achievements { background: #ffe066; }
-  #top-buttons .missions { background: #ffd1a3; }
-  #top-buttons .music-on { background: #9be0ff; }
-  #top-buttons .music-off { background: #ddd; opacity: 0.7; }
-  #top-buttons .photo { background: #c8f7c5; }
-  #top-buttons .badge {
-    position: absolute;
-    top: -4px; right: -4px;
-    background: #ff4757; color: white;
-    border-radius: 50%;
-    font-size: 0.7rem; font-weight: 900;
-    width: 18px; height: 18px;
-    display: flex; align-items: center; justify-content: center;
-    border: 2px solid white;
-  }
-
-  #hint {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-    background: rgba(254, 247, 224, 0.95);
-    border: 3px solid #b98c5c; border-radius: 50px;
-    padding: 10px 24px; font-weight: 700; color: #3a2c1b;
-    box-shadow: 0 6px 0 #8b6f4c; z-index: 10;
-    text-align: center; font-size: 0.9rem;
-    transition: opacity 0.3s;
-    pointer-events: none; max-width: 90vw;
-  }
-
-  #action-buttons {
-    position: fixed; bottom: 20px; left: 20px;
-    display: flex; flex-direction: column; gap: 10px;
-    z-index: 15;
-  }
-  #action-buttons button {
-    background: #ffd966;
-    border: 3px solid #b98c5c; border-radius: 50px;
-    font-size: 1rem; font-weight: 800; color: #3a2c1b;
-    padding: 14px 22px; cursor: pointer;
-    box-shadow: 0 5px 0 #8b6f4c; transition: 0.05s;
-    display: flex; align-items: center; gap: 8px;
-  }
-  #action-buttons button:active { transform: translateY(4px); box-shadow: 0 1px 0 #8b6f4c; }
-  #action-buttons button:disabled { opacity: 0.4; pointer-events: none; }
-  #action-buttons .talk-btn { background: #9be0ff; }
-  #action-buttons .boss-btn { background: #ff7675; color: white; }
-
-  #touch-controls {
-    position: fixed; bottom: 20px; right: 20px;
-    display: grid;
-    grid-template-columns: repeat(3, 60px);
-    grid-template-rows: repeat(3, 60px);
-    gap: 6px; z-index: 15;
-  }
-  #touch-controls button {
-    background: #ffd966;
-    border: 3px solid #b98c5c; border-radius: 14px;
-    font-size: 1.8rem; font-weight: 900; color: #3a2c1b;
-    cursor: pointer; box-shadow: 0 5px 0 #8b6f4c;
-    display: flex; align-items: center; justify-content: center;
-    padding: 0; transition: 0.05s;
-  }
-  #touch-controls button:active { transform: translateY(4px); box-shadow: 0 1px 0 #8b6f4c; }
-  #touch-controls .empty { visibility: hidden; }
-
-  #npc-dialog {
-    display: none;
-    position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
-    background: #fef7e0; border: 4px solid #b98c5c; border-radius: 24px;
-    padding: 16px 22px; max-width: 520px; width: 90vw;
-    box-shadow: 0 12px 24px rgba(0,0,0,0.4); z-index: 50;
-    font-weight: 600; color: #3a2c1b; font-size: 1.05rem;
-    animation: pop 0.2s ease-out;
-  }
-  #npc-dialog::before {
-    content: "💬"; position: absolute; top: -22px; left: 20px;
-    font-size: 1.8rem; filter: drop-shadow(0 2px 0 #b98c5c);
-  }
-  #npc-dialog .npc-name {
-    font-weight: 800; color: #b47c2e; margin-bottom: 6px;
-    font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;
-  }
-  #npc-dialog .close-dialog {
-    position: absolute; top: 6px; right: 10px;
-    background: none; border: none; font-size: 1.2rem;
-    cursor: pointer; color: #8b6f4c; font-weight: 900;
-  }
-
-  .modal-bg {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.75);
-    justify-content: center; align-items: center;
-    z-index: 100; padding: 16px;
-    overflow-y: auto;
-  }
-  .modal-bg.show { display: flex; }
-
-  .card {
-    background: #fef7e0;
-    border-radius: 40px;
-    padding: 28px 24px;
-    max-width: 520px; width: 100%;
-    border: 6px solid #b98c5c;
-    box-shadow: 0 20px 40px black;
-    text-align: center;
-    animation: pop 0.25s ease-out;
-    max-height: 92vh; overflow-y: auto;
-  }
-  @keyframes pop {
-    0% { transform: scale(0.7); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-  .card h2 {
-    font-size: 1.7rem; margin: 0 0 8px; color: #3a2c1b;
-    display: flex; justify-content: center; align-items: center; gap: 10px;
-  }
-  .card .question {
-    font-size: 1.6rem; font-weight: 700;
-    background: #e6d5b8; padding: 18px; border-radius: 30px;
-    margin: 16px 0; border: 2px solid #b98c5c;
-    word-break: break-word;
-  }
-  .card input {
-    font-size: 1.7rem; width: 160px; text-align: center;
-    padding: 8px; border-radius: 30px;
-    border: 4px solid #b98c5c; font-weight: 700; background: white;
-  }
-  .card input:focus { outline: 3px solid #ffb347; }
-  .card .btns {
-    display: flex; gap: 14px; justify-content: center;
-    margin-top: 20px; flex-wrap: wrap;
-  }
-  .card button {
-    background: #ffd966; border: none;
-    font-weight: 700; font-size: 1.1rem;
-    padding: 12px 26px; border-radius: 40px;
-    border-bottom: 6px solid #b98c5c;
-    cursor: pointer; color: #2c1e0e;
-    box-shadow: 0 6px 0 #8b6f4c;
-    font-family: inherit; transition: 0.05s;
-  }
-  .card button:active { transform: translateY(4px); box-shadow: 0 2px 0 #8b6f4c; }
-  .card button:disabled { opacity: 0.5; pointer-events: none; }
-  .feedback { font-size: 1.3rem; font-weight: 700; min-height: 2rem; margin: 6px 0; }
-  .success { color: #2e7d32; }
-  .error { color: #c0392b; }
-  .stars-earned { font-size: 1.3rem; color: #b47c2e; min-height: 1.6rem; font-weight: 700; }
-
-  /* PERSONALIZACIÓN */
-  #customize-modal .card { max-width: 660px; text-align: left; }
-  #customize-modal h2 { text-align: center; }
-  #customize-modal .subtitle {
-    text-align: center; color: #8b6f4c;
-    font-size: 0.85rem; font-weight: 600; margin-bottom: 14px;
-  }
-  .custom-section {
-    background: #f1e3c8; border: 2px solid #b98c5c;
-    border-radius: 20px; padding: 12px 14px; margin-bottom: 12px;
-  }
-  .custom-section .label {
-    font-weight: 800; color: #3a2c1b; font-size: 0.95rem;
-    margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
-    justify-content: space-between;
-  }
-  .custom-section .label .lock-info {
-    font-size: 0.75rem; color: #b47c2e;
-    background: #ffd966;
-    padding: 3px 8px; border-radius: 20px;
-    font-weight: 700;
-  }
-  .options { display: flex; flex-wrap: wrap; gap: 8px; }
-  .options button {
-    background: white; border: 3px solid #b98c5c;
-    border-radius: 14px; padding: 8px 12px;
-    font-size: 0.8rem; font-weight: 700; color: #3a2c1b;
-    cursor: pointer; box-shadow: 0 3px 0 #b98c5c;
-    transition: 0.05s; font-family: inherit;
-    display: flex; align-items: center; gap: 6px;
-    position: relative;
-  }
-  .options button:active { transform: translateY(2px); box-shadow: 0 1px 0 #b98c5c; }
-  .options button.selected {
-    background: #ffd966; border-color: #8b6f4c;
-    transform: translateY(2px); box-shadow: 0 1px 0 #8b6f4c;
-  }
-  .options button.locked {
-    opacity: 0.55; cursor: not-allowed;
-    background: #e0d5c0;
-  }
-  .options button.locked::after {
-    content: "🔒"; font-size: 0.7rem; margin-left: 4px;
-  }
-  .color-swatch {
-    width: 32px; height: 32px; border-radius: 50%;
-    border: 3px solid #b98c5c; cursor: pointer;
-    box-shadow: 0 3px 0 #b98c5c; padding: 0;
-    transition: 0.05s; position: relative;
-  }
-  .color-swatch.selected {
-    border-color: #3a2c1b;
-    transform: scale(1.15);
-    box-shadow: 0 3px 0 #3a2c1b;
-  }
-  .color-swatch.locked { opacity: 0.5; cursor: not-allowed; }
-  .color-swatch.locked::after {
-    content: "🔒"; position: absolute;
-    top: -6px; right: -6px; font-size: 0.9rem;
-  }
-  .color-swatch.golden {
-    background: linear-gradient(135deg, #ffd700, #ffb300, #ffecb3) !important;
-  }
-  .color-swatch.rainbow {
-    background: linear-gradient(135deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3) !important;
-  }
-
-  #customize-close, #achievements-close, #missions-close {
-    display: block; margin: 18px auto 0;
-    background: #ffd966; border: none; font-weight: 800;
-    font-size: 1.1rem; padding: 14px 40px; border-radius: 40px;
-    border-bottom: 6px solid #b98c5c; cursor: pointer;
-    color: #2c1e0e; box-shadow: 0 6px 0 #8b6f4c;
-    font-family: inherit; transition: 0.05s;
-  }
-  #customize-close:active, #achievements-close:active, #missions-close:active {
-    transform: translateY(4px); box-shadow: 0 2px 0 #8b6f4c;
-  }
-
-  /* LOGROS */
-  #achievements-modal .card { text-align: left; }
-  .ach-item {
-    display: flex; align-items: center; gap: 12px;
-    background: #f1e3c8; border: 2px solid #b98c5c;
-    border-radius: 20px; padding: 12px 14px;
-    margin-bottom: 10px;
-  }
-  .ach-item.locked { opacity: 0.55; filter: grayscale(0.7); }
-  .ach-item.unlocked { background: #fff2b8; border-color: #ffb300; }
-  .ach-icon { font-size: 2.2rem; min-width: 50px; text-align: center; }
-  .ach-info { flex: 1; }
-  .ach-name { font-weight: 800; color: #3a2c1b; font-size: 1rem; }
-  .ach-desc { font-size: 0.8rem; color: #8b6f4c; margin-top: 2px; }
-
-  /* MISIONES DIARIAS */
-  #missions-modal .card { text-align: left; }
-  #missions-modal .date-info {
-    text-align: center; font-size: 0.85rem;
-    color: #8b6f4c; font-weight: 600; margin-bottom: 14px;
-  }
-  .mission-item {
-    display: flex; align-items: center; gap: 12px;
-    background: #f1e3c8; border: 2px solid #b98c5c;
-    border-radius: 20px; padding: 12px 14px;
-    margin-bottom: 10px;
-  }
-  .mission-item.done { background: #d4f5d4; border-color: #4caf50; }
-  .mission-icon { font-size: 2rem; min-width: 44px; text-align: center; }
-  .mission-info { flex: 1; }
-  .mission-name { font-weight: 800; color: #3a2c1b; font-size: 0.95rem; }
-  .mission-desc { font-size: 0.8rem; color: #8b6f4c; margin: 2px 0 4px; }
-  .mission-progress {
-    height: 8px; background: #d9c9a8;
-    border-radius: 10px; overflow: hidden;
-    margin-top: 4px;
-  }
-  .mission-progress-bar {
-    height: 100%; background: linear-gradient(90deg, #ffd966, #ffb300);
-    transition: width 0.3s;
-  }
-  .mission-reward {
-    font-size: 0.85rem; font-weight: 800; color: #b47c2e;
-    margin-top: 3px;
-  }
-
-  /* NOTIFICACIONES */
-  #achievement-toast, #mission-toast {
-    position: fixed; top: 20px; left: 50%;
-    transform: translateX(-50%) translateY(-100px);
-    border: 4px solid #8b6f4c;
-    border-radius: 24px; padding: 14px 24px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-    z-index: 500;
-    display: flex; align-items: center; gap: 14px;
-    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    font-weight: 800; color: #3a2c1b;
-    pointer-events: none;
-  }
-  #achievement-toast {
-    background: linear-gradient(135deg, #ffd700, #ffb300);
-  }
-  #mission-toast {
-    background: linear-gradient(135deg, #a8e6cf, #7fccba);
-    top: 90px;
-  }
-  #achievement-toast.show, #mission-toast.show {
-    transform: translateX(-50%) translateY(0);
-  }
-  #achievement-toast .toast-icon, #mission-toast .toast-icon { font-size: 2rem; }
-  #achievement-toast .toast-title, #mission-toast .toast-title {
-    font-size: 0.75rem; text-transform: uppercase; color: #8b3a00;
-  }
-  #mission-toast .toast-title { color: #1e5a4a; }
-  #achievement-toast .toast-name, #mission-toast .toast-name { font-size: 1rem; }
-
-  /* JEFE FINAL */
-  #boss-modal .card {
-    background: linear-gradient(180deg, #4a1a1a, #fef7e0 30%);
-    border-color: #6b2c2c;
-  }
-  #boss-modal h2 { color: #3a2c1b; }
-  .boss-hp-bar {
-    width: 100%; height: 22px;
-    background: #4a1a1a;
-    border-radius: 20px;
-    overflow: hidden;
-    margin: 10px 0 14px;
-    border: 3px solid #3a2c1b;
-    position: relative;
-  }
-  .boss-hp-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #ff4757, #ff6b81);
-    transition: width 0.4s ease;
-    border-radius: 20px;
-  }
-  .boss-hp-bar .boss-hp-text {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 0.8rem; font-weight: 900;
-    color: white; text-shadow: 1px 1px 2px black;
-    z-index: 2;
-  }
-  .boss-progress {
-    display: flex; justify-content: center;
-    gap: 6px; margin: 10px 0;
-  }
-  .boss-progress .punto {
-    width: 22px; height: 22px;
-    border-radius: 50%;
-    background: #d9c9a8;
-    border: 2px solid #8b6f4c;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.75rem; font-weight: 900;
-    color: #8b6f4c;
-  }
-  .boss-progress .punto.correct { background: #51cf66; color: white; border-color: #2e7d32; }
-  .boss-progress .punto.wrong { background: #ff4757; color: white; border-color: #a02020; }
-  .boss-progress .punto.current { box-shadow: 0 0 0 3px #ffd966; }
-
-  @media (max-width: 700px) {
-    .panel { font-size: 0.85rem; padding: 6px 12px; }
-    .stars-total .num { font-size: 1.1rem; }
-    #touch-controls { grid-template-columns: repeat(3, 48px); grid-template-rows: repeat(3, 48px); }
-    #touch-controls button { font-size: 1.3rem; }
-    #hint { font-size: 0.75rem; padding: 8px 14px; bottom: 190px; }
-    #action-buttons button { padding: 10px 16px; font-size: 0.8rem; }
-    #top-buttons { top: 60px; }
-    #top-buttons button { padding: 6px 10px; font-size: 0.7rem; }
+  #loading {
+    position: fixed; inset: 0; background: #87ceeb;
+    display: flex; justify-content: center; align-items: center;
+    font-size: 2rem; color: white; z-index: 1000;
+    transition: opacity 0.5s;
   }
 </style>
 </head>
 <body>
-
+<div id="loading">Cargando mundo 3D…</div>
 <div id="canvas-container"></div>
-
-<div id="hud">
-  <div class="panel">🧭 Expedición Matemática</div>
-  <div class="panel stars-total">⭐ <span class="num" id="star-counter">0</span> / <span id="star-max">126</span></div>
-</div>
-
-<div id="top-buttons">
-  <button id="missions-btn" class="missions">📅 Misiones <span class="badge" id="missions-badge" style="display:none;">0</span></button>
-  <button id="music-btn" class="music-off">🎵 Música: OFF</button>
-  <button id="photo-btn" class="photo">📸 Foto</button>
-  <button id="customize-btn" class="customize">👗 Personalizar</button>
-  <button id="achievements-btn" class="achievements">🏆 Logros</button>
-  <button id="reset-btn" title="Reiniciar progreso">🔄 Reiniciar</button>
-</div>
-
-<div id="hint">🎮 Muévete con WASD o flechas</div>
-
-<div id="action-buttons">
-  <button id="btn-enter" disabled>🚪 ENTRAR</button>
-  <button id="btn-talk" class="talk-btn" disabled>💬 HABLAR</button>
-  <button id="btn-boss" class="boss-btn" disabled>👹 DESAFIAR</button>
-</div>
-
-<div id="touch-controls">
-  <button class="empty"></button>
-  <button id="t-up">▲</button>
-  <button class="empty"></button>
-  <button id="t-left">◀</button>
-  <button class="empty"></button>
-  <button id="t-right">▶</button>
-  <button class="empty"></button>
-  <button id="t-down">▼</button>
-  <button class="empty"></button>
-</div>
-
-<div id="npc-dialog">
-  <button class="close-dialog" onclick="document.getElementById('npc-dialog').style.display='none'">✕</button>
-  <div class="npc-name" id="npc-name">Aldeano</div>
-  <div id="npc-text">Hola, viajero.</div>
-</div>
-
-<div id="achievement-toast">
-  <div class="toast-icon">🏆</div>
-  <div>
-    <div class="toast-title">¡Logro desbloqueado!</div>
-    <div class="toast-name" id="toast-name">Nombre del logro</div>
-  </div>
-</div>
-
-<div id="mission-toast">
-  <div class="toast-icon">📅</div>
-  <div>
-    <div class="toast-title">¡Misión completada!</div>
-    <div class="toast-name" id="mission-toast-name">Nombre</div>
-  </div>
-</div>
-
-<div id="photo-flash"></div>
-<div id="photo-toast">📸 ¡Foto guardada!</div>
-
-<!-- MODAL EJERCICIOS -->
-<div id="modal" class="modal-bg">
-  <div class="card">
-    <h2 id="modal-title">🏠 Casita</h2>
-    <div id="question-text" class="question"></div>
-    <input type="text" id="answer-input" placeholder="?" autocomplete="off" inputmode="text">
-    <div id="feedback" class="feedback"></div>
-    <div class="btns">
-      <button id="check-btn">✅ Comprobar</button>
-      <button id="close-btn">🔙 Salir</button>
-    </div>
-    <div id="stars-earned" class="stars-earned"></div>
-  </div>
-</div>
-
-<!-- MODAL JEFE FINAL -->
-<div id="boss-modal" class="modal-bg">
-  <div class="card">
-    <h2>👹 ¡El Devorador de Números!</h2>
-    <div style="font-size:0.9rem;color:#8b3a00;font-weight:700;margin-bottom:6px;">Responde 10 seguidas. Si fallas una, vuelves a empezar.</div>
-    <div class="boss-hp-bar">
-      <div class="boss-hp-fill" id="boss-hp-fill" style="width:100%"></div>
-      <div class="boss-hp-text" id="boss-hp-text">10 / 10 ❤️</div>
-    </div>
-    <div class="boss-progress" id="boss-progress"></div>
-    <div class="question" id="boss-question">¿Cuánto es 2+2?</div>
-    <input type="text" id="boss-answer-input" placeholder="?" autocomplete="off" inputmode="text">
-    <div class="feedback" id="boss-feedback"></div>
-    <div class="btns">
-      <button id="boss-check-btn">⚔️ Atacar</button>
-      <button id="boss-close-btn">🔙 Huir</button>
-    </div>
-    <div class="stars-earned" id="boss-stars-earned"></div>
-  </div>
-</div>
-
-<!-- MODAL PERSONALIZACIÓN -->
-<div id="customize-modal" class="modal-bg">
-  <div class="card">
-    <h2>👗 Vestidor</h2>
-    <div class="subtitle">Personaliza tu personaje · Se guarda automáticamente</div>
-
-    <div class="custom-section">
-      <div class="label">👧 Color de piel</div>
-      <div class="options" id="skin-options"></div>
-    </div>
-
-    <div class="custom-section">
-      <div class="label">💇 Pelo</div>
-      <div class="options" id="hair-style-options"></div>
-      <div class="options" id="hair-color-options" style="margin-top:8px;"></div>
-    </div>
-
-    <div class="custom-section">
-      <div class="label">👀 Ojos</div>
-      <div class="options" id="eye-style-options"></div>
-      <div class="options" id="eye-color-options" style="margin-top:8px;"></div>
-    </div>
-
-    <div class="custom-section">
-      <div class="label">😊 Cara</div>
-      <div class="options" id="face-options"></div>
-    </div>
-
-    <div class="custom-section">
-      <div class="label">
-        👗 Ropa
-        <span class="lock-info" id="outfit-lock-info">0 ⭐</span>
-      </div>
-      <div class="options" id="outfit-style-options"></div>
-      <div class="options" id="outfit-color-options" style="margin-top:8px;"></div>
-    </div>
-
-    <div class="custom-section">
-      <div class="label">🎒 Accesorios</div>
-      <div class="options" id="accessory-options"></div>
-    </div>
-
-    <div class="custom-section">
-      <div class="label">🐾 Mascota</div>
-      <div class="options" id="pet-options"></div>
-    </div>
-
-    <button id="customize-close">✅ ¡Listo!</button>
-  </div>
-</div>
-
-<!-- MODAL LOGROS -->
-<div id="achievements-modal" class="modal-bg">
-  <div class="card">
-    <h2>🏆 Logros</h2>
-    <div class="subtitle">Consigue logros mientras juegas</div>
-    <div id="achievements-list"></div>
-    <button id="achievements-close">✅ Cerrar</button>
-  </div>
-</div>
-
-<!-- MODAL MISIONES -->
-<div id="missions-modal" class="modal-bg">
-  <div class="card">
-    <h2>📅 Misiones diarias</h2>
-    <div class="date-info" id="missions-date">Hoy</div>
-    <div id="missions-list"></div>
-    <div style="font-size:0.8rem;text-align:center;color:#8b6f4c;margin-top:10px;">
-      🌅 Las misiones se renuevan cada día a medianoche.
-    </div>
-    <button id="missions-close">✅ Cerrar</button>
-  </div>
-</div>
+<div id="debug">Iniciando…</div>
 
 <script type="importmap">
 {
   "imports": {
-    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
   }
 }
 </script>
@@ -598,1878 +39,329 @@
 <script type="module">
 import * as THREE from 'three';
 
-// ==================================================================
-// AUDIO
-// ==================================================================
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-function playTone(freq, duration = 0.15, type = 'sine', volume = 0.2, delay = 0) {
-  if (audioCtx.state === 'suspended') audioCtx.resume();
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  osc.type = type;
-  osc.frequency.value = freq;
-  const t = audioCtx.currentTime + delay;
-  gain.gain.setValueAtTime(0, t);
-  gain.gain.linearRampToValueAtTime(volume, t + 0.01);
-  gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
-  osc.connect(gain).connect(audioCtx.destination);
-  osc.start(t); osc.stop(t + duration + 0.05);
-}
-
-const Sounds = {
-  step: () => playTone(220, 0.06, 'square', 0.05),
-  open: () => { playTone(523, 0.1, 'sine', 0.15); playTone(659, 0.12, 'sine', 0.15, 0.08); },
-  correct: () => { playTone(659, 0.12, 'sine', 0.25); playTone(784, 0.12, 'sine', 0.25, 0.1); playTone(1047, 0.2, 'sine', 0.25, 0.2); },
-  wrong: () => { playTone(200, 0.15, 'sawtooth', 0.15); playTone(150, 0.2, 'sawtooth', 0.15, 0.1); },
-  complete: () => { [523, 659, 784, 1047, 1319].forEach((f, i) => playTone(f, 0.18, 'triangle', 0.22, i * 0.1)); },
-  talk: () => { playTone(500, 0.05, 'triangle', 0.12); playTone(700, 0.05, 'triangle', 0.12, 0.06); },
-  change: () => { playTone(880, 0.08, 'triangle', 0.15); playTone(1100, 0.08, 'triangle', 0.15, 0.06); },
-  achievement: () => { [659, 784, 988, 1319, 1568].forEach((f, i) => playTone(f, 0.15, 'triangle', 0.2, i * 0.08)); },
-  mission: () => { [784, 988, 1175].forEach((f, i) => playTone(f, 0.18, 'sine', 0.22, i * 0.1)); },
-  photo: () => { playTone(1500, 0.04, 'square', 0.25); playTone(900, 0.06, 'square', 0.2, 0.05); },
-  bossRoar: () => {
-    playTone(80, 0.5, 'sawtooth', 0.25);
-    playTone(120, 0.5, 'sawtooth', 0.2, 0.1);
-    playTone(60, 0.7, 'square', 0.2, 0.2);
-  },
-  bossHit: () => { playTone(200, 0.1, 'square', 0.3); playTone(100, 0.15, 'sawtooth', 0.25, 0.05); },
-  bossWin: () => { [523, 659, 784, 1047, 1319, 1568].forEach((f, i) => playTone(f, 0.25, 'triangle', 0.28, i * 0.15)); },
-  unlock: () => { [659, 880, 1047].forEach((f, i) => playTone(f, 0.2, 'sine', 0.22, i * 0.12)); }
+const debugEl = document.getElementById('debug');
+const log = (msg) => {
+  console.log(msg);
+  debugEl.textContent += '\n' + msg;
 };
 
-// --------- MÚSICA ---------
-const Music = {
-  playing: false, timer: null, step: 0,
-  scale: [0, 2, 4, 5, 7, 9, 11, 12],
-  chord: [0, 4, 7],
-  start() {
-    if (this.playing) return;
-    this.playing = true; this.step = 0;
-    const tick = () => {
-      if (!this.playing) return;
-      const idx = this.scale[(this.step * 3) % this.scale.length];
-      const freq = 261.63 * Math.pow(2, idx / 12);
-      playTone(freq, 0.9, 'sine', 0.035);
-      if (this.step % 4 === 0) {
-        const bassIdx = this.chord[Math.floor(this.step / 4) % this.chord.length];
-        playTone(130.81 * Math.pow(2, bassIdx / 12), 1.8, 'triangle', 0.045);
-      }
-      this.step++;
-      this.timer = setTimeout(tick, 500);
-    };
-    tick();
-  },
-  stop() { this.playing = false; if (this.timer) clearTimeout(this.timer); }
-};
+log('✅ Three.js cargado');
 
-// ==================================================================
-// ZONAS Y TEMAS (mapa expandible)
-// ==================================================================
-const ZONES = {
-  pueblo:   { name: 'Pueblo',   unlockStars: 0,  offset: { x: 0, z: 0 },        color: 0x7ec850 },
-  bosque:   { name: 'Bosque',   unlockStars: 10, offset: { x: 0, z: -60 },      color: 0x4a8c4a },
-  montana:  { name: 'Montaña',  unlockStars: 30, offset: { x: 60, z: -30 },     color: 0x8a7a5a }
-};
-
-// Temas por zona
-const topics = [
-  // === PUEBLO (9) ===
-  { id:'numeros',       name:'Números y operaciones',  icon:'🔢', color:0xff6b6b, zone:'pueblo',  position:{x:-16, z:-16}, question:'¿Cuánto es 15 + 27?', answer:'42', stars:0, maxStars:9,
-    hints:['Sumar es juntar cantidades.','Pista: 15 + 20 = 35, y luego suma 7.'] },
-  { id:'divisibilidad', name:'Divisibilidad',          icon:'🧩', color:0x4ecdc4, zone:'pueblo',  position:{x:-8,  z:-18}, question:'¿Cuál es el MCD de 12 y 18?', answer:'6', stars:0, maxStars:9,
-    hints:['El MCD es el mayor número que divide a ambos.','12 = 2×2×3 y 18 = 2×3×3.'] },
-  { id:'fracciones',    name:'Fracciones',             icon:'🍕', color:0xffa94d, zone:'pueblo',  position:{x:0,   z:-18}, question:'¿Cuánto es 1/2 + 1/4? (ej: 3/4)', answer:'3/4', stars:0, maxStars:9,
-    hints:['Busca un denominador común.','1/2 = 2/4, y 2/4 + 1/4 = ?'] },
-  { id:'decimales',     name:'Números decimales',      icon:'🔬', color:0x845ef7, zone:'pueblo',  position:{x:8,   z:-18}, question:'¿Cuánto es 2,5 + 1,75? (usa coma)', answer:'4,25', stars:0, maxStars:9,
-    hints:['Alinea las comas: 2,50 + 1,75.','Suma como sin coma: 250 + 175 = 425.'] },
-  { id:'porcentajes',   name:'Porcentajes',            icon:'📊', color:0xff922b, zone:'pueblo',  position:{x:16,  z:-16}, question:'¿Cuánto es el 20% de 150?', answer:'30', stars:0, maxStars:9,
-    hints:['El 20% es 1/5 del total.','150 ÷ 5 = ?'] },
-  { id:'geometria',     name:'Geometría',              icon:'📐', color:0x51cf66, zone:'pueblo',  position:{x:18,  z:0},   question:'Área de un rectángulo de 8×5 (solo número)', answer:'40', stars:0, maxStars:9,
-    hints:['Área = base × altura.','8 × 5 = ?'] },
-  { id:'medidas',       name:'Medidas',                icon:'⏱️', color:0x22b8cf, zone:'pueblo',  position:{x:18,  z:14},  question:'¿Cuántos cm hay en 3,5 metros?', answer:'350', stars:0, maxStars:9,
-    hints:['1 metro = 100 centímetros.','3,5 × 100 = ?'] },
-  { id:'problemas',     name:'Problemas',              icon:'🧠', color:0xf06595, zone:'pueblo',  position:{x:0,   z:20},  question:'Si un lápiz cuesta 0,75 €, ¿4 lápices? (en €)', answer:'3', stars:0, maxStars:9,
-    hints:['Multiplica el precio por la cantidad.','0,75 × 4 = ?'] },
-  { id:'estadistica',   name:'Estadística y probabilidad', icon:'🎲', color:0x748ffc, zone:'pueblo', position:{x:-16, z:16}, question:'¿Cuál es la media de 4, 6 y 8?', answer:'6', stars:0, maxStars:9,
-    hints:['La media es la suma dividida entre cuántos hay.','(4 + 6 + 8) ÷ 3 = ?'] },
-
-  // === BOSQUE (3) ===
-  { id:'potencias',     name:'Potencias y raíces',     icon:'⚡', color:0xff7675, zone:'bosque', position:{x:-10, z:-15}, question:'¿Cuánto es 2⁵?', answer:'32', stars:0, maxStars:9,
-    hints:['2⁵ = 2×2×2×2×2.','Multiplica 2 cinco veces.'] },
-  { id:'enteros',       name:'Números enteros',        icon:'🌡️', color:0x74b9ff, zone:'bosque', position:{x:0, z:-18},   question:'¿Cuánto es (-5) + 8?', answer:'3', stars:0, maxStars:9,
-    hints:['Empieza en -5 y avanza 8 hacia arriba.','-5 + 5 = 0, y aún quedan 3.'] },
-  { id:'algebra',       name:'Álgebra básica',         icon:'🧮', color:0xa29bfe, zone:'bosque', position:{x:10, z:-15},  question:'Si x + 5 = 12, ¿cuánto vale x?', answer:'7', stars:0, maxStars:9,
-    hints:['Resta 5 en los dos lados.','x = 12 - 5.'] },
-
-  // === MONTAÑA (2) ===
-  { id:'ecuaciones',    name:'Ecuaciones',             icon:'⚖️', color:0xfab1a0, zone:'montana', position:{x:-8, z:0},   question:'Si 3x = 21, ¿cuánto vale x?', answer:'7', stars:0, maxStars:9,
-    hints:['Divide ambos lados entre 3.','21 ÷ 3 = ?'] },
-  { id:'probabilidad',  name:'Probabilidad avanzada',  icon:'🎯', color:0xffd93d, zone:'montana', position:{x:8, z:0},    question:'Al tirar un dado, ¿probabilidad de sacar par? (ej: 1/2)', answer:'1/2', stars:0, maxStars:9,
-    hints:['Los pares en un dado son 2, 4, 6.','3 casos favorables de 6 posibles.'] }
-];
-
-const MAX_TOTAL_STARS = topics.length * 9; // 14 temas × 9 = 126
-let totalStars = 0;
-
-// Offset aplicado a cada tema según su zona
-function getWorldPosition(topic) {
-  const zone = ZONES[topic.zone];
-  return {
-    x: topic.position.x + zone.offset.x,
-    z: topic.position.z + zone.offset.z
-  };
-}
-
-function isZoneUnlocked(zoneId) {
-  return totalStars >= ZONES[zoneId].unlockStars;
-}
-
-// ==================================================================
-// LOGROS
-// ==================================================================
-const achievements = [
-  { id:'first_star',    icon:'⭐', name:'Primera estrella',  desc:'Consigue tu primera estrella', check: () => totalStars >= 1, unlocked: false },
-  { id:'ten_stars',     icon:'✨', name:'Coleccionista',     desc:'Consigue 10 estrellas', check: () => totalStars >= 10, unlocked: false },
-  { id:'fast_math',     icon:'⚡', name:'Matemática veloz',  desc:'Responde correctamente en menos de 5 s', check: () => false, unlocked: false },
-  { id:'first_house',   icon:'🏠', name:'Primera casita',    desc:'Completa un tema (9/9)', check: () => topics.some(t => t.stars >= t.maxStars), unlocked: false },
-  { id:'explorer',      icon:'🌲', name:'Exploradora',       desc:'Desbloquea el Bosque', check: () => totalStars >= 10, unlocked: false },
-  { id:'mountaineer',   icon:'⛰️', name:'Montañera',         desc:'Desbloquea la Montaña', check: () => totalStars >= 30, unlocked: false },
-  { id:'boss_slayer',   icon:'👹', name:'Cazadora de Jefes', desc:'Derrota al Devorador de Números', check: () => false, unlocked: false },
-  { id:'town_complete', icon:'🏘️', name:'Pueblo completo',   desc:'Completa los 9 temas del Pueblo', check: () => topics.filter(t => t.zone === 'pueblo').every(t => t.stars >= t.maxStars), unlocked: false },
-  { id:'all_stars',     icon:'🌟', name:'Maestría total',    desc:'Consigue todas las estrellas', check: () => totalStars >= MAX_TOTAL_STARS, unlocked: false }
-];
-
-function checkAchievements() {
-  achievements.forEach(a => {
-    if (!a.unlocked && a.check()) {
-      a.unlocked = true;
-      showAchievementToast(a);
-      Sounds.achievement();
-      saveAll();
-    }
-  });
-}
-function showAchievementToast(ach) {
-  const toast = document.getElementById('achievement-toast');
-  document.getElementById('toast-name').textContent = ach.name;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 3200);
-}
-
-// ==================================================================
-// MISIONES DIARIAS
-// ==================================================================
-const MISSION_TEMPLATES = [
-  { id:'answer5',  icon:'📝', name:'Estudiosa',      desc:'Responde 5 preguntas correctamente', target:5, reward:2, field:'answersToday' },
-  { id:'stars3',   icon:'⭐', name:'Cazadora de estrellas', desc:'Gana 3 estrellas hoy', target:3, reward:2, field:'starsToday' },
-  { id:'talk2',    icon:'💬', name:'Charlatana',     desc:'Habla con 2 aldeanos diferentes', target:2, reward:1, field:'npcsTalkedToday' },
-  { id:'oneTheme', icon:'🏠', name:'Especialista',   desc:'Completa un tema hoy (9/9)', target:1, reward:3, field:'themesCompletedToday' }
-];
-
-const DAILY_KEY = 'expedicion_matematica_daily_v1';
-
-let dailyData = {
-  date: getTodayKey(),
-  progress: { answersToday: 0, starsToday: 0, npcsTalkedToday: 0, themesCompletedToday: 0, npcsSeen: [] },
-  completed: [],   // ids de misiones completadas hoy
-  rewarded: []     // ids ya recompensadas
-};
-
-function getTodayKey() {
-  const d = new Date();
-  return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`;
-}
-
-function loadDailyData() {
-  try {
-    const raw = localStorage.getItem(DAILY_KEY);
-    if (raw) {
-      const data = JSON.parse(raw);
-      if (data.date === getTodayKey()) {
-        dailyData = data;
-      } else {
-        // Nuevo día
-        dailyData = {
-          date: getTodayKey(),
-          progress: { answersToday: 0, starsToday: 0, npcsTalkedToday: 0, themesCompletedToday: 0, npcsSeen: [] },
-          completed: [], rewarded: []
-        };
-        saveDailyData();
-      }
-    }
-  } catch(e) {}
-}
-function saveDailyData() {
-  try { localStorage.setItem(DAILY_KEY, JSON.stringify(dailyData)); } catch(e) {}
-}
-
-function getMissionProgress(field) {
-  if (field === 'npcsTalkedToday') return dailyData.progress.npcsSeen.length;
-  return dailyData.progress[field] || 0;
-}
-
-function updateMissions() {
-  // Comprobar cada misión
-  let nuevos = false;
-  MISSION_TEMPLATES.forEach(m => {
-    const prog = getMissionProgress(m.field);
-    if (prog >= m.target && !dailyData.completed.includes(m.id)) {
-      dailyData.completed.push(m.id);
-      nuevos = true;
-    }
-  });
-  if (nuevos) {
-    saveDailyData();
-    updateMissionsBadge();
-  }
-}
-
-function claimMissionReward(mission) {
-  if (dailyData.rewarded.includes(mission.id)) return;
-  if (!dailyData.completed.includes(mission.id)) return;
-  dailyData.rewarded.push(mission.id);
-  totalStars += mission.reward;
-  updateStarDisplay();
-  saveAll();
-  saveDailyData();
-  showMissionToast(mission);
-  Sounds.mission();
-  checkAchievements();
-  updateMissionsBadge();
-  renderMissions();
-}
-
-function showMissionToast(mission) {
-  const toast = document.getElementById('mission-toast');
-  document.getElementById('mission-toast-name').textContent = `${mission.name} (+${mission.reward}⭐)`;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 3200);
-}
-
-function updateMissionsBadge() {
-  const badge = document.getElementById('missions-badge');
-  const completables = MISSION_TEMPLATES.filter(m =>
-    dailyData.completed.includes(m.id) && !dailyData.rewarded.includes(m.id)
-  );
-  if (completables.length > 0) {
-    badge.textContent = completables.length;
-    badge.style.display = 'flex';
-  } else {
-    badge.style.display = 'none';
-  }
-}
-
-function renderMissions() {
-  const list = document.getElementById('missions-list');
-  const dateInfo = document.getElementById('missions-date');
-  const d = new Date();
-  const opciones = { weekday: 'long', day: 'numeric', month: 'long' };
-  dateInfo.textContent = `Misiones de ${d.toLocaleDateString('es-ES', opciones)}`;
-  list.innerHTML = '';
-  MISSION_TEMPLATES.forEach(m => {
-    const prog = Math.min(getMissionProgress(m.field), m.target);
-    const pct = (prog / m.target) * 100;
-    const done = dailyData.completed.includes(m.id);
-    const rewarded = dailyData.rewarded.includes(m.id);
-    const div = document.createElement('div');
-    div.className = 'mission-item' + (done ? ' done' : '');
-    div.innerHTML = `
-      <div class="mission-icon">${m.icon}</div>
-      <div class="mission-info">
-        <div class="mission-name">${m.name} ${done ? '✅' : ''}</div>
-        <div class="mission-desc">${m.desc}</div>
-        <div class="mission-progress"><div class="mission-progress-bar" style="width:${pct}%"></div></div>
-        <div class="mission-reward">
-          ${prog}/${m.target} · Recompensa: +${m.reward}⭐
-          ${done && !rewarded ? ' — <button style="background:#51cf66;color:white;border:none;border-radius:20px;padding:4px 10px;font-weight:800;cursor:pointer;font-size:0.75rem;" onclick="window.claimMission(\'' + m.id + '\')">¡RECLAMAR!</button>' : ''}
-          ${rewarded ? ' — ✅ Reclamada' : ''}
-        </div>
-      </div>
-    `;
-    list.appendChild(div);
-  });
-}
-
-window.claimMission = (id) => {
-  const m = MISSION_TEMPLATES.find(x => x.id === id);
-  if (m) claimMissionReward(m);
-};
-
-// Registrar progreso de misiones
-function trackDaily(field, value = 1) {
-  if (field === 'npcsTalkedToday') return;
-  dailyData.progress[field] = (dailyData.progress[field] || 0) + value;
-  updateMissions();
-  saveDailyData();
-}
-
-function trackDailyNPC(npcName) {
-  if (!dailyData.progress.npcsSeen.includes(npcName)) {
-    dailyData.progress.npcsSeen.push(npcName);
-    updateMissions();
-    saveDailyData();
-  }
-}
-
-loadDailyData();
-
-// ==================================================================
-// PERSONALIZACIÓN
-// ==================================================================
-const defaultAppearance = {
-  skinColor: 0xffe0b2, hairStyle: 'short', hairColor: 0x4a2c17,
-  eyeStyle: 'round', eyeColor: 0x222222, face: 'smile',
-  outfitStyle: 'dress', outfitColor: 0x3d5a99,
-  accessory: 'none', pet: 'none'
-};
-let appearance = { ...defaultAppearance };
-
-const UNLOCKS = {
-  outfits: { dress:0, tshirt:0, uniform:10, overalls:20 },
-  outfitColors: {
-    0x3d5a99:0, 0xff6b6b:0, 0x4ecdc4:0, 0xffa94d:0,
-    0x845ef7:5, 0x51cf66:10, 0xf06595:15, 0xffd93d:25,
-    0xffffff:30, 0x2c2c2c:40, 0xffd700:50, 0xrainbow:70
-  },
-  accessories: { none:0, cap:3, glasses:8, backpack:15, all:35 },
-  pets: { none:0, cat:12, dog:25, bird:45 }
-};
-
-function isUnlocked(cat, val) {
-  const map = UNLOCKS[cat];
-  if (!map) return true;
-  const req = map[val];
-  if (req === undefined) return true;
-  return totalStars >= req;
-}
-
-// ==================================================================
-// LOCALSTORAGE
-// ==================================================================
-const STORAGE_KEY = 'expedicion_matematica_save_v4';
-const APPEARANCE_KEY = 'expedicion_matematica_appearance_v3';
-const ACHIEVEMENTS_KEY = 'expedicion_matematica_achievements_v2';
-const BOSS_KEY = 'expedicion_matematica_boss_v1';
-
-function saveAll() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      stars: topics.map(t => ({ id: t.id, stars: t.stars })),
-      totalStars
-    }));
-    localStorage.setItem(APPEARANCE_KEY, JSON.stringify(appearance));
-    localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify(
-      achievements.map(a => ({ id: a.id, unlocked: a.unlocked }))
-    ));
-  } catch(e) {}
-}
-
-function loadAll() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const data = JSON.parse(raw);
-      if (data.stars) {
-        data.stars.forEach(s => {
-          const t = topics.find(x => x.id === s.id);
-          if (t) t.stars = s.stars;
-        });
-        totalStars = topics.reduce((a, t) => a + t.stars, 0);
-      }
-    }
-    const rawA = localStorage.getItem(APPEARANCE_KEY);
-    if (rawA) appearance = { ...defaultAppearance, ...JSON.parse(rawA) };
-    const rawAch = localStorage.getItem(ACHIEVEMENTS_KEY);
-    if (rawAch) {
-      JSON.parse(rawAch).forEach(s => {
-        const a = achievements.find(x => x.id === s.id);
-        if (a) a.unlocked = s.unlocked;
-      });
-    }
-  } catch(e) {}
-}
-
-function resetProgress() {
-  if (!confirm('¿Seguro que quieres borrar TODO el progreso?')) return;
-  localStorage.removeItem(STORAGE_KEY);
-  localStorage.removeItem(APPEARANCE_KEY);
-  localStorage.removeItem(ACHIEVEMENTS_KEY);
-  localStorage.removeItem(DAILY_KEY);
-  localStorage.removeItem(BOSS_KEY);
-  topics.forEach(t => t.stars = 0);
-  totalStars = 0;
-  achievements.forEach(a => a.unlocked = false);
-  appearance = { ...defaultAppearance };
-  dailyData = {
-    date: getTodayKey(),
-    progress: { answersToday: 0, starsToday: 0, npcsTalkedToday: 0, themesCompletedToday: 0, npcsSeen: [] },
-    completed: [], rewarded: []
-  };
-  updateStarDisplay();
-  houses.forEach(h => {
-    const t = h.topic;
-    if (t.zone === 'pueblo') h.mesh.children[1].material.color.setHex(t.color);
-  });
-  applyAppearance();
-  updateMusicButton();
-  updateMissionsBadge();
-}
-
-loadAll();
-
-// ==================================================================
-// ESCENA 3D
-// ==================================================================
+// ============ ESCENA ============
 const container = document.getElementById('canvas-container');
 const scene = new THREE.Scene();
-const DAY_BG = new THREE.Color(0x87ceeb);
-const NIGHT_BG = new THREE.Color(0x0a0a2a);
-scene.background = DAY_BG.clone();
-scene.fog = new THREE.Fog(0x87ceeb, 40, 130);
+scene.background = new THREE.Color(0x87ceeb);
 
-const camera = new THREE.PerspectiveCamera(65, window.innerWidth/window.innerHeight, 0.1, 500);
-const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 500);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 container.appendChild(renderer.domElement);
+log('✅ Renderer creado');
+
+// ============ LUCES ============
+const ambient = new THREE.AmbientLight(0xffffff, 0.7);
+scene.add(ambient);
 
 const hemi = new THREE.HemisphereLight(0xffffff, 0x88aa88, 0.9);
 scene.add(hemi);
 
-const sun = new THREE.DirectionalLight(0xfff5d0, 1.5);
-sun.position.set(25, 40, 20);
+const sun = new THREE.DirectionalLight(0xffffff, 1.2);
+sun.position.set(20, 30, 15);
 sun.castShadow = true;
 sun.shadow.mapSize.set(2048, 2048);
-sun.shadow.camera.left = -70; sun.shadow.camera.right = 70;
-sun.shadow.camera.top = 70; sun.shadow.camera.bottom = -70;
-sun.shadow.camera.near = 1; sun.shadow.camera.far = 200;
-sun.shadow.bias = -0.0005;
+sun.shadow.camera.left = -50;
+sun.shadow.camera.right = 50;
+sun.shadow.camera.top = 50;
+sun.shadow.camera.bottom = -50;
+sun.shadow.camera.near = 1;
+sun.shadow.camera.far = 100;
 scene.add(sun);
+log('✅ Luces añadidas');
 
-// Suelo por zonas
-Object.entries(ZONES).forEach(([id, zone]) => {
-  const geo = new THREE.PlaneGeometry(60, 60);
-  const mat = new THREE.MeshStandardMaterial({ color: zone.color, roughness: 0.9 });
-  const mesh = new THREE.Mesh(geo, mat);
-  mesh.rotation.x = -Math.PI / 2;
-  mesh.position.set(zone.offset.x, -0.02, zone.offset.z);
-  mesh.receiveShadow = true;
-  scene.add(mesh);
+// ============ SUELO ============
+const groundGeo = new THREE.PlaneGeometry(100, 100);
+const groundMat = new THREE.MeshStandardMaterial({ color: 0x7ec850, roughness: 0.9 });
+const ground = new THREE.Mesh(groundGeo, groundMat);
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+
+// Camino circular
+const pathGeo = new THREE.RingGeometry(18, 21, 64);
+const pathMat = new THREE.MeshStandardMaterial({
+  color: 0xd9b382, roughness: 0.9, side: THREE.DoubleSide
 });
-
-// Camino central del pueblo
-const pathGeo = new THREE.RingGeometry(21, 24, 64);
-const pathMat = new THREE.MeshStandardMaterial({ color: 0xd9b382, roughness: 0.9, side: THREE.DoubleSide });
 const path = new THREE.Mesh(pathGeo, pathMat);
-path.rotation.x = -Math.PI/2;
+path.rotation.x = -Math.PI / 2;
 path.position.y = 0.02;
 path.receiveShadow = true;
 scene.add(path);
 
 // Fuente central
-const centerBase = new THREE.Mesh(
-  new THREE.CylinderGeometry(2.2, 2.4, 0.6, 24),
-  new THREE.MeshStandardMaterial({ color: 0xb0b0b0, roughness: 0.6 })
+const fountain = new THREE.Mesh(
+  new THREE.CylinderGeometry(2, 2.2, 0.6, 24),
+  new THREE.MeshStandardMaterial({ color: 0xb0b0b0 })
 );
-centerBase.position.y = 0.3;
-centerBase.castShadow = true; centerBase.receiveShadow = true;
-scene.add(centerBase);
+fountain.position.y = 0.3;
+fountain.castShadow = true;
+scene.add(fountain);
 
-const centerTop = new THREE.Mesh(
-  new THREE.CylinderGeometry(0.6, 0.6, 1.5, 16),
+const fountainTop = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.5, 0.5, 1.5, 16),
   new THREE.MeshStandardMaterial({ color: 0x9aa0a6 })
 );
-centerTop.position.y = 1.35; centerTop.castShadow = true;
-scene.add(centerTop);
+fountainTop.position.y = 1.35;
+fountainTop.castShadow = true;
+scene.add(fountainTop);
 
 const waterBall = new THREE.Mesh(
   new THREE.SphereGeometry(0.5, 16, 12),
-  new THREE.MeshStandardMaterial({ color: 0x5bc0eb, transparent: true, opacity: 0.85 })
+  new THREE.MeshStandardMaterial({ color: 0x5bc0eb })
 );
 waterBall.position.y = 2.2;
 scene.add(waterBall);
+log('✅ Suelo y fuente creados');
 
-// Vallas del pueblo
-function createFenceSegment() {
-  const g = new THREE.Group();
-  const woodMat = new THREE.MeshStandardMaterial({ color: 0xb58b5a, roughness: 0.9 });
-  const post1 = new THREE.Mesh(new THREE.BoxGeometry(0.15, 1, 0.15), woodMat);
-  post1.position.set(0, 0.5, 0); post1.castShadow = true; g.add(post1);
-  const post2 = post1.clone(); post2.position.set(0, 0.5, -0.9); g.add(post2);
-  const bar1 = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.1, 1), woodMat);
-  bar1.position.set(0, 0.7, -0.45); bar1.castShadow = true; g.add(bar1);
-  const bar2 = bar1.clone(); bar2.position.y = 0.35; g.add(bar2);
-  return g;
-}
-for (let i = 0; i < 80; i++) {
-  const angle = (i / 80) * Math.PI * 2;
-  const deg = (i / 80) * 360;
-  const nearHouse = topics.filter(t => t.zone === 'pueblo').some(t => {
-    const tAngle = (Math.atan2(t.position.z, t.position.x) * 180 / Math.PI + 360) % 360;
-    let d = Math.abs(deg - tAngle);
-    if (d > 180) d = 360 - d;
-    return d < 14;
-  });
-  if (nearHouse) continue;
-  const r = 24.5;
-  const x = Math.cos(angle) * r;
-  const z = Math.sin(angle) * r;
-  const fence = createFenceSegment();
-  fence.position.set(x, 0, z);
-  fence.rotation.y = -angle + Math.PI/2;
-  scene.add(fence);
-}
-
-// Flores
-function createFlower(x, z, color) {
-  const g = new THREE.Group();
-  const stem = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.04, 0.04, 0.5, 5),
-    new THREE.MeshStandardMaterial({ color: 0x3d8c3d })
-  );
-  stem.position.y = 0.25; g.add(stem);
-  const petals = new THREE.Mesh(
-    new THREE.SphereGeometry(0.15, 8, 6),
-    new THREE.MeshStandardMaterial({ color, roughness: 0.7, emissive: color, emissiveIntensity: 0.15 })
-  );
-  petals.position.y = 0.55; petals.scale.y = 0.6; g.add(petals);
-  g.position.set(x, 0, z);
-  return g;
-}
-const flowerColors = [0xff6b6b, 0xffd93d, 0xff9ff3, 0xffffff, 0xa29bfe, 0xffa94d];
-for (let i = 0; i < 150; i++) {
-  const angle = Math.random() * Math.PI * 2;
-  const r = 26 + Math.random() * 22;
-  const x = Math.cos(angle) * r;
-  const z = Math.sin(angle) * r;
-  if (topics.filter(t => t.zone==='pueblo').some(t => Math.hypot(x - t.position.x, z - t.position.z) < 4)) continue;
-  scene.add(createFlower(x, z, flowerColors[Math.floor(Math.random()*flowerColors.length)]));
-}
-
-// Farolas
-const lampposts = [];
-function createLamppost(x, z) {
-  const g = new THREE.Group();
-  const poleMat = new THREE.MeshStandardMaterial({ color: 0x2c2c2c, roughness: 0.5, metalness: 0.6 });
-  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 4, 8), poleMat);
-  pole.position.y = 2; pole.castShadow = true; g.add(pole);
-  const lampMat = new THREE.MeshStandardMaterial({
-    color: 0xffe066, emissive: 0xffc93c, emissiveIntensity: 0
-  });
-  const lamp = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), lampMat);
-  lamp.position.y = 4.2; g.add(lamp);
-  const cap = new THREE.Mesh(new THREE.ConeGeometry(0.4, 0.3, 4), poleMat);
-  cap.position.y = 4.6; cap.rotation.y = Math.PI/4; g.add(cap);
-  const light = new THREE.PointLight(0xffd070, 0, 12, 2);
-  light.position.y = 4.2; g.add(light);
-  g.position.set(x, 0, z);
-  lampposts.push({ group: g, lamp, light, lampMat });
-  return g;
-}
-for (let i = 0; i < 8; i++) {
-  const angle = (i / 8) * Math.PI * 2;
-  scene.add(createLamppost(Math.cos(angle) * 22.5, Math.sin(angle) * 22.5));
-}
-
-// Árboles (más en el bosque)
-function createTree(x, z, scale = 1) {
-  const g = new THREE.Group();
-  const trunk = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.25, 0.35, 1.4, 8),
-    new THREE.MeshStandardMaterial({ color: 0x8b5a2b, roughness: 1 })
-  );
-  trunk.position.y = 0.7; trunk.castShadow = true; g.add(trunk);
-  const leavesMat = new THREE.MeshStandardMaterial({ color: 0x3d9e3d, roughness: 0.9, flatShading: true });
-  const leaf1 = new THREE.Mesh(new THREE.ConeGeometry(1.3, 1.6, 8), leavesMat);
-  leaf1.position.y = 1.9; leaf1.castShadow = true; g.add(leaf1);
-  const leaf2 = new THREE.Mesh(new THREE.ConeGeometry(1.0, 1.3, 8), leavesMat);
-  leaf2.position.y = 2.7; leaf2.castShadow = true; g.add(leaf2);
-  const leaf3 = new THREE.Mesh(new THREE.ConeGeometry(0.7, 1.0, 8), leavesMat);
-  leaf3.position.y = 3.4; leaf3.castShadow = true; g.add(leaf3);
-  g.position.set(x, 0, z);
-  g.rotation.y = Math.random() * Math.PI * 2;
-  g.scale.set(scale, scale, scale);
-  return g;
-}
-const treePositions = [
-  [-30,-28],[-26,-10],[-32,10],[-28,24],[-12,32],[0,34],[12,32],[28,24],
-  [32,10],[30,-10],[26,-28],[-5,-32],[5,-32],[-34,-18],[34,-18],[-34,18],[34,18],
-  [-42,-5],[42,-5],[-42,5],[42,5],[-20,-34],[20,-34],[-20,34],[20,34]
+// ============ CASITAS (9) ============
+const topics = [
+  { name:'Números', icon:'🔢', color:0xff6b6b, pos:{x:-14, z:-14} },
+  { name:'Divisibilidad', icon:'🧩', color:0x4ecdc4, pos:{x:-7, z:-16} },
+  { name:'Fracciones', icon:'🍕', color:0xffa94d, pos:{x:0, z:-16} },
+  { name:'Decimales', icon:'🔬', color:0x845ef7, pos:{x:7, z:-16} },
+  { name:'Porcentajes', icon:'📊', color:0xff922b, pos:{x:14, z:-14} },
+  { name:'Geometría', icon:'📐', color:0x51cf66, pos:{x:16, z:0} },
+  { name:'Medidas', icon:'⏱️', color:0x22b8cf, pos:{x:16, z:12} },
+  { name:'Problemas', icon:'🧠', color:0xf06595, pos:{x:0, z:17} },
+  { name:'Estadística', icon:'🎲', color:0x748ffc, pos:{x:-14, z:14} }
 ];
-treePositions.forEach(p => scene.add(createTree(p[0], p[1])));
 
-// Bosque: muchos árboles alrededor de la zona bosque
-for (let i = 0; i < 40; i++) {
-  const bx = ZONES.bosque.offset.x + (Math.random()-0.5) * 40;
-  const bz = ZONES.bosque.offset.z + (Math.random()-0.5) * 40;
-  if (Math.hypot(bx - ZONES.bosque.offset.x, bz - ZONES.bosque.offset.z) < 12) continue;
-  scene.add(createTree(bx, bz, 0.9 + Math.random()*0.4));
-}
-// Montaña: piedras y árboles dispersos
-function createRock(x, z) {
-  const g = new THREE.Group();
-  const mat = new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 1, flatShading: true });
-  const r1 = new THREE.Mesh(new THREE.DodecahedronGeometry(0.7 + Math.random()*0.4), mat);
-  r1.position.y = 0.5; r1.castShadow = true;
-  g.add(r1);
-  const r2 = new THREE.Mesh(new THREE.DodecahedronGeometry(0.5 + Math.random()*0.3), mat);
-  r2.position.set(0.6, 0.3, 0.3); r2.castShadow = true;
-  g.add(r2);
-  g.position.set(x, 0, z);
-  g.rotation.y = Math.random() * Math.PI * 2;
-  return g;
-}
-for (let i = 0; i < 25; i++) {
-  const mx = ZONES.montana.offset.x + (Math.random()-0.5) * 45;
-  const mz = ZONES.montana.offset.z + (Math.random()-0.5) * 45;
-  if (Math.hypot(mx - ZONES.montana.offset.x, mz - ZONES.montana.offset.z) < 14) continue;
-  scene.add(createRock(mx, mz));
-}
-
-// Caminos entre zonas
-function createPathBetween(from, to) {
-  const dx = to.x - from.x;
-  const dz = to.z - from.z;
-  const len = Math.hypot(dx, dz);
-  const geo = new THREE.PlaneGeometry(3, len);
-  const mat = new THREE.MeshStandardMaterial({ color: 0xc9a77a, roughness: 0.9 });
-  const path = new THREE.Mesh(geo, mat);
-  path.rotation.x = -Math.PI/2;
-  path.position.set((from.x + to.x)/2, 0.01, (from.z + to.z)/2);
-  path.rotation.z = -Math.atan2(dx, dz);
-  path.receiveShadow = true;
-  scene.add(path);
-}
-createPathBetween(ZONES.pueblo.offset, ZONES.bosque.offset);
-createPathBetween(ZONES.pueblo.offset, ZONES.montana.offset);
-
-// Nubes
-function createCloud(x, y, z) {
-  const g = new THREE.Group();
-  const mat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1, emissive: 0xffffff, emissiveIntensity: 0.1 });
-  for (let i = 0; i < 4; i++) {
-    const p = new THREE.Mesh(new THREE.SphereGeometry(1 + Math.random()*0.6, 8, 6), mat);
-    p.position.set((Math.random()-0.5)*2.5, (Math.random()-0.5)*0.5, (Math.random()-0.5)*1.5);
-    g.add(p);
-  }
-  g.position.set(x, y, z);
-  return g;
-}
-const clouds = [];
-for (let i = 0; i < 12; i++) {
-  const c = createCloud((Math.random()-0.5)*140, 25 + Math.random()*8, (Math.random()-0.5)*140);
-  c.userData.speed = 0.5 + Math.random() * 0.5;
-  clouds.push(c);
-  scene.add(c);
-}
-
-// Cartel de zona bloqueada
-function createZoneSign(zoneId) {
-  const zone = ZONES[zoneId];
-  const canvas = document.createElement('canvas');
-  canvas.width = 512; canvas.height = 128;
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = 'rgba(254, 247, 224, 0.95)';
-  ctx.strokeStyle = '#8b6f4c'; ctx.lineWidth = 8;
-  ctx.beginPath(); ctx.roundRect(8, 8, 496, 112, 30); ctx.fill(); ctx.stroke();
-  ctx.fillStyle = '#3a2c1b';
-  ctx.font = 'bold 42px Arial';
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText(`${zone.name} · ${zone.unlockStars}⭐`, 256, 68);
-  const tex = new THREE.CanvasTexture(canvas);
-  const mat = new THREE.SpriteMaterial({ map: tex, depthTest: false });
-  const sprite = new THREE.Sprite(mat);
-  sprite.scale.set(8, 2, 1);
-  const pos = zone.offset;
-  sprite.position.set(pos.x, 6, pos.z - 30);
-  scene.add(sprite);
-  return sprite;
-}
-const zoneSigns = {
-  bosque: createZoneSign('bosque'),
-  montana: createZoneSign('montana')
-};
-
-// ============ CASITAS ============
 const houses = [];
-function createHouse(topic) {
-  const worldPos = getWorldPosition(topic);
-  const g = new THREE.Group();
-  const color = topic.color;
 
+topics.forEach(topic => {
+  const g = new THREE.Group();
+  // Base
   const base = new THREE.Mesh(
-    new THREE.BoxGeometry(4, 3, 4),
-    new THREE.MeshStandardMaterial({ color: 0xfbe5c8, roughness: 0.9 })
+    new THREE.BoxGeometry(3.5, 2.5, 3.5),
+    new THREE.MeshStandardMaterial({ color: 0xfbe5c8 })
   );
-  base.position.y = 1.5; base.castShadow = true; base.receiveShadow = true;
+  base.position.y = 1.25;
+  base.castShadow = true;
+  base.receiveShadow = true;
   g.add(base);
 
-  const roofMat = new THREE.MeshStandardMaterial({ color, roughness: 0.7, flatShading: true });
-  const roof = new THREE.Mesh(new THREE.ConeGeometry(3.3, 2.2, 4), roofMat);
-  roof.position.y = 4.1; roof.rotation.y = Math.PI/4; roof.castShadow = true;
+  // Tejado
+  const roof = new THREE.Mesh(
+    new THREE.ConeGeometry(2.8, 1.8, 4),
+    new THREE.MeshStandardMaterial({ color: topic.color, flatShading: true })
+  );
+  roof.position.y = 3.4;
+  roof.rotation.y = Math.PI / 4;
+  roof.castShadow = true;
   g.add(roof);
 
+  // Puerta
   const door = new THREE.Mesh(
-    new THREE.BoxGeometry(1.1, 1.8, 0.1),
+    new THREE.BoxGeometry(0.9, 1.5, 0.1),
     new THREE.MeshStandardMaterial({ color: 0x6b3e1d })
   );
-  door.position.set(0, 0.9, 2.01); g.add(door);
+  door.position.set(0, 0.75, 1.76);
+  g.add(door);
 
-  const windowMat = new THREE.MeshStandardMaterial({ color: 0x9be0ff, emissive: 0x224466, emissiveIntensity: 0.4 });
-  const win1 = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.9, 0.1), windowMat);
-  win1.position.set(-1.2, 1.7, 2.01); g.add(win1);
-  const win2 = win1.clone(); win2.position.x = 1.2; g.add(win2);
+  // Ventanas
+  const winMat = new THREE.MeshStandardMaterial({ color: 0x9be0ff, emissive: 0x224466, emissiveIntensity: 0.4 });
+  const win1 = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.7, 0.1), winMat);
+  win1.position.set(-1, 1.5, 1.76);
+  g.add(win1);
+  const win2 = win1.clone();
+  win2.position.x = 1;
+  g.add(win2);
 
+  // Sprite del icono flotante
   const canvas = document.createElement('canvas');
-  canvas.width = 256; canvas.height = 256;
+  canvas.width = 256;
+  canvas.height = 256;
   const ctx = canvas.getContext('2d');
-  ctx.beginPath(); ctx.arc(128, 128, 110, 0, Math.PI*2);
-  ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.fill();
-  ctx.strokeStyle = '#3a2c1b'; ctx.lineWidth = 10; ctx.stroke();
-  ctx.font = 'bold 140px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.beginPath();
+  ctx.arc(128, 128, 110, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  ctx.fill();
+  ctx.strokeStyle = '#3a2c1b';
+  ctx.lineWidth = 10;
+  ctx.stroke();
+  ctx.font = 'bold 140px Arial';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
   ctx.fillText(topic.icon, 128, 138);
   const texture = new THREE.CanvasTexture(canvas);
-  const spriteMat = new THREE.SpriteMaterial({ map: texture, depthTest: false, depthWrite: false });
+  const spriteMat = new THREE.SpriteMaterial({ map: texture, depthTest: false });
   const sprite = new THREE.Sprite(spriteMat);
-  sprite.scale.set(2.2, 2.2, 2.2); sprite.position.y = 6.2;
+  sprite.scale.set(2, 2, 2);
+  sprite.position.y = 5;
   g.add(sprite);
 
-  const labelCanvas = document.createElement('canvas');
-  labelCanvas.width = 512; labelCanvas.height = 96;
-  const lctx = labelCanvas.getContext('2d');
-  lctx.fillStyle = 'rgba(254, 247, 224, 0.95)';
-  lctx.strokeStyle = '#8b6f4c'; lctx.lineWidth = 6;
-  lctx.beginPath(); lctx.roundRect(4, 4, 504, 88, 30);
-  lctx.fill(); lctx.stroke();
-  lctx.fillStyle = '#2c1e0e'; lctx.font = 'bold 40px Arial';
-  lctx.textAlign = 'center'; lctx.textBaseline = 'middle';
-  lctx.fillText(topic.name.length > 26 ? topic.name.slice(0,24)+'…' : topic.name, 256, 50);
-  const labelTex = new THREE.CanvasTexture(labelCanvas);
-  const labelMat = new THREE.SpriteMaterial({ map: labelTex, depthTest: false, depthWrite: false });
-  const labelSprite = new THREE.Sprite(labelMat);
-  labelSprite.scale.set(5, 0.95, 1);
-  labelSprite.position.y = 7.4;
-  g.add(labelSprite);
-
-  g.position.set(worldPos.x, 0, worldPos.z);
-  g.rotation.y = Math.atan2(-worldPos.x, -worldPos.z);
+  g.position.set(topic.pos.x, 0, topic.pos.z);
+  g.rotation.y = Math.atan2(-topic.pos.x, -topic.pos.z);
   scene.add(g);
-  houses.push({ topic, mesh: g, x: worldPos.x, z: worldPos.z, radius: 3.5, zone: topic.zone });
 
-  if (topic.stars >= topic.maxStars) roofMat.color.set(0xffd700);
-}
-topics.forEach(createHouse);
-
-// ============ NPCs ============
-const npcs = [];
-function createNPC(x, z, color, name, hints) {
-  const g = new THREE.Group();
-  const bodyMat = new THREE.MeshStandardMaterial({ color, roughness: 0.8 });
-  const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.5, 0.7, 4, 12), bodyMat);
-  body.position.y = 1.0; body.castShadow = true; g.add(body);
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.55, 16, 12),
-    new THREE.MeshStandardMaterial({ color: 0xffe0b2 }));
-  head.position.y = 2.0; head.castShadow = true; g.add(head);
-  const hatMat = new THREE.MeshStandardMaterial({ color: 0x3a2c1b });
-  const hat = new THREE.Mesh(new THREE.ConeGeometry(0.7, 0.6, 8), hatMat);
-  hat.position.y = 2.55; g.add(hat);
-  const brim = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.7, 0.05, 12), hatMat);
-  brim.position.y = 2.3; g.add(brim);
-  const eyeMat = new THREE.MeshStandardMaterial({ color: 0x222222 });
-  const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 8), eyeMat);
-  eyeL.position.set(-0.18, 2.05, 0.48); g.add(eyeL);
-  const eyeR = eyeL.clone(); eyeR.position.x = 0.18; g.add(eyeR);
-  g.position.set(x, 0, z);
-  g.rotation.y = Math.random() * Math.PI * 2;
-  scene.add(g);
-  npcs.push({ mesh: g, x, z, name, hints, hintIndex: 0, color });
-}
-createNPC(-5, 5, 0xff6b6b, 'Maestro Ramón', [
-  'Para sumar rápido, descompón: 15 + 27 = (15+20) + 7 = 35 + 7.',
-  'Cuando dudes, dibuja el problema. ¡Los dibujos ayudan!'
-]);
-createNPC(7, -3, 0x4ecdc4, 'Doña Marta', [
-  'Para las fracciones, busca el mismo denominador.',
-  'El 50% es la mitad, el 25% es un cuarto.'
-]);
-createNPC(2, 10, 0xffa94d, 'Pequeño Leo', [
-  '¿Sabías que el área de un cuadrado es lado × lado?',
-  '1 metro son 100 centímetros, ¡no lo olvides!'
-]);
-
-function getNearestTopicToNPC(npc) {
-  let best = null, bestDist = Infinity;
-  topics.forEach(t => {
-    const wp = getWorldPosition(t);
-    const d = Math.hypot(wp.x - npc.x, wp.z - npc.z);
-    if (d < bestDist) { bestDist = d; best = t; }
-  });
-  return best;
-}
-
-// ============ JEFE FINAL ============
-const bossPos = { x: ZONES.montana.offset.x, z: ZONES.montana.offset.z - 12 };
-
-function createBossLair() {
-  const g = new THREE.Group();
-  // Roca grande
-  const rockMat = new THREE.MeshStandardMaterial({ color: 0x4a3a3a, roughness: 1, flatShading: true });
-  const bigRock = new THREE.Mesh(new THREE.DodecahedronGeometry(5), rockMat);
-  bigRock.position.y = 3; bigRock.castShadow = true; bigRock.receiveShadow = true;
-  g.add(bigRock);
-  // Entrada oscura
-  const entrance = new THREE.Mesh(
-    new THREE.CircleGeometry(1.6, 16),
-    new THREE.MeshStandardMaterial({ color: 0x0a0a0a, side: THREE.DoubleSide })
-  );
-  entrance.position.set(0, 1.8, 4.5);
-  g.add(entrance);
-  // Ojos brillantes
-  const eyeMat = new THREE.MeshStandardMaterial({ color: 0xff0000, emissive: 0xff0000, emissiveIntensity: 1.5 });
-  const eye1 = new THREE.Mesh(new THREE.SphereGeometry(0.25, 8, 8), eyeMat);
-  eye1.position.set(-0.5, 2, 4.6);
-  g.add(eye1);
-  const eye2 = eye1.clone(); eye2.position.x = 0.5; g.add(eye2);
-
-  g.position.set(bossPos.x, 0, bossPos.z);
-  g.rotation.y = Math.PI; // mira al pueblo
-  scene.add(g);
-}
-createBossLair();
+  houses.push({ topic, mesh: g, x: topic.pos.x, z: topic.pos.z });
+});
+log('✅ ' + houses.length + ' casitas creadas');
 
 // ============ PERSONAJE ============
 const player = new THREE.Group();
-scene.add(player);
 
-const playerParts = {
-  body: null, bodyOverlay: null, head: null, neck: null,
-  hairGroup: null, eyeL: null, eyeR: null, pupilL: null, pupilR: null,
-  smile: null, freckles: [], blushL: null, blushR: null,
-  armL: null, armR: null, legL: null, legR: null,
-  accessoriesGroup: null, petGroup: null
-};
-
-const headMat = new THREE.MeshStandardMaterial({ color: appearance.skinColor });
-const head = new THREE.Mesh(new THREE.SphereGeometry(0.55, 16, 12), headMat);
-head.position.y = 2.0; head.castShadow = true;
-player.add(head); playerParts.head = head;
-
-const neck = new THREE.Mesh(
-  new THREE.CylinderGeometry(0.18, 0.2, 0.2, 8),
-  new THREE.MeshStandardMaterial({ color: appearance.skinColor })
+// Cuerpo
+const body = new THREE.Mesh(
+  new THREE.CapsuleGeometry(0.5, 0.7, 4, 12),
+  new THREE.MeshStandardMaterial({ color: 0xffb347 })
 );
-neck.position.y = 1.55; player.add(neck); playerParts.neck = neck;
+body.position.y = 1.0;
+body.castShadow = true;
+player.add(body);
 
-const bodyMat = new THREE.MeshStandardMaterial({ color: appearance.outfitColor, roughness: 0.8 });
-const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.5, 0.7, 4, 12), bodyMat);
-body.position.y = 1.0; body.castShadow = true;
-player.add(body); playerParts.body = body;
-
-const overlay = new THREE.Mesh(
-  new THREE.BoxGeometry(0.7, 0.7, 0.05),
-  new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.7 })
+// Cabeza
+const head = new THREE.Mesh(
+  new THREE.SphereGeometry(0.55, 16, 12),
+  new THREE.MeshStandardMaterial({ color: 0xffe0b2 })
 );
-overlay.position.set(0, 1.15, 0.5); overlay.visible = false;
-player.add(overlay); playerParts.bodyOverlay = overlay;
+head.position.y = 2.0;
+head.castShadow = true;
+player.add(head);
 
-const hairGroup = new THREE.Group();
-player.add(hairGroup); playerParts.hairGroup = hairGroup;
-
-const eyeMat = new THREE.MeshStandardMaterial({ color: appearance.eyeColor });
-const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.09, 10, 10), eyeMat);
-eyeL.position.set(-0.18, 2.05, 0.48); player.add(eyeL);
-const eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.09, 10, 10), eyeMat);
-eyeR.position.set(0.18, 2.05, 0.48); player.add(eyeR);
-playerParts.eyeL = eyeL; playerParts.eyeR = eyeR;
-
-const pupilMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
-const pupilL = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), pupilMat);
-pupilL.position.set(-0.18, 2.08, 0.55); player.add(pupilL);
-const pupilR = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), pupilMat);
-pupilR.position.set(0.18, 2.08, 0.55); player.add(pupilR);
-playerParts.pupilL = pupilL; playerParts.pupilR = pupilR;
-
-const smile = new THREE.Mesh(
-  new THREE.TorusGeometry(0.13, 0.025, 6, 12, Math.PI),
-  new THREE.MeshStandardMaterial({ color: 0x8b3a1f })
+// Pelo
+const hair = new THREE.Mesh(
+  new THREE.SphereGeometry(0.58, 16, 12, 0, Math.PI * 2, 0, Math.PI / 2),
+  new THREE.MeshStandardMaterial({ color: 0x4a2c17 })
 );
-smile.position.set(0, 1.85, 0.5);
-smile.rotation.x = Math.PI; smile.rotation.z = Math.PI;
-player.add(smile); playerParts.smile = smile;
+hair.position.y = 2.15;
+player.add(hair);
 
-const freckleMat = new THREE.MeshStandardMaterial({ color: 0x8b5a2b });
-for (let i = 0; i < 6; i++) {
-  const f = new THREE.Mesh(new THREE.SphereGeometry(0.025, 6, 6), freckleMat);
-  const side = i % 2 === 0 ? -1 : 1;
-  const idx = Math.floor(i / 2);
-  f.position.set(side * (0.15 + idx * 0.08), 1.98 + (idx % 2) * 0.03, 0.51);
-  f.visible = false; player.add(f);
-  playerParts.freckles.push(f);
-}
+// Ojos
+const eyeMat = new THREE.MeshStandardMaterial({ color: 0x222222 });
+const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8), eyeMat);
+eyeL.position.set(-0.18, 2.05, 0.48);
+player.add(eyeL);
+const eyeR = eyeL.clone();
+eyeR.position.x = 0.18;
+player.add(eyeR);
 
-const blushMat = new THREE.MeshStandardMaterial({ color: 0xff8fa3, transparent: true, opacity: 0.7 });
-const blushL = new THREE.Mesh(new THREE.CircleGeometry(0.09, 12), blushMat);
-blushL.position.set(-0.3, 1.92, 0.51); blushL.visible = false; player.add(blushL);
-const blushR = new THREE.Mesh(new THREE.CircleGeometry(0.09, 12), blushMat);
-blushR.position.set(0.3, 1.92, 0.51); blushR.visible = false; player.add(blushR);
-playerParts.blushL = blushL; playerParts.blushR = blushR;
-
-const armMat = new THREE.MeshStandardMaterial({ color: appearance.skinColor });
-const armL = new THREE.Mesh(new THREE.CapsuleGeometry(0.15, 0.5, 3, 8), armMat);
-armL.position.set(-0.65, 1.05, 0); armL.castShadow = true; player.add(armL);
-const armR = new THREE.Mesh(new THREE.CapsuleGeometry(0.15, 0.5, 3, 8), armMat);
-armR.position.set(0.65, 1.05, 0); armR.castShadow = true; player.add(armR);
-playerParts.armL = armL; playerParts.armR = armR;
-
-const legMat = new THREE.MeshStandardMaterial({ color: appearance.outfitColor });
+// Piernas
+const legMat = new THREE.MeshStandardMaterial({ color: 0x3d5a99 });
 const legL = new THREE.Mesh(new THREE.CapsuleGeometry(0.17, 0.5, 3, 8), legMat);
-legL.position.set(-0.22, 0.3, 0); legL.castShadow = true; player.add(legL);
-const legR = new THREE.Mesh(new THREE.CapsuleGeometry(0.17, 0.5, 3, 8), legMat);
-legR.position.set(0.22, 0.3, 0); legR.castShadow = true; player.add(legR);
-playerParts.legL = legL; playerParts.legR = legR;
+legL.position.set(-0.22, 0.3, 0);
+legL.castShadow = true;
+player.add(legL);
+const legR = legL.clone();
+legR.position.x = 0.22;
+player.add(legR);
 
-const accessoriesGroup = new THREE.Group();
-player.add(accessoriesGroup); playerParts.accessoriesGroup = accessoriesGroup;
+// Brazos
+const armMat = new THREE.MeshStandardMaterial({ color: 0xffb347 });
+const armL = new THREE.Mesh(new THREE.CapsuleGeometry(0.15, 0.5, 3, 8), armMat);
+armL.position.set(-0.65, 1.05, 0);
+armL.castShadow = true;
+player.add(armL);
+const armR = armL.clone();
+armR.position.x = 0.65;
+player.add(armR);
 
-const petGroup = new THREE.Group();
-petGroup.position.set(1.3, 0, -0.5);
-scene.add(petGroup); playerParts.petGroup = petGroup;
+// Colocar al personaje en el centro
+player.position.set(0, 0, 0);
+scene.add(player);
+log('✅ Personaje creado en (0,0,0)');
 
-function rebuildHair() {
-  while (playerParts.hairGroup.children.length > 0) {
-    const c = playerParts.hairGroup.children[0];
-    playerParts.hairGroup.remove(c);
-    if (c.geometry) c.geometry.dispose();
-    if (c.material) c.material.dispose();
-  }
-  const hairMat = new THREE.MeshStandardMaterial({ color: appearance.hairColor, roughness: 0.8 });
-  const style = appearance.hairStyle;
-  if (style === 'short') {
-    const h = new THREE.Mesh(new THREE.SphereGeometry(0.58, 16, 12, 0, Math.PI*2, 0, Math.PI*0.55), hairMat);
-    h.position.y = 2.18; playerParts.hairGroup.add(h);
-  } else if (style === 'long') {
-    const cap = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 12, 0, Math.PI*2, 0, Math.PI*0.6), hairMat);
-    cap.position.y = 2.15; playerParts.hairGroup.add(cap);
-    const back = new THREE.Mesh(new THREE.BoxGeometry(0.85, 1.0, 0.4), hairMat);
-    back.position.set(0, 1.55, -0.4); playerParts.hairGroup.add(back);
-  } else if (style === 'ponytails') {
-    const cap = new THREE.Mesh(new THREE.SphereGeometry(0.58, 16, 12, 0, Math.PI*2, 0, Math.PI*0.6), hairMat);
-    cap.position.y = 2.18; playerParts.hairGroup.add(cap);
-    const tailL = new THREE.Mesh(new THREE.SphereGeometry(0.25, 10, 8), hairMat);
-    tailL.position.set(-0.65, 2.15, -0.1); playerParts.hairGroup.add(tailL);
-    const tailR = tailL.clone(); tailR.position.x = 0.65; playerParts.hairGroup.add(tailR);
-  } else if (style === 'curly') {
-    const cap = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 12, 0, Math.PI*2, 0, Math.PI*0.65), hairMat);
-    cap.position.y = 2.18; playerParts.hairGroup.add(cap);
-    for (let i = 0; i < 8; i++) {
-      const angle = (i / 8) * Math.PI * 2;
-      const c = new THREE.Mesh(new THREE.SphereGeometry(0.16, 8, 6), hairMat);
-      c.position.set(Math.cos(angle) * 0.55, 2.15, Math.sin(angle) * 0.55);
-      playerParts.hairGroup.add(c);
-    }
-  }
-}
+// ============ CÁMARA INICIAL ============
+camera.position.set(0, 8, 12);
+camera.lookAt(0, 1.5, 0);
+log('✅ Cámara en ' + camera.position.x + ',' + camera.position.y + ',' + camera.position.z);
 
-function rebuildAccessories() {
-  while (playerParts.accessoriesGroup.children.length > 0) {
-    const c = playerParts.accessoriesGroup.children[0];
-    playerParts.accessoriesGroup.remove(c);
-    if (c.geometry) c.geometry.dispose();
-    if (c.material) c.material.dispose();
-  }
-  const acc = appearance.accessory;
-  if (acc === 'cap' || acc === 'all') {
-    const capMat = new THREE.MeshStandardMaterial({ color: 0xff6b6b });
-    const capTop = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 8, 0, Math.PI*2, 0, Math.PI*0.5), capMat);
-    capTop.position.y = 2.35; playerParts.accessoriesGroup.add(capTop);
-    const visor = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.08, 0.5), capMat);
-    visor.position.set(0, 2.32, 0.45); playerParts.accessoriesGroup.add(visor);
-  }
-  if (acc === 'glasses' || acc === 'all') {
-    const frameMat = new THREE.MeshStandardMaterial({ color: 0x222222 });
-    const lensMat = new THREE.MeshStandardMaterial({ color: 0x88ccff, transparent: true, opacity: 0.5 });
-    const lensL = new THREE.Mesh(new THREE.CircleGeometry(0.14, 16), lensMat);
-    lensL.position.set(-0.18, 2.05, 0.57); playerParts.accessoriesGroup.add(lensL);
-    const lensR = new THREE.Mesh(new THREE.CircleGeometry(0.14, 16), lensMat);
-    lensR.position.set(0.18, 2.05, 0.57); playerParts.accessoriesGroup.add(lensR);
-    const ringGeo = new THREE.TorusGeometry(0.15, 0.02, 6, 16);
-    const ringL = new THREE.Mesh(ringGeo, frameMat);
-    ringL.position.set(-0.18, 2.05, 0.58); playerParts.accessoriesGroup.add(ringL);
-    const ringR = new THREE.Mesh(ringGeo, frameMat);
-    ringR.position.set(0.18, 2.05, 0.58); playerParts.accessoriesGroup.add(ringR);
-  }
-  if (acc === 'backpack' || acc === 'all') {
-    const packMat = new THREE.MeshStandardMaterial({ color: 0x8b5a2b, roughness: 0.9 });
-    const pack = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.8, 0.35), packMat);
-    pack.position.set(0, 1.1, -0.6); playerParts.accessoriesGroup.add(pack);
-  }
-}
-
-function rebuildPet() {
-  while (playerParts.petGroup.children.length > 0) {
-    const c = playerParts.petGroup.children[0];
-    playerParts.petGroup.remove(c);
-    if (c.geometry) c.geometry.dispose();
-    if (c.material) c.material.dispose();
-  }
-  const pet = appearance.pet;
-  if (pet === 'cat') {
-    const mat = new THREE.MeshStandardMaterial({ color: 0xffa94d });
-    const body = new THREE.Mesh(new THREE.SphereGeometry(0.3, 12, 10), mat);
-    body.position.y = 0.35; body.castShadow = true; playerParts.petGroup.add(body);
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 10), mat);
-    head.position.set(0, 0.6, 0.15); playerParts.petGroup.add(head);
-    const earGeo = new THREE.ConeGeometry(0.08, 0.15, 6);
-    const earL = new THREE.Mesh(earGeo, mat);
-    earL.position.set(-0.12, 0.78, 0.12); playerParts.petGroup.add(earL);
-    const earR = earL.clone(); earR.position.x = 0.12; playerParts.petGroup.add(earR);
-  } else if (pet === 'dog') {
-    const mat = new THREE.MeshStandardMaterial({ color: 0x8b5a2b });
-    const body = new THREE.Mesh(new THREE.SphereGeometry(0.32, 12, 10), mat);
-    body.position.y = 0.35; body.castShadow = true; playerParts.petGroup.add(body);
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.24, 12, 10), mat);
-    head.position.set(0, 0.62, 0.18); playerParts.petGroup.add(head);
-  } else if (pet === 'bird') {
-    const mat = new THREE.MeshStandardMaterial({ color: 0x4ecdc4 });
-    const body = new THREE.Mesh(new THREE.SphereGeometry(0.25, 12, 10), mat);
-    body.position.y = 0.4; body.castShadow = true; playerParts.petGroup.add(body);
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.18, 12, 10), mat);
-    head.position.set(0, 0.6, 0.1); playerParts.petGroup.add(head);
-  }
-}
-
-function applyAppearance() {
-  playerParts.head.material.color.setHex(appearance.skinColor);
-  playerParts.neck.material.color.setHex(appearance.skinColor);
-  playerParts.armL.material.color.setHex(appearance.skinColor);
-  playerParts.armR.material.color.setHex(appearance.skinColor);
-  rebuildHair();
-  playerParts.eyeL.material.color.setHex(appearance.eyeColor);
-  playerParts.eyeR.material.color.setHex(appearance.eyeColor);
-
-  const eyeStyle = appearance.eyeStyle;
-  if (eyeStyle === 'round') {
-    playerParts.eyeL.scale.set(1,1,1); playerParts.eyeR.scale.set(1,1,1);
-    playerParts.pupilL.visible = true; playerParts.pupilR.visible = true;
-  } else if (eyeStyle === 'happy') {
-    playerParts.eyeL.scale.set(1, 0.5, 1); playerParts.eyeR.scale.set(1, 0.5, 1);
-    playerParts.pupilL.visible = false; playerParts.pupilR.visible = false;
-  } else if (eyeStyle === 'sparkle') {
-    playerParts.eyeL.scale.set(1.2, 1.2, 1.2); playerParts.eyeR.scale.set(1.2, 1.2, 1.2);
-    playerParts.pupilL.visible = true; playerParts.pupilR.visible = true;
-  } else if (eyeStyle === 'sleepy') {
-    playerParts.eyeL.scale.set(1, 0.25, 1); playerParts.eyeR.scale.set(1, 0.25, 1);
-    playerParts.pupilL.visible = false; playerParts.pupilR.visible = false;
-  }
-
-  const face = appearance.face;
-  playerParts.smile.visible = (face === 'smile' || face === 'all' || face === 'freckles' || face === 'blush');
-  playerParts.freckles.forEach(f => f.visible = (face === 'freckles' || face === 'all'));
-  playerParts.blushL.visible = (face === 'blush' || face === 'all');
-  playerParts.blushR.visible = (face === 'blush' || face === 'all');
-
-  const outfitColor = appearance.outfitColor;
-  if (outfitColor === 0xrainbow) {
-    playerParts.body.material.color.setHex(0xff6b6b);
-    playerParts.legL.material.color.setHex(0x845ef7);
-    playerParts.legR.material.color.setHex(0x51cf66);
-  } else {
-    playerParts.body.material.color.setHex(outfitColor);
-    playerParts.legL.material.color.setHex(outfitColor);
-    playerParts.legR.material.color.setHex(outfitColor);
-  }
-
-  const outfit = appearance.outfitStyle;
-  if (outfit === 'uniform') {
-    playerParts.bodyOverlay.visible = true;
-    playerParts.bodyOverlay.material.color.setHex(0xffffff);
-    playerParts.bodyOverlay.scale.set(1,1,1);
-  } else if (outfit === 'overalls') {
-    playerParts.bodyOverlay.visible = true;
-    playerParts.bodyOverlay.material.color.setHex(0x3d5a99);
-    playerParts.bodyOverlay.scale.set(0.9, 1.2, 1);
-  } else {
-    playerParts.bodyOverlay.visible = false;
-  }
-
-  rebuildAccessories();
-  rebuildPet();
-  saveAll();
-}
-
-applyAppearance();
-
-// ==================================================================
-// ESTADO DEL JUEGO
-// ==================================================================
+// ============ ESTADO ============
 const state = {
-  x: 0, z: 0, speed: 9,
-  keys: {}, nearHouse: null, nearNPC: null, nearBoss: false,
-  moving: false, walkCycle: 0, stepTimer: 0,
-  customizing: false,
-  celebrating: 0, jumping: 0, jumpVel: 0,
-  timeOfDay: 0.35, daySpeed: 0.008,
-  questionStartTime: 0
+  x: 0, z: 0,
+  speed: 8,
+  keys: {}
 };
 
-// ==================================================================
-// CONTROLES
-// ==================================================================
+// ============ CONTROLES ============
 window.addEventListener('keydown', (e) => {
-  if (modalOpen) {
-    if (e.key === 'Enter') { e.preventDefault(); checkAnswer(); }
-    if (e.key === 'Escape') closeModal();
-    return;
-  }
-  if (bossModalOpen) {
-    if (e.key === 'Enter') { e.preventDefault(); bossAttack(); }
-    if (e.key === 'Escape') closeBossModal();
-    return;
-  }
-  if (state.customizing) {
-    if (e.key === 'Escape') closeCustomize();
-    return;
-  }
   const k = e.key.toLowerCase();
-  if (['arrowup','arrowdown','arrowleft','arrowright',' ','w','a','s','d','q','e'].includes(k)) e.preventDefault();
-  state.keys[k] = true;
-  if (k === ' ' || k === 'e') tryOpenNearbyHouse();
-  if (k === 'q') tryTalkToNPC();
+  if (['arrowup','arrowdown','arrowleft','arrowright','w','a','s','d'].includes(k)) {
+    e.preventDefault();
+    state.keys[k] = true;
+  }
 });
-window.addEventListener('keyup', (e) => { state.keys[e.key.toLowerCase()] = false; });
+window.addEventListener('keyup', (e) => {
+  state.keys[e.key.toLowerCase()] = false;
+});
 
-function bindTouch(id, key) {
-  const el = document.getElementById(id);
-  const down = (e) => { e.preventDefault(); state.keys[key] = true; };
-  const up = (e) => { e.preventDefault(); state.keys[key] = false; };
-  el.addEventListener('touchstart', down, {passive:false});
-  el.addEventListener('touchend', up);
-  el.addEventListener('touchcancel', up);
-  el.addEventListener('mousedown', down);
-  el.addEventListener('mouseup', up);
-  el.addEventListener('mouseleave', up);
-}
-bindTouch('t-up','arrowup'); bindTouch('t-down','arrowdown');
-bindTouch('t-left','arrowleft'); bindTouch('t-right','arrowright');
-
-document.getElementById('btn-enter').addEventListener('click', tryOpenNearbyHouse);
-document.getElementById('btn-talk').addEventListener('click', tryTalkToNPC);
-document.getElementById('btn-boss').addEventListener('click', openBossModal);
-document.getElementById('reset-btn').addEventListener('click', resetProgress);
-
-document.body.addEventListener('click', () => {
-  if (audioCtx.state === 'suspended') audioCtx.resume();
-}, { once: true });
-
+// ============ RESIZE ============
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// ==================================================================
-// MODAL EJERCICIOS
-// ==================================================================
-let modalOpen = false, currentTopic = null, answeredCorrectly = false;
-const modalEl = document.getElementById('modal');
-const modalTitle = document.getElementById('modal-title');
-const questionText = document.getElementById('question-text');
-const answerInput = document.getElementById('answer-input');
-const feedbackEl = document.getElementById('feedback');
-const starsEarnedEl = document.getElementById('stars-earned');
-const checkBtn = document.getElementById('check-btn');
-const closeBtn = document.getElementById('close-btn');
-const starCounterEl = document.getElementById('star-counter');
-
-function openModal(topic) {
-  if (modalOpen) return;
-  modalOpen = true; currentTopic = topic; answeredCorrectly = false;
-  state.questionStartTime = performance.now();
-  modalTitle.innerHTML = `${topic.icon} ${topic.name}`;
-  questionText.textContent = topic.question;
-  answerInput.value = ''; answerInput.disabled = false; answerInput.focus();
-  feedbackEl.textContent = ''; feedbackEl.className = 'feedback';
-  starsEarnedEl.textContent = ''; checkBtn.disabled = false;
-  modalEl.classList.add('show');
-  Sounds.open();
-}
-function closeModal() {
-  modalEl.classList.remove('show');
-  modalOpen = false; currentTopic = null;
-}
-
-function checkAnswer() {
-  if (!currentTopic || answeredCorrectly) return;
-  const user = answerInput.value.trim().replace(/\s/g,'').toLowerCase().replace(',', '.');
-  const correct = currentTopic.answer.trim().replace(/\s/g,'').toLowerCase().replace(',', '.');
-  let isCorrect = false;
-  const uNum = parseFloat(user), cNum = parseFloat(correct);
-  if (!isNaN(uNum) && !isNaN(cNum)) isCorrect = Math.abs(uNum - cNum) < 0.001;
-  else isCorrect = user === correct;
-  if (!isCorrect && correct.includes('/')) {
-    const [n,d] = correct.split('/').map(Number);
-    if (!isNaN(n) && !isNaN(d) && d !== 0 && !isNaN(uNum)) isCorrect = Math.abs(uNum - n/d) < 0.001;
-  }
-  if (!isCorrect && user.includes('/')) {
-    const [n,d] = user.split('/').map(Number);
-    if (!isNaN(n) && !isNaN(d) && d !== 0 && !isNaN(cNum)) isCorrect = Math.abs(n/d - cNum) < 0.001;
-  }
-
-  if (isCorrect) {
-    const elapsed = (performance.now() - state.questionStartTime) / 1000;
-    if (elapsed < 5) {
-      const a = achievements.find(x => x.id === 'fast_math');
-      if (!a.unlocked) { a.unlocked = true; showAchievementToast(a); Sounds.achievement(); saveAll(); }
-    }
-
-    feedbackEl.textContent = '✅ ¡Correcto!';
-    feedbackEl.className = 'feedback success';
-
-    // Misión: respuestas
-    trackDaily('answersToday');
-
-    if (currentTopic.stars < currentTopic.maxStars) {
-      const wasComplete = currentTopic.stars === currentTopic.maxStars - 1;
-      currentTopic.stars++;
-      totalStars = topics.reduce((a,t) => a + t.stars, 0);
-      updateStarDisplay();
-      trackDaily('starsToday');
-      if (wasComplete) trackDaily('themesCompletedToday');
-      saveAll();
-      answeredCorrectly = true;
-      checkBtn.disabled = true; answerInput.disabled = true;
-      state.celebrating = 2.5;
-      if (currentTopic.stars === currentTopic.maxStars) {
-        starsEarnedEl.textContent = '🏆 ¡Nivel completado! ¡Tejado dorado!';
-        const house = houses.find(h => h.topic.id === currentTopic.id);
-        if (house) house.mesh.children[1].material.color.setHex(0xffd700);
-        state.jumpVel = 8;
-        Sounds.complete();
-      } else {
-        starsEarnedEl.textContent = `⭐ +1 estrella (${currentTopic.stars}/${currentTopic.maxStars})`;
-        Sounds.correct();
-      }
-      checkAchievements();
-      updateMissions();
-    } else {
-      starsEarnedEl.textContent = '🏆 ¡Nivel ya completado!';
-    }
-  } else {
-    feedbackEl.textContent = '❌ Inténtalo de nuevo';
-    feedbackEl.className = 'feedback error';
-    Sounds.wrong();
-  }
-}
-
-function updateStarDisplay() {
-  starCounterEl.textContent = totalStars;
-}
-
-checkBtn.addEventListener('click', checkAnswer);
-closeBtn.addEventListener('click', closeModal);
-answerInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') { e.preventDefault(); checkAnswer(); }
-});
-modalEl.addEventListener('click', (e) => { if (e.target === modalEl) closeModal(); });
-
-// ==================================================================
-// JEFE FINAL
-// ==================================================================
-const bossQuestions = [
-  { q: '¿Cuánto es 7 × 8?', a: '56' },
-  { q: '¿Cuánto es 144 ÷ 12?', a: '12' },
-  { q: '¿Cuál es el MCM de 4 y 6?', a: '12' },
-  { q: '¿Cuánto es 3/4 + 1/4? (fracción ej: 1/1)', a: '1' },
-  { q: '¿Cuánto es el 25% de 80?', a: '20' },
-  { q: '¿Cuánto es 2³ + 3²?', a: '17' },
-  { q: '¿Cuánto es (-8) + 5?', a: '-3' },
-  { q: 'Si 4x = 32, ¿cuánto vale x?', a: '8' },
-  { q: '¿Cuántos cm hay en 0,75 metros?', a: '75' },
-  { q: '¿Cuál es la media de 5, 10 y 15?', a: '10' }
-];
-
-let bossModalOpen = false;
-let bossIndex = 0;
-let bossResults = [];
-let bossUnlocked = false;
-
-function isBossUnlocked() { return totalStars >= 40; }
-
-function openBossModal() {
-  if (!isBossUnlocked()) {
-    alert('Necesitas al menos 40 estrellas para desafiar al jefe.');
-    return;
-  }
-  if (!state.nearBoss) {
-    alert('Acércate a la cueva del jefe para desafiarlo.');
-    return;
-  }
-  bossModalOpen = true;
-  bossIndex = 0;
-  bossResults = [];
-  renderBossQuestion();
-  document.getElementById('boss-modal').classList.add('show');
-  Sounds.bossRoar();
-}
-
-function closeBossModal() {
-  document.getElementById('boss-modal').classList.remove('show');
-  bossModalOpen = false;
-}
-
-function renderBossQuestion() {
-  if (bossIndex >= bossQuestions.length) {
-    finishBoss(true);
-    return;
-  }
-  const q = bossQuestions[bossIndex];
-  document.getElementById('boss-question').textContent = q.q;
-  document.getElementById('boss-answer-input').value = '';
-  document.getElementById('boss-answer-input').focus();
-  document.getElementById('boss-feedback').textContent = '';
-  document.getElementById('boss-feedback').className = 'feedback';
-
-  // Barra de vida = (10 - bossIndex) / 10
-  const hp = ((bossQuestions.length - bossIndex) / bossQuestions.length) * 100;
-  document.getElementById('boss-hp-fill').style.width = hp + '%';
-  document.getElementById('boss-hp-text').textContent = `${bossQuestions.length - bossIndex} / ${bossQuestions.length} ❤️`;
-
-  // Progreso
-  const progEl = document.getElementById('boss-progress');
-  progEl.innerHTML = '';
-  bossResults.forEach((res, i) => {
-    const dot = document.createElement('div');
-    dot.className = 'punto ' + (res ? 'correct' : 'wrong');
-    dot.textContent = i + 1;
-    progEl.appendChild(dot);
-  });
-  // Punto actual
-  const cur = document.createElement('div');
-  cur.className = 'punto current';
-  cur.textContent = bossIndex + 1;
-  progEl.appendChild(cur);
-}
-
-function bossAttack() {
-  if (!bossModalOpen) return;
-  const q = bossQuestions[bossIndex];
-  const user = document.getElementById('boss-answer-input').value.trim().replace(/\s/g,'').replace(',', '.').toLowerCase();
-  const correct = q.a.replace(/\s/g,'').replace(',', '.').toLowerCase();
-
-  let isCorrect = false;
-  const uNum = parseFloat(user), cNum = parseFloat(correct);
-  if (!isNaN(uNum) && !isNaN(cNum)) isCorrect = Math.abs(uNum - cNum) < 0.001;
-  else isCorrect = user === correct;
-
-  bossResults.push(isCorrect);
-
-  if (isCorrect) {
-    document.getElementById('boss-feedback').textContent = '⚔️ ¡Golpe certero!';
-    document.getElementById('boss-feedback').className = 'feedback success';
-    Sounds.bossHit();
-    bossIndex++;
-    setTimeout(() => {
-      if (bossIndex >= bossQuestions.length) finishBoss(true);
-      else renderBossQuestion();
-    }, 700);
-  } else {
-    document.getElementById('boss-feedback').textContent = `💀 ¡Fallaste! Era ${q.a}. El jefe te ha vencido...`;
-    document.getElementById('boss-feedback').className = 'feedback error';
-    Sounds.wrong();
-    setTimeout(() => finishBoss(false), 1500);
-  }
-}
-
-function finishBoss(win) {
-  bossModalOpen = false;
-  document.getElementById('boss-modal').classList.remove('show');
-  if (win) {
-    Sounds.bossWin();
-    // Recompensa: 5 estrellas
-    totalStars += 5;
-    updateStarDisplay();
-    const a = achievements.find(x => x.id === 'boss_slayer');
-    if (!a.unlocked) {
-      a.unlocked = true;
-      showAchievementToast(a);
-    }
-    saveAll();
-    checkAchievements();
-    alert('🎉 ¡Has derrotado al Devorador de Números!\n+5 ⭐ de recompensa.');
-  } else {
-    alert('💀 El jefe te ha derrotado. ¡Vuelve a intentarlo cuando estés lista!');
-  }
-}
-
-document.getElementById('boss-check-btn').addEventListener('click', bossAttack);
-document.getElementById('boss-close-btn').addEventListener('click', closeBossModal);
-document.getElementById('boss-answer-input').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') { e.preventDefault(); bossAttack(); }
-});
-document.getElementById('boss-modal').addEventListener('click', (e) => {
-  if (e.target === document.getElementById('boss-modal')) closeBossModal();
-});
-
-// ==================================================================
-// INTERACCIÓN MUNDO
-// ==================================================================
-function tryOpenNearbyHouse() {
-  if (modalOpen || state.customizing || bossModalOpen) return;
-  if (state.nearHouse) {
-    if (!isZoneUnlocked(state.nearHouse.zone)) {
-      const zone = ZONES[state.nearHouse.zone];
-      alert(`🔒 Esta zona se desbloquea con ${zone.unlockStars} estrellas. ¡Sigue estudiando!`);
-      return;
-    }
-    openModal(state.nearHouse.topic);
-  }
-}
-
-function tryTalkToNPC() {
-  if (modalOpen || state.customizing || bossModalOpen) return;
-  if (!state.nearNPC) return;
-  const npc = state.nearNPC;
-  const nearestTopic = getNearestTopicToNPC(npc);
-  const hintList = nearestTopic ? nearestTopic.hints : npc.hints;
-  const hint = hintList[npc.hintIndex % hintList.length];
-  npc.hintIndex++;
-  document.getElementById('npc-name').textContent = npc.name + (nearestTopic ? ` · ${nearestTopic.icon} ${nearestTopic.name}` : '');
-  document.getElementById('npc-text').textContent = hint;
-  document.getElementById('npc-dialog').style.display = 'block';
-  trackDailyNPC(npc.name);
-  Sounds.talk();
-}
-
-window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') document.getElementById('npc-dialog').style.display = 'none';
-});
-
-// ==================================================================
-// PERSONALIZACIÓN MODAL
-// ==================================================================
-const customizeModal = document.getElementById('customize-modal');
-const skinColors = [0xffe0b2, 0xf1c27d, 0xd9a066, 0xa86a3d, 0x6b4226, 0xffdab9];
-const hairColors = [0x4a2c17, 0x1a1a1a, 0x8b5a2b, 0xd4a373, 0xffd93d, 0xff6b6b, 0x9b59b6, 0x3498db];
-const eyeColors = [0x222222, 0x4a2c17, 0x2e86de, 0x10ac84, 0x8e44ad, 0x6b4226, 0x576574];
-const outfitColors = [0x3d5a99, 0xff6b6b, 0x4ecdc4, 0xffa94d, 0x845ef7, 0x51cf66, 0xf06595, 0xffd93d, 0xffffff, 0x2c2c2c, 0xffd700, 0xrainbow];
-
-function buildOptions() {
-  const skinOpts = document.getElementById('skin-options');
-  skinOpts.innerHTML = '';
-  skinColors.forEach(c => {
-    const btn = document.createElement('button');
-    btn.className = 'color-swatch' + (appearance.skinColor === c ? ' selected' : '');
-    btn.style.background = '#' + c.toString(16).padStart(6, '0');
-    btn.onclick = () => { appearance.skinColor = c; applyAppearance(); buildOptions(); Sounds.change(); };
-    skinOpts.appendChild(btn);
-  });
-
-  const hairStyleOpts = document.getElementById('hair-style-options');
-  hairStyleOpts.innerHTML = '';
-  [['short','Corto'],['long','Largo'],['ponytails','Coletas'],['curly','Rizado']].forEach(([val, label]) => {
-    const btn = document.createElement('button');
-    btn.className = (appearance.hairStyle === val ? 'selected' : '');
-    btn.textContent = label;
-    btn.onclick = () => { appearance.hairStyle = val; applyAppearance(); buildOptions(); Sounds.change(); };
-    hairStyleOpts.appendChild(btn);
-  });
-
-  const hairColorOpts = document.getElementById('hair-color-options');
-  hairColorOpts.innerHTML = '';
-  hairColors.forEach(c => {
-    const btn = document.createElement('button');
-    btn.className = 'color-swatch' + (appearance.hairColor === c ? ' selected' : '');
-    btn.style.background = '#' + c.toString(16).padStart(6, '0');
-    btn.onclick = () => { appearance.hairColor = c; applyAppearance(); buildOptions(); Sounds.change(); };
-    hairColorOpts.appendChild(btn);
-  });
-
-  const eyeStyleOpts = document.getElementById('eye-style-options');
-  eyeStyleOpts.innerHTML = '';
-  [['round','Redondos'],['happy','Felices'],['sparkle','Brillantes'],['sleepy','Dormilones']].forEach(([val, label]) => {
-    const btn = document.createElement('button');
-    btn.className = (appearance.eyeStyle === val ? 'selected' : '');
-    btn.textContent = label;
-    btn.onclick = () => { appearance.eyeStyle = val; applyAppearance(); buildOptions(); Sounds.change(); };
-    eyeStyleOpts.appendChild(btn);
-  });
-
-  const eyeColorOpts = document.getElementById('eye-color-options');
-  eyeColorOpts.innerHTML = '';
-  eyeColors.forEach(c => {
-    const btn = document.createElement('button');
-    btn.className = 'color-swatch' + (appearance.eyeColor === c ? ' selected' : '');
-    btn.style.background = '#' + c.toString(16).padStart(6, '0');
-    btn.onclick = () => { appearance.eyeColor = c; applyAppearance(); buildOptions(); Sounds.change(); };
-    eyeColorOpts.appendChild(btn);
-  });
-
-  const faceOpts = document.getElementById('face-options');
-  faceOpts.innerHTML = '';
-  [['smile','😊 Sonrisa'],['freckles','🧑‍🦰 Pecas'],['blush','☺️ Mofletes'],['all','✨ Todo']].forEach(([val, label]) => {
-    const btn = document.createElement('button');
-    btn.className = (appearance.face === val ? 'selected' : '');
-    btn.textContent = label;
-    btn.onclick = () => { appearance.face = val; applyAppearance(); buildOptions(); Sounds.change(); };
-    faceOpts.appendChild(btn);
-  });
-
-  const outfitStyleOpts = document.getElementById('outfit-style-options');
-  outfitStyleOpts.innerHTML = '';
-  [['dress','Vestido'],['tshirt','Camiseta'],['uniform','Uniforme'],['overalls','Peto']].forEach(([val, label]) => {
-    const btn = document.createElement('button');
-    const unlocked = isUnlocked('outfits', val);
-    btn.className = (appearance.outfitStyle === val ? 'selected' : '') + (unlocked ? '' : ' locked');
-    btn.textContent = label + (unlocked ? '' : ` (${UNLOCKS.outfits[val]}⭐)`);
-    btn.onclick = () => { if (!unlocked) return; appearance.outfitStyle = val; applyAppearance(); buildOptions(); Sounds.change(); };
-    outfitStyleOpts.appendChild(btn);
-  });
-
-  const outfitColorOpts = document.getElementById('outfit-color-options');
-  outfitColorOpts.innerHTML = '';
-  outfitColors.forEach(c => {
-    const btn = document.createElement('button');
-    const unlocked = isUnlocked('outfitColors', c);
-    let cls = 'color-swatch';
-    if (appearance.outfitColor === c) cls += ' selected';
-    if (!unlocked) cls += ' locked';
-    if (c === 0xffd700) cls += ' golden';
-    if (c === 0xrainbow) cls += ' rainbow';
-    btn.className = cls;
-    if (c !== 0xffd700 && c !== 0xrainbow) btn.style.background = '#' + c.toString(16).padStart(6, '0');
-    btn.title = unlocked ? '' : `Desbloquea con ${UNLOCKS.outfitColors[c]}⭐`;
-    btn.onclick = () => { if (!unlocked) return; appearance.outfitColor = c; applyAppearance(); buildOptions(); Sounds.change(); };
-    outfitColorOpts.appendChild(btn);
-  });
-
-  document.getElementById('outfit-lock-info').textContent = `${totalStars} ⭐`;
-
-  const accOpts = document.getElementById('accessory-options');
-  accOpts.innerHTML = '';
-  [['none','Ninguno'],['cap','🧢 Gorra'],['glasses','👓 Gafas'],['backpack','🎒 Mochila'],['all','✨ Todo']].forEach(([val, label]) => {
-    const btn = document.createElement('button');
-    const unlocked = isUnlocked('accessories', val);
-    btn.className = (appearance.accessory === val ? 'selected' : '') + (unlocked ? '' : ' locked');
-    btn.textContent = label + (unlocked ? '' : ` (${UNLOCKS.accessories[val]}⭐)`);
-    btn.onclick = () => { if (!unlocked) return; appearance.accessory = val; applyAppearance(); buildOptions(); Sounds.change(); };
-    accOpts.appendChild(btn);
-  });
-
-  const petOpts = document.getElementById('pet-options');
-  petOpts.innerHTML = '';
-  [['none','Ninguna'],['cat','🐱 Gato'],['dog','🐶 Perro'],['bird','🐦 Pájaro']].forEach(([val, label]) => {
-    const btn = document.createElement('button');
-    const unlocked = isUnlocked('pets', val);
-    btn.className = (appearance.pet === val ? 'selected' : '') + (unlocked ? '' : ' locked');
-    btn.textContent = label + (unlocked ? '' : ` (${UNLOCKS.pets[val]}⭐)`);
-    btn.onclick = () => { if (!unlocked) return; appearance.pet = val; applyAppearance(); buildOptions(); Sounds.change(); };
-    petOpts.appendChild(btn);
-  });
-}
-
-function openCustomize() {
-  state.customizing = true; state.keys = {};
-  buildOptions();
-  customizeModal.classList.add('show');
-}
-function closeCustomize() {
-  state.customizing = false;
-  customizeModal.classList.remove('show');
-  saveAll();
-}
-document.getElementById('customize-btn').addEventListener('click', openCustomize);
-document.getElementById('customize-close').addEventListener('click', closeCustomize);
-customizeModal.addEventListener('click', (e) => { if (e.target === customizeModal) closeCustomize(); });
-
-// ==================================================================
-// LOGROS MODAL
-// ==================================================================
-const achievementsModal = document.getElementById('achievements-modal');
-document.getElementById('achievements-btn').addEventListener('click', () => {
-  renderAchievements();
-  achievementsModal.classList.add('show');
-});
-document.getElementById('achievements-close').addEventListener('click', () => {
-  achievementsModal.classList.remove('show');
-});
-achievementsModal.addEventListener('click', (e) => {
-  if (e.target === achievementsModal) achievementsModal.classList.remove('show');
-});
-function renderAchievements() {
-  const list = document.getElementById('achievements-list');
-  list.innerHTML = '';
-  achievements.forEach(a => {
-    const div = document.createElement('div');
-    div.className = 'ach-item ' + (a.unlocked ? 'unlocked' : 'locked');
-    div.innerHTML = `
-      <div class="ach-icon">${a.icon}</div>
-      <div class="ach-info">
-        <div class="ach-name">${a.name} ${a.unlocked ? '✅' : '🔒'}</div>
-        <div class="ach-desc">${a.desc}</div>
-      </div>
-    `;
-    list.appendChild(div);
-  });
-}
-
-// ==================================================================
-// MISIONES MODAL
-// ==================================================================
-const missionsModal = document.getElementById('missions-modal');
-document.getElementById('missions-btn').addEventListener('click', () => {
-  renderMissions();
-  missionsModal.classList.add('show');
-});
-document.getElementById('missions-close').addEventListener('click', () => {
-  missionsModal.classList.remove('show');
-});
-missionsModal.addEventListener('click', (e) => {
-  if (e.target === missionsModal) missionsModal.classList.remove('show');
-});
-
-// ==================================================================
-// MODO FOTO
-// ==================================================================
-document.getElementById('photo-btn').addEventListener('click', () => {
-  if (modalOpen || state.customizing || bossModalOpen) return;
-  Sounds.photo();
-  const flash = document.getElementById('photo-flash');
-  flash.classList.add('active');
-  const hud = document.getElementById('hud');
-  const topButtons = document.getElementById('top-buttons');
-  const touch = document.getElementById('touch-controls');
-  const actions = document.getElementById('action-buttons');
-  const hint = document.getElementById('hint');
-  const visibility = [hud, topButtons, touch, actions, hint].map(el => el.style.visibility);
-  [hud, topButtons, touch, actions, hint].forEach(el => el.style.visibility = 'hidden');
-  setTimeout(() => {
-    renderer.render(scene, camera);
-    const dataURL = renderer.domElement.toDataURL('image/png');
-    const link = document.createElement('a');
-    const ts = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
-    link.download = `expedicion-matematica-${ts}.png`;
-    link.href = dataURL; link.click();
-    flash.classList.remove('active');
-    const toast = document.getElementById('photo-toast');
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
-    [hud, topButtons, touch, actions, hint].forEach((el, i) => el.style.visibility = visibility[i]);
-  }, 200);
-});
-
-// ==================================================================
-// MÚSICA
-// ==================================================================
-const musicBtn = document.getElementById('music-btn');
-function updateMusicButton() {
-  if (Music.playing) {
-    musicBtn.textContent = '🎵 Música: ON';
-    musicBtn.className = 'music-on';
-  } else {
-    musicBtn.textContent = '🎵 Música: OFF';
-    musicBtn.className = 'music-off';
-  }
-}
-musicBtn.addEventListener('click', () => {
-  if (Music.playing) Music.stop(); else Music.start();
-  updateMusicButton();
-});
-updateMusicButton();
-
-// ==================================================================
-// CICLO DÍA/NOCHE
-// ==================================================================
-function updateDayNight(dt) {
-  state.timeOfDay = (state.timeOfDay + state.daySpeed * dt) % 1;
-  const t = state.timeOfDay;
-  const sunAngle = (t - 0.25) * Math.PI * 2;
-  sun.position.set(
-    Math.cos(sunAngle) * 50,
-    Math.sin(sunAngle) * 60 + 5,
-    Math.sin(sunAngle) * 25
-  );
-  const dayFactor = Math.max(0, Math.sin((t - 0.25) * Math.PI * 2) * 0.5 + 0.5);
-  sun.intensity = Math.max(0, dayFactor * 1.5 - 0.1);
-  sun.color.setHSL(0.1, 0.7, 0.5 + dayFactor * 0.4);
-  hemi.intensity = 0.15 + dayFactor * 0.75;
-  const skyColor = new THREE.Color().lerpColors(NIGHT_BG, DAY_BG, dayFactor);
-  scene.background.copy(skyColor);
-  scene.fog.color.copy(skyColor);
-  const lampOn = Math.max(0, 1 - dayFactor * 3);
-  lampposts.forEach(lp => {
-    lp.light.intensity = lampOn * 12;
-    lp.lampMat.emissiveIntensity = lampOn * 1.2;
-  });
-}
-
-// ==================================================================
-// LOOP
-// ==================================================================
+// ============ LOOP ============
 const clock = new THREE.Clock();
-const camOffset = new THREE.Vector3(0, 4.5, -8);
-const camLookAtOffset = new THREE.Vector3(0, 1.5, 0);
-const tempCamPos = new THREE.Vector3();
-const tempLookAt = new THREE.Vector3();
+const camOffset = new THREE.Vector3(0, 5, 9);
+const tempCam = new THREE.Vector3();
+const tempLook = new THREE.Vector3();
 
+let frameCount = 0;
 function animate() {
   requestAnimationFrame(animate);
   const dt = Math.min(clock.getDelta(), 0.1);
-  const elapsed = clock.elapsedTime;
 
-  updateDayNight(dt);
-
-  clouds.forEach(c => {
-    c.position.x += c.userData.speed * dt;
-    if (c.position.x > 80) c.position.x = -80;
-  });
-  waterBall.position.y = 2.2 + Math.sin(elapsed * 3) * 0.15;
-
-  if (state.customizing) {
-    player.rotation.y += dt * 1.2;
-    tempCamPos.set(state.x, 2.5, state.z).add(new THREE.Vector3(0, 1.5, 6));
-    camera.position.lerp(tempCamPos, 5 * dt);
-    tempLookAt.set(state.x, 1.5, state.z);
-    camera.lookAt(tempLookAt);
-    legL.rotation.x *= 0.9; legR.rotation.x *= 0.9;
-    armL.rotation.x *= 0.9; armR.rotation.x *= 0.9;
-    renderer.render(scene, camera);
-    return;
-  }
-
+  // Movimiento
   let mx = 0, mz = 0;
   if (state.keys['arrowup'] || state.keys['w']) mz -= 1;
   if (state.keys['arrowdown'] || state.keys['s']) mz += 1;
   if (state.keys['arrowleft'] || state.keys['a']) mx -= 1;
   if (state.keys['arrowright'] || state.keys['d']) mx += 1;
 
-  if (state.celebrating > 0) {
-    state.celebrating -= dt;
-    player.rotation.y += dt * 8;
-    armL.rotation.x = Math.sin(elapsed * 20) * 1.2;
-    armR.rotation.x = -Math.sin(elapsed * 20) * 1.2;
-    legL.rotation.x = Math.sin(elapsed * 20) * 0.6;
-    legR.rotation.x = -Math.sin(elapsed * 20) * 0.6;
-    player.position.set(state.x, Math.max(0, Math.sin(elapsed * 12) * 0.15), state.z);
-  } else if (mx !== 0 || mz !== 0) {
+  if (mx !== 0 || mz !== 0) {
     const len = Math.hypot(mx, mz);
-    mx /= len; mz /= len;
+    mx /= len;
+    mz /= len;
     state.x += mx * state.speed * dt;
     state.z += mz * state.speed * dt;
-    state.moving = true;
     const targetAngle = Math.atan2(mx, mz);
     let diff = targetAngle - player.rotation.y;
-    while (diff > Math.PI) diff -= Math.PI*2;
-    while (diff < -Math.PI) diff += Math.PI*2;
+    while (diff > Math.PI) diff -= Math.PI * 2;
+    while (diff < -Math.PI) diff += Math.PI * 2;
     player.rotation.y += diff * 10 * dt;
-    state.walkCycle += dt * 12;
-    legL.rotation.x = Math.sin(state.walkCycle) * 0.5;
-    legR.rotation.x = -Math.sin(state.walkCycle) * 0.5;
-    armL.rotation.x = -Math.sin(state.walkCycle) * 0.5;
-    armR.rotation.x = Math.sin(state.walkCycle) * 0.5;
-    state.stepTimer += dt;
-    if (state.stepTimer > 0.35) { state.stepTimer = 0; Sounds.step(); }
-    player.position.y = 0;
-  } else {
-    state.moving = false;
-    legL.rotation.x *= 0.85; legR.rotation.x *= 0.85;
-    armL.rotation.x *= 0.85; armR.rotation.x *= 0.85;
-    state.stepTimer = 0.35;
-    player.position.y = 0;
   }
 
-  // Límites globales del mundo expandido
-  state.x = Math.max(-60, Math.min(90, state.x));
-  state.z = Math.max(-90, Math.min(60, state.z));
-  player.position.x = state.x; player.position.z = state.z;
+  // Limitar
+  state.x = Math.max(-40, Math.min(40, state.x));
+  state.z = Math.max(-40, Math.min(40, state.z));
+  player.position.set(state.x, 0, state.z);
 
-  // Mascota
-  const petTarget = new THREE.Vector3(state.x + 1.3, 0, state.z - 0.8);
-  playerParts.petGroup.position.lerp(petTarget, 3 * dt);
-  playerParts.petGroup.lookAt(state.x, 0, state.z);
+  // Animar agua
+  waterBall.position.y = 2.2 + Math.sin(clock.elapsedTime * 3) * 0.15;
 
-  // Casas
-  let nearestHouse = null, minDistH = 5;
-  for (const h of houses) {
-    const d = Math.hypot(state.x - h.x, state.z - h.z);
-    if (d < minDistH) { minDistH = d; nearestHouse = h; }
-  }
-  state.nearHouse = nearestHouse;
-
-  // NPCs
-  let nearestNPC = null, minDistN = 3.5;
-  for (const npc of npcs) {
-    const d = Math.hypot(state.x - npc.x, state.z - npc.z);
-    if (d < minDistN) { minDistN = d; nearestNPC = npc; }
-  }
-  state.nearNPC = nearestNPC;
-
-  // Jefe
-  const distBoss = Math.hypot(state.x - bossPos.x, state.z - bossPos.z);
-  state.nearBoss = distBoss < 6;
-
-  const btnEnter = document.getElementById('btn-enter');
-  const btnTalk = document.getElementById('btn-talk');
-  const btnBoss = document.getElementById('btn-boss');
-  btnEnter.disabled = !nearestHouse;
-  btnTalk.disabled = !nearestNPC;
-  btnBoss.disabled = !state.nearBoss || !isBossUnlocked();
-
-  // Hint
-  const hintEl = document.getElementById('hint');
-  if (state.nearBoss) {
-    if (isBossUnlocked()) {
-      hintEl.innerHTML = `👹 <strong>¡Cueva del Devorador!</strong> — Pulsa el botón <strong>DESAFIAR</strong>`;
-    } else {
-      hintEl.innerHTML = `🔒 <strong>Cueva del Jefe</strong> — Necesitas 40 ⭐ (tienes ${totalStars})`;
-    }
-    hintEl.style.opacity = '1';
-  } else if (nearestHouse) {
-    const zone = ZONES[nearestHouse.zone];
-    const unlocked = isZoneUnlocked(nearestHouse.zone);
-    if (unlocked) {
-      hintEl.innerHTML = `🚪 <strong>${nearestHouse.topic.icon} ${nearestHouse.topic.name}</strong> — Pulsa <strong>ESPACIO</strong>`;
-    } else {
-      hintEl.innerHTML = `🔒 <strong>${zone.name}</strong> — Necesitas ${zone.unlockStars} ⭐ (tienes ${totalStars})`;
-    }
-    hintEl.style.opacity = '1';
-  } else if (nearestNPC) {
-    hintEl.innerHTML = `💬 <strong>${nearestNPC.name}</strong> quiere hablar — Pulsa <strong>Q</strong>`;
-    hintEl.style.opacity = '1';
-  } else {
-    hintEl.innerHTML = `🎮 WASD o flechas · Explora las 3 zonas (⭐10 Bosque, ⭐30 Montaña)`;
-    hintEl.style.opacity = '0.9';
-  }
-
-  // Cámara
-  if (state.celebrating <= 0) {
-    const angle = player.rotation.y;
-    const rotatedOffset = camOffset.clone().applyAxisAngle(new THREE.Vector3(0,1,0), angle);
-    tempCamPos.set(state.x, 0, state.z).add(rotatedOffset);
-    camera.position.lerp(tempCamPos, 5 * dt);
-  } else {
-    const camAngle = elapsed * 1.5;
-    tempCamPos.set(state.x + Math.cos(camAngle) * 6, 3.5, state.z + Math.sin(camAngle) * 6);
-    camera.position.lerp(tempCamPos, 5 * dt);
-  }
-  tempLookAt.set(state.x, 1.5, state.z).add(camLookAtOffset);
-  camera.lookAt(tempLookAt);
-
-  // Ocultar carteles de zona si están desbloqueadas
-  if (isZoneUnlocked('bosque')) zoneSigns.bosque.visible = false;
-  if (isZoneUnlocked('montana')) zoneSigns.montana.visible = false;
+  // Cámara sigue al jugador
+  const angle = player.rotation.y;
+  const rotatedOffset = camOffset.clone().applyAxisAngle(new THREE.Vector3(0,1,0), angle);
+  tempCam.set(state.x, 0, state.z).add(rotatedOffset);
+  camera.position.lerp(tempCam, 5 * dt);
+  tempLook.set(state.x, 1.5, state.z);
+  camera.lookAt(tempLook);
 
   renderer.render(scene, camera);
+
+  frameCount++;
+  if (frameCount === 60) {
+    log('✅ 60 frames renderizados OK');
+    document.getElementById('loading').style.opacity = '0';
+    setTimeout(() => document.getElementById('loading').style.display = 'none', 500);
+  }
 }
 
-updateStarDisplay();
-updateMissionsBadge();
 animate();
-
-// Recalcular badge cada 30s
-setInterval(updateMissionsBadge, 30000);
+log('✅ Bucle de animación iniciado');
 </script>
 </body>
 </html>
