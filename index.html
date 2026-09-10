@@ -322,7 +322,6 @@
 <div id="photo-flash"></div>
 <div id="photo-toast">Foto guardada!</div>
 
-<!-- MODAL DE TEORIA + EJERCICIO -->
 <div id="modal" class="modal-bg">
   <div class="card">
     <div id="theory-view">
@@ -520,62 +519,257 @@
       { id:'numeros', name:'Numeros', icon:'1', color:0xff6b6b, zone:'pueblo', position:{x:-14, z:-14},
         explicacion:'Los numeros naturales sirven para contar y ordenar. Al sumar juntamos cantidades, al restar quitamos, al multiplicar sumamos varias veces lo mismo y al dividir repartimos en partes iguales.',
         ejemplo:'Sumamos 15 + 27 paso a paso:<br>1. Descomponemos: 15 = 10 + 5, y 27 = 20 + 7.<br>2. Sumamos decenas: 10 + 20 = 30.<br>3. Sumamos unidades: 5 + 7 = 12.<br>4. Juntamos todo: 30 + 12 = <b>42</b>.',
-        question:'Cuanto es 15 + 27?', answer:'42', stars:0, maxStars:9, hints:['15+20=35, +7.','Suma por partes.'] },
+        stars:0, maxStars:9, hints:['Suma por partes.','Descompone en decenas y unidades.'],
+        ejercicios:[
+          { q:'Cuanto es 15 + 27?', a:'42' },
+          { q:'Cuanto es 48 - 19?', a:'29' },
+          { q:'Cuanto es 7 x 8?', a:'56' },
+          { q:'Cuanto es 63 / 7?', a:'9' },
+          { q:'Cuanto es 125 + 87?', a:'212' },
+          { q:'Cuanto es 300 - 145?', a:'155' },
+          { q:'Cuanto es 12 x 11?', a:'132' },
+          { q:'Cuanto es 144 / 12?', a:'12' },
+          { q:'Cuanto es 256 + 178?', a:'434' },
+          { q:'Cuanto es 25 x 4?', a:'100' }
+        ]
+      },
       { id:'divisibilidad', name:'Divisibilidad', icon:'2', color:0x4ecdc4, zone:'pueblo', position:{x:-7, z:-16},
         explicacion:'Un divisor de un numero es el que lo divide exactamente, sin que sobre nada. El MCD (Maximo Comun Divisor) de dos numeros es el divisor mas grande que comparten.',
-        ejemplo:'MCD de 12 y 18:<br>1. Descomponemos en factores primos:<br>&nbsp;&nbsp;12 = 2 x 2 x 3<br>&nbsp;&nbsp;18 = 2 x 3 x 3<br>2. Cogemos los factores comunes con menor exponente: 2 y 3.<br>3. Los multiplicamos: 2 x 3 = <b>6</b>.',
-        question:'MCD de 12 y 18', answer:'6', stars:0, maxStars:9, hints:['Mayor divisor comun.','12=2x2x3.'] },
+        ejemplo:'MCD de 12 y 18:<br>1. Descomponemos: 12 = 2x2x3, 18 = 2x3x3.<br>2. Factores comunes: 2 y 3.<br>3. Los multiplicamos: 2 x 3 = <b>6</b>.',
+        stars:0, maxStars:9, hints:['El mayor divisor comun.','Descompone en primos.'],
+        ejercicios:[
+          { q:'MCD de 12 y 18', a:'6' },
+          { q:'MCD de 8 y 12', a:'4' },
+          { q:'MCD de 15 y 25', a:'5' },
+          { q:'MCM de 4 y 6', a:'12' },
+          { q:'MCM de 3 y 5', a:'15' },
+          { q:'MCM de 6 y 8', a:'24' },
+          { q:'Es 7 un numero primo? (si/no)', a:'si' },
+          { q:'Es 15 un numero primo? (si/no)', a:'no' },
+          { q:'MCD de 24 y 36', a:'12' },
+          { q:'MCM de 10 y 15', a:'30' }
+        ]
+      },
       { id:'fracciones', name:'Fracciones', icon:'3', color:0xffa94d, zone:'pueblo', position:{x:0, z:-16},
-        explicacion:'Una fraccion representa partes de un todo. Para sumar o restar fracciones necesitamos el mismo denominador. Si no lo tienen, buscamos fracciones equivalentes con denominador comun.',
-        ejemplo:'1/2 + 1/4:<br>1. Buscamos denominador comun. El 4 sirve porque 4 es multiplo de 2.<br>2. Convertimos 1/2 en 2/4 (multiplicamos arriba y abajo por 2).<br>3. Ahora sumamos: 2/4 + 1/4 = 3/4.<br>Resultado: <b>3/4</b>.',
-        question:'1/2 + 1/4 (ej: 3/4)', answer:'3/4', stars:0, maxStars:9, hints:['Denominador comun.','1/2 = 2/4.'] },
+        explicacion:'Una fraccion representa partes de un todo. Para sumar o restar fracciones necesitamos el mismo denominador. Si no lo tienen, buscamos fracciones equivalentes.',
+        ejemplo:'1/2 + 1/4:<br>1. Denominador comun: 4.<br>2. 1/2 = 2/4.<br>3. 2/4 + 1/4 = 3/4.<br>Resultado: <b>3/4</b>.',
+        stars:0, maxStars:9, hints:['Busca denominador comun.','Convierte a fracciones equivalentes.'],
+        ejercicios:[
+          { q:'1/2 + 1/4 (ej: 3/4)', a:'3/4' },
+          { q:'1/3 + 1/3 (ej: 2/3)', a:'2/3' },
+          { q:'3/5 - 1/5 (ej: 2/5)', a:'2/5' },
+          { q:'1/2 + 1/3 (ej: 5/6)', a:'5/6' },
+          { q:'2/3 + 1/6 (ej: 5/6)', a:'5/6' },
+          { q:'1/4 + 1/4 (ej: 1/2)', a:'1/2' },
+          { q:'3/4 - 1/4 (ej: 1/2)', a:'1/2' },
+          { q:'1/5 + 2/5 (ej: 3/5)', a:'3/5' },
+          { q:'5/6 - 1/6 (ej: 2/3)', a:'2/3' },
+          { q:'1/2 + 3/4 (ej: 5/4)', a:'5/4' }
+        ]
+      },
       { id:'decimales', name:'Decimales', icon:'4', color:0x845ef7, zone:'pueblo', position:{x:7, z:-16},
-        explicacion:'Los numeros decimales tienen una parte entera y una parte decimal separadas por una coma. Al sumar o restar hay que alinear las comas para que coincidan unidades con unidades, decimas con decimas, etc.',
-        ejemplo:'2,5 + 1,75:<br>1. Alineamos: <br>&nbsp;&nbsp;2,50<br>+&nbsp;1,75<br>2. Sumamos como si no hubiera coma: 250 + 175 = 425.<br>3. Ponemos la coma en su sitio: <b>4,25</b>.',
-        question:'2,5 + 1,75', answer:'4,25', stars:0, maxStars:9, hints:['Alinea las comas.','250+175=425.'] },
+        explicacion:'Los numeros decimales tienen parte entera y parte decimal separadas por una coma. Al sumar o restar hay que alinear las comas.',
+        ejemplo:'2,5 + 1,75:<br>1. Alineamos: 2,50 + 1,75.<br>2. Sumamos sin coma: 250 + 175 = 425.<br>3. Ponemos la coma: <b>4,25</b>.',
+        stars:0, maxStars:9, hints:['Alinea las comas.','Suma como si no hubiera coma.'],
+        ejercicios:[
+          { q:'2,5 + 1,75 (usa coma)', a:'4,25' },
+          { q:'3,4 + 2,6 (usa coma)', a:'6' },
+          { q:'5,25 + 3,15 (usa coma)', a:'8,4' },
+          { q:'7,8 - 3,2 (usa coma)', a:'4,6' },
+          { q:'10,5 - 4,3 (usa coma)', a:'6,2' },
+          { q:'1,5 x 2 (usa coma)', a:'3' },
+          { q:'2,5 x 4 (usa coma)', a:'10' },
+          { q:'8,4 / 2 (usa coma)', a:'4,2' },
+          { q:'12,6 / 3 (usa coma)', a:'4,2' },
+          { q:'0,5 + 0,75 (usa coma)', a:'1,25' }
+        ]
+      },
       { id:'porcentajes', name:'Porcentajes', icon:'5', color:0xff922b, zone:'pueblo', position:{x:14, z:-14},
-        explicacion:'Un porcentaje es una fraccion con denominador 100. El 20% significa 20 de cada 100, que es lo mismo que 1/5. Para calcular un porcentaje, multiplicamos por el numero y dividimos entre 100.',
-        ejemplo:'20% de 150:<br>1. 20% = 20/100 = 1/5.<br>2. Dividimos 150 entre 5: 150 / 5 = <b>30</b>.<br>Tambien podemos hacer: 150 x 20 = 3000, y 3000 / 100 = 30.',
-        question:'20% de 150', answer:'30', stars:0, maxStars:9, hints:['20%=1/5.','150/5.'] },
+        explicacion:'Un porcentaje es una fraccion con denominador 100. El 20% significa 20 de cada 100. Para calcular un porcentaje multiplicamos y dividimos entre 100.',
+        ejemplo:'20% de 150:<br>1. 20% = 1/5.<br>2. 150 / 5 = <b>30</b>.',
+        stars:0, maxStars:9, hints:['El 20% es 1/5.','Divide entre 100 y multiplica.'],
+        ejercicios:[
+          { q:'20% de 150', a:'30' },
+          { q:'50% de 80', a:'40' },
+          { q:'25% de 200', a:'50' },
+          { q:'10% de 90', a:'9' },
+          { q:'75% de 100', a:'75' },
+          { q:'30% de 200', a:'60' },
+          { q:'15% de 200', a:'30' },
+          { q:'5% de 400', a:'20' },
+          { q:'40% de 250', a:'100' },
+          { q:'60% de 50', a:'30' }
+        ]
+      },
       { id:'geometria', name:'Geometria', icon:'6', color:0x51cf66, zone:'pueblo', position:{x:16, z:0},
-        explicacion:'El area de una figura es la cantidad de superficie que ocupa. Se mide en unidades cuadradas. Para el rectangulo, el area es base x altura.',
-        ejemplo:'Area de un rectangulo de 8 x 5:<br>1. Formula: Area = base x altura.<br>2. Sustituimos: Area = 8 x 5.<br>3. Resultado: <b>40</b> unidades cuadradas.',
-        question:'Area 8 x 5', answer:'40', stars:0, maxStars:9, hints:['base x altura.','8x5.'] },
+        explicacion:'El area de una figura es la cantidad de superficie que ocupa. Para el rectangulo es base x altura. Para el triangulo es base x altura / 2.',
+        ejemplo:'Area de un rectangulo de 8 x 5:<br>1. Formula: base x altura.<br>2. 8 x 5 = <b>40</b>.',
+        stars:0, maxStars:9, hints:['Rectangulo = base x altura.','Triangulo = base x altura / 2.'],
+        ejercicios:[
+          { q:'Area rectangulo 8 x 5', a:'40' },
+          { q:'Area rectangulo 6 x 4', a:'24' },
+          { q:'Area cuadrado de lado 7', a:'49' },
+          { q:'Area cuadrado de lado 9', a:'81' },
+          { q:'Area triangulo base 6 altura 4', a:'12' },
+          { q:'Area triangulo base 10 altura 5', a:'25' },
+          { q:'Perimetro cuadrado lado 5', a:'20' },
+          { q:'Perimetro rectangulo 8 x 3', a:'22' },
+          { q:'Area rectangulo 12 x 5', a:'60' },
+          { q:'Area cuadrado de lado 11', a:'121' }
+        ]
+      },
       { id:'medidas', name:'Medidas', icon:'7', color:0x22b8cf, zone:'pueblo', position:{x:16, z:12},
-        explicacion:'Las unidades de longitud se relacionan entre si. 1 metro = 100 centimetros. Para pasar de metros a centimetros multiplicamos por 100.',
-        ejemplo:'Cuantos cm hay en 3,5 m:<br>1. Sabemos que 1 m = 100 cm.<br>2. Multiplicamos: 3,5 x 100.<br>3. Resultado: <b>350 cm</b>.',
-        question:'cm en 3,5 m', answer:'350', stars:0, maxStars:9, hints:['1m = 100cm.','3,5 x 100.'] },
+        explicacion:'Las unidades de longitud se relacionan: 1 m = 100 cm, 1 km = 1000 m. Para pasar de metros a cm multiplicamos por 100.',
+        ejemplo:'Cuantos cm hay en 3,5 m:<br>1. 1 m = 100 cm.<br>2. 3,5 x 100 = <b>350 cm</b>.',
+        stars:0, maxStars:9, hints:['1 m = 100 cm.','Multiplica por 100.'],
+        ejercicios:[
+          { q:'cm en 3,5 m', a:'350' },
+          { q:'cm en 2 m', a:'200' },
+          { q:'cm en 0,5 m', a:'50' },
+          { q:'m en 500 cm', a:'5' },
+          { q:'cm en 1,25 m', a:'125' },
+          { q:'m en 1200 cm', a:'12' },
+          { q:'cm en 0,75 m', a:'75' },
+          { q:'m en 350 cm', a:'3,5' },
+          { q:'cm en 4 m', a:'400' },
+          { q:'cm en 1,8 m', a:'180' }
+        ]
+      },
       { id:'problemas', name:'Problemas', icon:'8', color:0xf06595, zone:'pueblo', position:{x:0, z:17},
-        explicacion:'Los problemas matematicos nos cuentan una situacion real que resolvemos con operaciones. Leemos con atencion, identificamos los datos y elegimos la operacion adecuada.',
-        ejemplo:'4 lapices a 0,75 euros:<br>1. Datos: 4 lapices, cada uno cuesta 0,75 euros.<br>2. Operacion: multiplicar 0,75 x 4.<br>3. Resultado: <b>3 euros</b>.',
-        question:'4 lapices a 0,75 euros', answer:'3', stars:0, maxStars:9, hints:['Multiplica.','0,75 x 4.'] },
+        explicacion:'Los problemas matematicos cuentan una situacion real que resolvemos con operaciones. Leemos, identificamos datos y elegimos la operacion.',
+        ejemplo:'4 lapices a 0,75 euros:<br>1. Datos: 4 lapices, 0,75 cada uno.<br>2. 0,75 x 4 = <b>3 euros</b>.',
+        stars:0, maxStars:9, hints:['Lee con atencion.','Elige bien la operacion.'],
+        ejercicios:[
+          { q:'4 lapices a 0,75 euros cada uno. Total?', a:'3' },
+          { q:'5 caramelos a 0,20 euros. Total?', a:'1' },
+          { q:'Ana tiene 25 euros y gasta 10. Cuanto le queda?', a:'15' },
+          { q:'3 cajas con 12 huevos cada una. Total huevos?', a:'36' },
+          { q:'Un libro cuesta 15 euros. 4 libros?', a:'60' },
+          { q:'Tengo 50 euros y compro 3 camisetas de 12 euros. Cuanto me queda?', a:'14' },
+          { q:'Un autobus con 40 plazas hace 5 viajes. Cuantas plazas en total?', a:'200' },
+          { q:'6 amigos comparten 24 caramelos. Cuantos toca a cada uno?', a:'4' },
+          { q:'Si 1 kg de manzanas cuesta 2 euros, cuanto cuestan 3 kg?', a:'6' },
+          { q:'Un tren recorre 80 km en 1 hora. Cuantos km en 3 horas?', a:'240' }
+        ]
+      },
       { id:'estadistica', name:'Estadistica', icon:'9', color:0x748ffc, zone:'pueblo', position:{x:-14, z:14},
-        explicacion:'La media o promedio de varios numeros se calcula sumando todos y dividiendo entre cuantos hay. Nos da un valor representativo del conjunto.',
-        ejemplo:'Media de 4, 6 y 8:<br>1. Sumamos: 4 + 6 + 8 = 18.<br>2. Contamos cuantos numeros hay: 3.<br>3. Dividimos: 18 / 3 = <b>6</b>.',
-        question:'Media de 4, 6, 8', answer:'6', stars:0, maxStars:9, hints:['Suma entre cuantos.','18/3.'] },
+        explicacion:'La media o promedio se calcula sumando todos los valores y dividiendo entre cuantos hay.',
+        ejemplo:'Media de 4, 6 y 8:<br>1. Suma: 4+6+8 = 18.<br>2. Cuantos: 3.<br>3. 18 / 3 = <b>6</b>.',
+        stars:0, maxStars:9, hints:['Suma y divide entre cuantos.','La media es el promedio.'],
+        ejercicios:[
+          { q:'Media de 4, 6, 8', a:'6' },
+          { q:'Media de 2, 4, 6', a:'4' },
+          { q:'Media de 10, 20, 30', a:'20' },
+          { q:'Media de 5, 5, 5', a:'5' },
+          { q:'Media de 1, 2, 3, 4', a:'2,5' },
+          { q:'Media de 8, 10', a:'9' },
+          { q:'Media de 7, 9, 11', a:'9' },
+          { q:'Media de 0, 10, 20', a:'10' },
+          { q:'Media de 6, 8, 10, 12', a:'9' },
+          { q:'Media de 3, 7, 5', a:'5' }
+        ]
+      },
       { id:'potencias', name:'Potencias', icon:'P', color:0xff7675, zone:'bosque', position:{x:-8, z:-12},
-        explicacion:'Una potencia es una multiplicacion repetida. a elevado a n significa multiplicar a por si mismo n veces. El numero de abajo es la base y el de arriba el exponente.',
-        ejemplo:'2 elevado a 5:<br>1. Base = 2, exponente = 5.<br>2. Multiplicamos 2 por si mismo 5 veces: 2 x 2 x 2 x 2 x 2.<br>3. Resultado: <b>32</b>.',
-        question:'2 elevado a 5', answer:'32', stars:0, maxStars:9, hints:['2x2x2x2x2.','5 veces.'] },
+        explicacion:'Una potencia es una multiplicacion repetida. a elevado a n significa multiplicar a por si mismo n veces.',
+        ejemplo:'2 elevado a 5:<br>1. Base = 2, exponente = 5.<br>2. 2 x 2 x 2 x 2 x 2 = <b>32</b>.',
+        stars:0, maxStars:9, hints:['Multiplica la base por si misma.','El exponente dice cuantas veces.'],
+        ejercicios:[
+          { q:'2 elevado a 5', a:'32' },
+          { q:'3 elevado a 3', a:'27' },
+          { q:'5 elevado a 2', a:'25' },
+          { q:'4 elevado a 2', a:'16' },
+          { q:'10 elevado a 3', a:'1000' },
+          { q:'2 elevado a 4', a:'16' },
+          { q:'6 elevado a 2', a:'36' },
+          { q:'2 elevado a 6', a:'64' },
+          { q:'3 elevado a 4', a:'81' },
+          { q:'7 elevado a 2', a:'49' }
+        ]
+      },
       { id:'enteros', name:'Enteros', icon:'E', color:0x74b9ff, zone:'bosque', position:{x:0, z:-15},
-        explicacion:'Los numeros enteros incluyen positivos, negativos y el cero. Al sumar un positivo avanzamos hacia la derecha en la recta numerica; al sumar un negativo, hacia la izquierda.',
-        ejemplo:'(-5) + 8:<br>1. Empezamos en -5 en la recta.<br>2. Avanzamos 8 pasos hacia la derecha.<br>3. Llegamos a <b>3</b>.',
-        question:'(-5) + 8', answer:'3', stars:0, maxStars:9, hints:['Desde -5 avanza 8.','-5+5=0, +3.'] },
+        explicacion:'Los numeros enteros incluyen positivos, negativos y el cero. Al sumar avanzamos en la recta numerica.',
+        ejemplo:'(-5) + 8:<br>1. Empezamos en -5.<br>2. Avanzamos 8 hacia la derecha.<br>3. Llegamos a <b>3</b>.',
+        stars:0, maxStars:9, hints:['Dibuja la recta numerica.','Los negativos van a la izquierda.'],
+        ejercicios:[
+          { q:'(-5) + 8', a:'3' },
+          { q:'(-3) + 7', a:'4' },
+          { q:'5 - 8', a:'-3' },
+          { q:'(-2) + (-4)', a:'-6' },
+          { q:'(-10) + 15', a:'5' },
+          { q:'8 - 12', a:'-4' },
+          { q:'(-7) + 7', a:'0' },
+          { q:'(-6) - 2', a:'-8' },
+          { q:'3 - 10', a:'-7' },
+          { q:'(-1) + 9', a:'8' }
+        ]
+      },
       { id:'algebra', name:'Algebra', icon:'A', color:0xa29bfe, zone:'bosque', position:{x:8, z:-12},
-        explicacion:'En algebra usamos letras para representar numeros desconocidos. Resolver una ecuacion es encontrar el valor de la letra que hace que la igualdad sea cierta.',
-        ejemplo:'x + 5 = 12:<br>1. Queremos dejar x sola.<br>2. Restamos 5 en los dos lados: x + 5 - 5 = 12 - 5.<br>3. Resultado: x = <b>7</b>.',
-        question:'x+5=12, x?', answer:'7', stars:0, maxStars:9, hints:['Resta 5.','12-5.'] },
+        explicacion:'En algebra usamos letras para representar numeros desconocidos. Resolver es encontrar el valor que hace cierta la igualdad.',
+        ejemplo:'x + 5 = 12:<br>1. Restamos 5 en los dos lados.<br>2. x = 12 - 5 = <b>7</b>.',
+        stars:0, maxStars:9, hints:['Haz la operacion inversa.','Deja la x sola.'],
+        ejercicios:[
+          { q:'x + 5 = 12, x?', a:'7' },
+          { q:'x + 3 = 10, x?', a:'7' },
+          { q:'x - 4 = 6, x?', a:'10' },
+          { q:'x + 8 = 15, x?', a:'7' },
+          { q:'x - 2 = 9, x?', a:'11' },
+          { q:'x + 10 = 20, x?', a:'10' },
+          { q:'x - 5 = 5, x?', a:'10' },
+          { q:'x + 1 = 8, x?', a:'7' },
+          { q:'x - 7 = 3, x?', a:'10' },
+          { q:'x + 6 = 14, x?', a:'8' }
+        ]
+      },
       { id:'ecuaciones', name:'Ecuaciones', icon:'X', color:0xfab1a0, zone:'montana', position:{x:-6, z:0},
-        explicacion:'Una ecuacion es una igualdad con una incognita. Para resolverla hacemos la operacion inversa en los dos lados hasta dejar la incognita sola.',
-        ejemplo:'3x = 21:<br>1. La x esta multiplicada por 3.<br>2. Hacemos la operacion inversa: dividir entre 3 los dos lados.<br>3. Resultado: x = 21 / 3 = <b>7</b>.',
-        question:'3x=21, x?', answer:'7', stars:0, maxStars:9, hints:['Divide entre 3.','21/3.'] },
+        explicacion:'Una ecuacion es una igualdad con una incognita. Hacemos la operacion inversa hasta dejar la incognita sola.',
+        ejemplo:'3x = 21:<br>1. Dividimos entre 3 los dos lados.<br>2. x = 21 / 3 = <b>7</b>.',
+        stars:0, maxStars:9, hints:['Divide o multiplica en los dos lados.','La x sola.'],
+        ejercicios:[
+          { q:'3x = 21, x?', a:'7' },
+          { q:'2x = 10, x?', a:'5' },
+          { q:'4x = 20, x?', a:'5' },
+          { q:'5x = 45, x?', a:'9' },
+          { q:'6x = 36, x?', a:'6' },
+          { q:'2x = 18, x?', a:'9' },
+          { q:'7x = 49, x?', a:'7' },
+          { q:'8x = 64, x?', a:'8' },
+          { q:'3x = 27, x?', a:'9' },
+          { q:'9x = 81, x?', a:'9' }
+        ]
+      },
       { id:'probabilidad', name:'Probabilidad', icon:'D', color:0xffd93d, zone:'montana', position:{x:6, z:0},
-        explicacion:'La probabilidad mide las posibilidades de que ocurra un suceso. Se calcula dividiendo los casos favorables entre los casos posibles.',
-        ejemplo:'Probabilidad de sacar par en un dado:<br>1. Casos favorables: 2, 4, 6 -> 3 casos.<br>2. Casos posibles: 1, 2, 3, 4, 5, 6 -> 6 casos.<br>3. Probabilidad = 3/6 = <b>1/2</b>.',
-        question:'P(par)? 1/2', answer:'1/2', stars:0, maxStars:9, hints:['Pares: 2, 4, 6.','3 de 6.'] }
+        explicacion:'La probabilidad mide las posibilidades de que ocurra un suceso. Se calcula dividiendo casos favorables entre casos posibles.',
+        ejemplo:'P(sacar par) en un dado:<br>1. Favorables: 2, 4, 6 = 3.<br>2. Posibles: 6.<br>3. 3/6 = <b>1/2</b>.',
+        stars:0, maxStars:9, hints:['Favorables entre posibles.','Simplifica la fraccion.'],
+        ejercicios:[
+          { q:'P(par) en un dado (ej: 1/2)', a:'1/2' },
+          { q:'P(sacar 3) en un dado (ej: 1/6)', a:'1/6' },
+          { q:'P(sacar 6) en un dado (ej: 1/6)', a:'1/6' },
+          { q:'P(cara) al lanzar moneda (ej: 1/2)', a:'1/2' },
+          { q:'P(impar) en un dado (ej: 1/2)', a:'1/2' },
+          { q:'P(mayor que 4) en un dado (ej: 1/3)', a:'1/3' },
+          { q:'P(menor que 3) en un dado (ej: 1/3)', a:'1/3' },
+          { q:'P(sacar 1) en un dado (ej: 1/6)', a:'1/6' },
+          { q:'P(sacar 2 o 4) en un dado (ej: 1/3)', a:'1/3' },
+          { q:'P(cruz) al lanzar moneda (ej: 1/2)', a:'1/2' }
+        ]
+      }
     ];
     var MAX_TOTAL_STARS = topics.length * 9;
     var totalStars = 0;
+
+    // Indice de ejercicio actual por tema (rotacion)
+    var ejercicioIndexPorTema = {};
+
+    function getSiguienteEjercicio(topic) {
+      if (!topic.ejercicios || topic.ejercicios.length === 0) {
+        return { q: 'Sin ejercicios', a: '' };
+      }
+      var idx = ejercicioIndexPorTema[topic.id] || 0;
+      var ej = topic.ejercicios[idx % topic.ejercicios.length];
+      ejercicioIndexPorTema[topic.id] = (idx + 1) % topic.ejercicios.length;
+      return ej;
+    }
 
     function getWorldPosition(topic) {
       var zone = ZONES[topic.zone];
@@ -637,7 +831,7 @@
       { id:'talk2', icon:'C', name:'Charlatana', desc:'Habla con 2 aldeanos', target:2, reward:1, field:'npcsTalkedToday' },
       { id:'oneTheme', icon:'H', name:'Especialista', desc:'Completa un tema hoy', target:1, reward:3, field:'themesCompletedToday' }
     ];
-    var DAILY_KEY = 'expedicion_matematica_daily_v11';
+    var DAILY_KEY = 'expedicion_matematica_daily_v12';
     function getTodayKey() {
       var d = new Date();
       return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
@@ -771,9 +965,9 @@
     }
 
     // STORAGE
-    var STORAGE_KEY = 'expedicion_matematica_save_v11';
-    var APPEARANCE_KEY = 'expedicion_matematica_appearance_v11';
-    var ACHIEVEMENTS_KEY = 'expedicion_matematica_achievements_v11';
+    var STORAGE_KEY = 'expedicion_matematica_save_v12';
+    var APPEARANCE_KEY = 'expedicion_matematica_appearance_v12';
+    var ACHIEVEMENTS_KEY = 'expedicion_matematica_achievements_v12';
     function saveAll() {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify({ stars: topics.map(function(t) { return { id: t.id, stars: t.stars }; }), totalStars: totalStars }));
@@ -859,7 +1053,6 @@
       mesh.position.set(zone.offset.x, 0, zone.offset.z);
       mesh.receiveShadow = true;
       scene.add(mesh);
-      // Borde del suelo: un poco mas oscuro para marcar el limite
       var edgeGeo = new THREE.PlaneGeometry(60.4, 60.4);
       var edgeMat = new THREE.MeshStandardMaterial({ color: 0x2a3a2a, roughness: 1 });
       var edge = new THREE.Mesh(edgeGeo, edgeMat);
@@ -920,20 +1113,17 @@
       g.scale.set(scale, scale, scale);
       return g;
     }
-    // Arboles del pueblo (dentro del suelo de 60x60)
     for (var i = 0; i < 16; i++) {
       var a = (i / 16) * Math.PI * 2;
       var r = 26 + Math.random() * 2;
       scene.add(createTree(Math.cos(a) * r, Math.sin(a) * r, 0.9 + Math.random() * 0.3));
     }
-    // Arboles del bosque
     for (var i = 0; i < 30; i++) {
       var bx = ZONES.bosque.offset.x + (Math.random() - 0.5) * 50;
       var bz = ZONES.bosque.offset.z + (Math.random() - 0.5) * 50;
       if (Math.hypot(bx - ZONES.bosque.offset.x, bz - ZONES.bosque.offset.z) < 12) continue;
       scene.add(createTree(bx, bz, 0.9 + Math.random() * 0.4));
     }
-    // Rocas en montana
     for (var i = 0; i < 20; i++) {
       var mx = ZONES.montana.offset.x + (Math.random() - 0.5) * 50;
       var mz = ZONES.montana.offset.z + (Math.random() - 0.5) * 50;
@@ -1019,7 +1209,51 @@
       fence.rotation.y = -a + Math.PI / 2;
       scene.add(fence);
     }
-    log('Decoracion OK');
+
+    // PUENTES entre zonas
+    function createBridge(x1, z1, x2, z2) {
+      var dx = x2 - x1;
+      var dz = z2 - z1;
+      var len = Math.hypot(dx, dz);
+      var angle = Math.atan2(dx, dz);
+      var g = new THREE.Group();
+      var plankMat = new THREE.MeshStandardMaterial({ color: 0xa67c52, roughness: 0.9 });
+      var deck = new THREE.Mesh(new THREE.BoxGeometry(3, 0.15, len), plankMat);
+      deck.position.set(0, 0.08, len / 2);
+      deck.receiveShadow = true;
+      g.add(deck);
+      var railMat = new THREE.MeshStandardMaterial({ color: 0x6b3e1d, roughness: 0.8 });
+      var numPosts = Math.floor(len / 3);
+      for (var i = 0; i <= numPosts; i++) {
+        var pz = (i / numPosts) * len;
+        var postL = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.9, 0.1), railMat);
+        postL.position.set(-1.4, 0.55, pz);
+        postL.castShadow = true;
+        g.add(postL);
+        var postR = postL.clone();
+        postR.position.x = 1.4;
+        g.add(postR);
+      }
+      var railL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, len), railMat);
+      railL.position.set(-1.4, 1.0, len / 2);
+      g.add(railL);
+      var railR = railL.clone();
+      railR.position.x = 1.4;
+      g.add(railR);
+      var midL = railL.clone();
+      midL.position.y = 0.6;
+      g.add(midL);
+      var midR = railR.clone();
+      midR.position.y = 0.6;
+      g.add(midR);
+      g.position.set(x1, 0, z1);
+      g.rotation.y = angle;
+      scene.add(g);
+      return g;
+    }
+    createBridge(0, -30, 0, -40);
+    createBridge(30, 0, 40, 0);
+    log('Decoracion y puentes OK');
 
     // CASITAS
     var houses = [];
@@ -1603,8 +1837,11 @@
     }
     function startPractice() {
       if (!currentTopic) return;
+      var ej = getSiguienteEjercicio(currentTopic);
+      currentTopic._currentQuestion = ej.q;
+      currentTopic._currentAnswer = ej.a;
       document.getElementById('modal-title').textContent = currentTopic.name;
-      document.getElementById('question-text').textContent = currentTopic.question;
+      document.getElementById('question-text').textContent = ej.q;
       var ai = document.getElementById('answer-input');
       ai.value = '';
       ai.disabled = false;
@@ -1628,8 +1865,8 @@
     }
     function checkAnswer() {
       if (!currentTopic || answeredCorrectly) return;
+      var correct = (currentTopic._currentAnswer || '').trim().replace(/\s/g, '').toLowerCase().replace(',', '.');
       var user = document.getElementById('answer-input').value.trim().replace(/\s/g, '').toLowerCase().replace(',', '.');
-      var correct = currentTopic.answer.trim().replace(/\s/g, '').toLowerCase().replace(',', '.');
       var isCorrect = false;
       var uN = parseFloat(user);
       var cN = parseFloat(correct);
@@ -2207,7 +2444,7 @@
         hintEl.style.opacity = '0.9';
       }
 
-      // CAMARA FIJA: siempre misma direccion respecto al mundo
+      // CAMARA FIJA
       if (state.celebrating <= 0) {
         tempCamPos.set(state.x + 8, 12, state.z + 12);
         camera.position.lerp(tempCamPos, 5 * dt);
