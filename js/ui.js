@@ -16,6 +16,7 @@ import {
 import { Sounds, Music } from './audio.js';
 import { saveProfileState } from './storage.js';
 import { enterHouse, exitHouse } from './house.js';
+import { openCustomize, closeCustomize } from './customize.js';
 
 // ============================================================
 // MODAL DE EJERCICIOS: ABRIR / CERRAR
@@ -744,4 +745,3 @@ export function bindUI() {
 // EXPORT: abrir/cerrar el vestidor
 // (Reexportados desde customize.js para simplificar el binding)
 // ============================================================
-export { openCustomize, closeCustomize } from './customize.js';
