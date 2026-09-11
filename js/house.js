@@ -37,10 +37,10 @@ export function createHouseInterior() {
     addOutline(m, 1.03);
   }
 
-  wall(20, 5, 0.3, 0, 2.5, -10);
-  wall(20, 5, 0.3, 0, 2.5, 10);
-  wall(0.3, 5, 20, -10, 2.5, 0);
-  wall(0.3, 5, 20, 10, 2.5, 0);
+  wall(20, 5, 0.3, 0, 2.5, -10);   // fondo norte
+  wall(20, 5, 0.3, 0, 2.5, 10);    // frente sur
+  wall(0.3, 5, 20, -10, 2.5, 0);   // izquierda
+  wall(0.3, 5, 20, 10, 2.5, 0);    // derecha
 
   // --- Puerta de salida ---
   const exitDoor = new THREE.Mesh(
@@ -88,8 +88,9 @@ export function createHouseInterior() {
   addOutline(tab4, 1.05);
 
   // ==========================================================
-  // SALON
+  // MUEBLES DEL SALON
   // ==========================================================
+
   const sofa = new THREE.Group();
 
   const sofaBase = new THREE.Mesh(
@@ -148,8 +149,9 @@ export function createHouseInterior() {
   refs.houseInterior.add(rug);
 
   // ==========================================================
-  // COCINA
+  // MUEBLES DE LA COCINA
   // ==========================================================
+
   const counter = new THREE.Mesh(
     new THREE.BoxGeometry(4, 1, 1.2),
     toonMat(0xf0d8b8)
@@ -179,8 +181,9 @@ export function createHouseInterior() {
   }
 
   // ==========================================================
-  // HABITACION
+  // MUEBLES DE LA HABITACION
   // ==========================================================
+
   const bed = new THREE.Group();
 
   const bedBase = new THREE.Mesh(
@@ -228,8 +231,9 @@ export function createHouseInterior() {
   refs.houseObstacles.push({ x1: -5, x2: -4, z1: -7.5, z2: -6.5 });
 
   // ==========================================================
-  // BANO
+  // MUEBLES DEL BANO
   // ==========================================================
+
   const bathtub = new THREE.Mesh(
     new THREE.BoxGeometry(2.5, 0.8, 1.4),
     toonMat(0xffffff)
@@ -271,7 +275,9 @@ export function createHouseInterior() {
   addOutline(toilet, 1.05);
   refs.houseObstacles.push({ x1: 8, x2: 9, z1: -5.5, z2: -4.5 });
 
-  // Techo
+  // ==========================================================
+  // TECHO
+  // ==========================================================
   const ceiling = new THREE.Mesh(
     new THREE.BoxGeometry(20, 0.2, 20),
     toonMat(0xfff0d8)
@@ -279,7 +285,9 @@ export function createHouseInterior() {
   ceiling.position.y = 5;
   refs.houseInterior.add(ceiling);
 
-  // Carteles de zona
+  // ==========================================================
+  // CARTELES DE ZONA
+  // ==========================================================
   function addZoneSign(text, x, z, color) {
     const cv = document.createElement('canvas');
     cv.width = 256;
@@ -318,8 +326,25 @@ export function createHouseInterior() {
   addZoneSign('HABITACION', -7, -3, 0xffb3d9);
   addZoneSign('BANO',        7, -3, 0x9be0ff);
 
+  // ==========================================================
+  // LUCES INTERIORES (para que se vea bien dentro)
+  // ==========================================================
+  const interiorLight = new THREE.PointLight(0xffffff, 1.5, 40, 1);
+  interiorLight.position.set(0, 4.5, 0);
+  refs.houseInterior.add(interiorLight);
+
+  const interiorLight2 = new THREE.PointLight(0xfff0d0, 0.8, 30, 1);
+  interiorLight2.position.set(-6, 3, -6);
+  refs.houseInterior.add(interiorLight2);
+
+  const interiorLight3 = new THREE.PointLight(0xfff0d0, 0.8, 30, 1);
+  interiorLight3.position.set(6, 3, -6);
+  refs.houseInterior.add(interiorLight3);
+
   // Empieza oculto
   refs.houseInterior.visible = false;
+
+  console.log('[house] Interior creado. Hijos:', refs.houseInterior.children.length);
 }
 
 // ============================================================
@@ -340,10 +365,18 @@ export function enterHouse() {
   session.npcs.forEach(n => { n.mesh.visible = false; });
   if (refs.homeGroup) refs.homeGroup.visible = false;
 
-  // Mostrar interior
-  refs.houseInterior.visible = true;
+  // Forzar visibilidad del interior y TODOS sus hijos
+  if (refs.houseInterior) {
+    refs.houseInterior.visible = true;
+    refs.houseInterior.traverse(obj => {
+      obj.visible = true;
+    });
+    console.log('[house] Interior visible. Hijos:', refs.houseInterior.children.length);
+  } else {
+    console.error('[house] ¡NO EXISTE refs.houseInterior!');
+  }
 
-  // Colocar la camara ya en su sitio (sin lerp) para que se vea de inmediato
+  // Colocar la camara dentro (de golpe, sin animacion)
   refs.camera.position.set(0, 12, 18);
   refs.camera.lookAt(0, 0, 0);
 
@@ -356,7 +389,8 @@ export function enterHouse() {
 
   document.getElementById('hint').innerHTML = 'Explora la casa! Pulsa SALIR DE CASA cuando quieras salir.';
 
-  console.log('[house] Entrando en la casa. Camara:', refs.camera.position);
+  console.log('[house] Entrando. Camara:', refs.camera.position);
+  console.log('[house] Interior visible:', refs.houseInterior ? refs.houseInterior.visible : 'no existe');
 }
 
 // ============================================================
@@ -370,11 +404,15 @@ export function exitHouse() {
   state.z = 12;
   refs.player.position.set(state.x, 0, state.z);
 
-  refs.houseInterior.visible = false;
+  if (refs.houseInterior) {
+    refs.houseInterior.visible = false;
+  }
 
   session.houses.forEach(h => { h.mesh.visible = true; });
   session.npcs.forEach(n => { n.mesh.visible = true; });
   if (refs.homeGroup) refs.homeGroup.visible = true;
 
   document.getElementById('btn-exit-house').style.display = 'none';
+
+  console.log('[house] Saliendo de la casa');
 }
