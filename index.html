@@ -123,9 +123,17 @@
         <button id="theory-close-btn">Salir</button>
       </div>
     </div>
+
     <div id="practice-view" style="display:none;">
       <h2 id="modal-title">Casita</h2>
-      <div id="question-text" class="question"></div>
+      <div style="display:flex; align-items:center; justify-content:center; gap:12px;">
+        <button id="prev-exercise-btn" title="Ejercicio anterior">&larr;</button>
+        <div id="question-text" class="question" style="flex:1; margin:16px 0;"></div>
+        <button id="next-exercise-btn" title="Siguiente ejercicio">&rarr;</button>
+      </div>
+      <div style="text-align:center; font-weight:800; color:#8b6f4c; font-size:0.85rem; margin-bottom:10px;">
+        Ejercicio <span id="exercise-counter">1</span> de <span id="exercise-total">10</span>
+      </div>
       <input type="text" id="answer-input" placeholder="?" autocomplete="off">
       <div id="feedback" class="feedback"></div>
       <div class="btns">
@@ -223,7 +231,6 @@
   </div>
 </div>
 
-<!-- Three.js como módulo ES6 -->
 <script type="importmap">
 {
   "imports": {
