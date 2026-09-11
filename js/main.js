@@ -24,7 +24,8 @@ import {
   createHome,
   createNPC,
   createBossLair,
-  updateAllHousesForProfile
+  updateAllHousesForProfile,
+  initHouseScene
 } from './scene.js';
 
 import { createPlayer, applyAppearance } from './player.js';
@@ -132,6 +133,9 @@ function selectProfile(name) {
     initScene();
     console.log('[main] Escena base creada');
 
+    initHouseScene();
+    console.log('[main] Escena de la casa creada');
+
     createPlayer();
     console.log('[main] Jugador creado');
 
@@ -160,7 +164,12 @@ function selectProfile(name) {
   state.z = 5;
   state.inHouse = false;
   refs.player.position.set(0, 0, 5);
-  if (refs.houseInterior) refs.houseInterior.visible = false;
+
+  // Asegurarse de que el jugador esta en la escena del mundo
+  if (refs.scene && !refs.scene.children.includes(refs.player)) {
+    refs.scene.add(refs.player);
+  }
+
   document.getElementById('btn-exit-house').style.display = 'none';
 
   updateStarDisplay();
@@ -217,16 +226,19 @@ document.getElementById('profiles-btn').addEventListener('click', () => {
   renderProfilesScreen();
 });
 
-// GUARDAR SESION
-document.getElementById('save-session-btn').addEventListener('click', () => {
-  if (!session.currentProfile) {
-    alert('No hay perfil activo');
-    return;
-  }
-  saveProfileState();
-  alert('Sesion guardada: ' + session.currentProfile.name + ' (' + session.totalStars + ' estrellas)');
-  console.log('[main] Sesion guardada manualmente');
-});
+// Guardar sesion
+const saveBtn = document.getElementById('save-session-btn');
+if (saveBtn) {
+  saveBtn.addEventListener('click', () => {
+    if (!session.currentProfile) {
+      alert('No hay perfil activo');
+      return;
+    }
+    saveProfileState();
+    alert('Sesion guardada: ' + session.currentProfile.name + ' (' + session.totalStars + ' estrellas)');
+    console.log('[main] Sesion guardada manualmente');
+  });
+}
 
 // Borrar el perfil activo
 document.getElementById('reset-btn').addEventListener('click', () => {
@@ -306,7 +318,7 @@ function animate() {
   const dt = Math.min(refs.clock.getDelta(), 0.1);
   const el = refs.clock.elapsedTime;
 
-  if (refs.waterBall) {
+  if (refs.waterBall && !state.inHouse) {
     refs.waterBall.position.y = 2.2 + Math.sin(el * 3) * 0.15;
   }
 
@@ -385,15 +397,14 @@ function animate() {
   refs.player.position.x = state.x;
   refs.player.position.z = state.z;
 
+  // ---- Mascota sigue al jugador (solo fuera) ----
   if (refs.parts.petGroup && !state.inHouse) {
     const petTarget = new THREE.Vector3(state.x + 1.3, 0, state.z - 0.8);
     refs.parts.petGroup.position.lerp(petTarget, 3 * dt);
     refs.parts.petGroup.lookAt(state.x, 0, state.z);
-  } else if (refs.parts.petGroup) {
-    refs.parts.petGroup.position.set(state.x + 1, 0, state.z - 0.5);
   }
 
-  // Detecciones
+  // ---- Detecciones (solo fuera de la casa) ----
   if (!state.inHouse) {
     let nh = null, mh = 5;
     session.houses.forEach(h => {
@@ -446,32 +457,33 @@ function animate() {
     document.getElementById('hint').innerHTML = 'Explora la casa! Pulsa SALIR DE CASA para volver.';
   }
 
-  // ---- Camara ----
+  // ---- Camara y render ----
   if (state.inHouse) {
-    // CAMARA DENTRO DE LA CASA (vista cercana)
-    if (state.celebrating <= 0) {
-      // Camara mas cerca: 3 unidades detras y 3 de alto
-      tempCamPos.set(state.x + 3, 3.5, state.z + 5);
+    // === DENTRO DE LA CASA ===
+    if (refs.houseCamera) {
+      if (state.celebrating <= 0) {
+        tempCamPos.set(state.x + 5, 8, state.z + 8);
+        refs.houseCamera.position.lerp(tempCamPos, 8 * dt);
+        tempLookAt.set(state.x, 1, state.z);
+        refs.houseCamera.lookAt(tempLookAt);
+      } else {
+        const ca = el * 1.5;
+        tempCamPos.set(state.x + Math.cos(ca) * 6, 6, state.z + Math.sin(ca) * 6);
+        refs.houseCamera.position.lerp(tempCamPos, 5 * dt);
+        tempLookAt.set(state.x, 1, state.z);
+        refs.houseCamera.lookAt(tempLookAt);
+      }
+      refs.renderer.render(refs.houseScene, refs.houseCamera);
+    } else {
+      // Fallback: si no existe la camara de la casa, usar la del mundo
+      tempCamPos.set(state.x + 5, 8, state.z + 8);
       refs.camera.position.lerp(tempCamPos, 8 * dt);
-      // Mirar mas bajo y mas cerca del personaje
       tempLookAt.set(state.x, 1, state.z);
       refs.camera.lookAt(tempLookAt);
-    } else {
-      const ca = el * 1.5;
-      tempCamPos.set(state.x + Math.cos(ca) * 5, 3.5, state.z + Math.sin(ca) * 5);
-      refs.camera.position.lerp(tempCamPos, 5 * dt);
-      tempLookAt.set(state.x, 1, state.z);
-      refs.camera.lookAt(tempLookAt);
-    }
-    } else {
-      const ca = el * 1.5;
-      tempCamPos.set(state.x + Math.cos(ca) * 6, 5, state.z + Math.sin(ca) * 6);
-      refs.camera.position.lerp(tempCamPos, 5 * dt);
-      tempLookAt.set(state.x, 1, state.z);
-      refs.camera.lookAt(tempLookAt);
+      refs.renderer.render(refs.scene, refs.camera);
     }
   } else {
-    // CAMARA EXTERIOR
+    // === FUERA ===
     if (state.celebrating <= 0) {
       tempCamPos.set(state.x + 8, 12, state.z + 12);
       refs.camera.position.lerp(tempCamPos, 5 * dt);
@@ -482,9 +494,9 @@ function animate() {
     }
     tempLookAt.set(state.x, 1.5, state.z);
     refs.camera.lookAt(tempLookAt);
-  }
 
-  refs.renderer.render(refs.scene, refs.camera);
+    refs.renderer.render(refs.scene, refs.camera);
+  }
 
   frames++;
   if (frames === 30) log('TODO OK');
@@ -498,9 +510,8 @@ bindUI();
 renderProfilesScreen();
 console.log('[main] App lista. Perfiles guardados:', Object.keys(loadProfiles()));
 
-// DEBUG TEMPORAL: exponer refs y session globalmente
+// Debug: exponer refs globalmente
 window.__refs = refs;
 window.__session = session;
 window.__state = state;
 window.__THREE = THREE;
-console.log('[main] refs y session expuestos en window.__refs y window.__session');

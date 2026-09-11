@@ -61,12 +61,11 @@ export function addOutline(mesh, thickness = 1.05) {
 }
 
 // ============================================================
-// CONSTRUCTORES DE OBJETOS
+// CONSTRUCTORES DE OBJETOS DEL MUNDO
 // ============================================================
 
 export function createTree(x, z, scale = 1) {
   const g = new THREE.Group();
-
   const trunk = new THREE.Mesh(
     new THREE.CylinderGeometry(0.25, 0.35, 1.4, 8),
     toonMat(0xa86b3b)
@@ -95,7 +94,6 @@ export function createTree(x, z, scale = 1) {
 
 export function createLamppost(x, z) {
   const g = new THREE.Group();
-
   const pole = new THREE.Mesh(
     new THREE.CylinderGeometry(0.1, 0.12, 4, 8),
     toonMat(0x4a4a4a)
@@ -439,14 +437,13 @@ export function createBossLair() {
 }
 
 // ============================================================
-// INICIALIZAR LA ESCENA COMPLETA
+// INICIALIZAR LA ESCENA DEL MUNDO EXTERIOR
 // ============================================================
 export function initScene() {
   const container = document.getElementById('canvas-container');
 
   refs.scene = new THREE.Scene();
 
-  // CIELO AZUL
   const SKY_COLOR = new THREE.Color(0x87ceeb);
   refs.scene.background = SKY_COLOR.clone();
   refs.scene.fog = new THREE.Fog(0x87ceeb, 100, 260);
@@ -466,7 +463,6 @@ export function initScene() {
   refs.renderer.outputColorSpace = THREE.SRGBColorSpace;
   container.appendChild(refs.renderer.domElement);
 
-  // Luces
   refs.scene.add(new THREE.AmbientLight(0xffffff, 0.7));
   refs.scene.add(new THREE.HemisphereLight(0xc8e8ff, 0x7aa87a, 0.7));
 
@@ -482,10 +478,7 @@ export function initScene() {
   sun.shadow.camera.far = 250;
   refs.scene.add(sun);
 
-  // ============================================================
-  // PLANO AZUL DE FONDO (debajo de todo)
-  // Cubre TODO el mapa. Se ve azul entre las zonas.
-  // ============================================================
+  // Plano azul de fondo
   const waterPlane = new THREE.Mesh(
     new THREE.PlaneGeometry(300, 300),
     new THREE.MeshBasicMaterial({ color: 0x6cb8e6 })
@@ -516,7 +509,6 @@ export function initScene() {
     refs.scene.add(edge);
   });
 
-  // Camino circular
   const pathMesh = new THREE.Mesh(
     new THREE.RingGeometry(18, 21, 64),
     new THREE.MeshBasicMaterial({ color: 0xf0d8b8 })
@@ -525,7 +517,6 @@ export function initScene() {
   pathMesh.position.y = 0.02;
   refs.scene.add(pathMesh);
 
-  // Fuente central
   const fountain = new THREE.Mesh(
     new THREE.CylinderGeometry(2, 2.2, 0.6, 24),
     toonMat(0xd0d0d0)
@@ -551,7 +542,6 @@ export function initScene() {
   refs.scene.add(refs.waterBall);
   addOutline(refs.waterBall, 1.08);
 
-  // Arboles
   for (let i = 0; i < 16; i++) {
     const a = (i / 16) * Math.PI * 2;
     const r = 26 + Math.random() * 2;
@@ -645,7 +635,6 @@ export function initScene() {
     refs.scene.add(fence);
   }
 
-  // Puentes
   refs.scene.add(createBridge(0, -26, 0, -44));
   refs.scene.add(createBridge(26, 0, 44, 0));
 
@@ -659,4 +648,45 @@ export function updateAllHousesForProfile() {
   });
   session.houses = [];
   session.topics.forEach(createHouse);
+}
+
+// ============================================================
+// ESCENA DE LA CASA (SEPARADA DEL MUNDO)
+// ============================================================
+export function initHouseScene() {
+  if (refs.houseScene) return;
+
+  // Nueva escena, camara y luces SOLO para el interior
+  refs.houseScene = new THREE.Scene();
+  refs.houseScene.background = new THREE.Color(0xfff0d8);
+  refs.houseScene.fog = null; // sin niebla
+
+  refs.houseCamera = new THREE.PerspectiveCamera(
+    55,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    200
+  );
+
+  // Luces del interior
+  refs.houseScene.add(new THREE.AmbientLight(0xffffff, 0.9));
+  refs.houseScene.add(new THREE.HemisphereLight(0xfff5e0, 0xc8b090, 0.7));
+
+  const light1 = new THREE.PointLight(0xffffff, 1.5, 40, 1);
+  light1.position.set(0, 4.5, 0);
+  refs.houseScene.add(light1);
+
+  const light2 = new THREE.PointLight(0xfff0d0, 0.8, 30, 1);
+  light2.position.set(-6, 3, -6);
+  refs.houseScene.add(light2);
+
+  const light3 = new THREE.PointLight(0xfff0d0, 0.8, 30, 1);
+  light3.position.set(6, 3, -6);
+  refs.houseScene.add(light3);
+
+  // El grupo del interior se añade a esta escena
+  refs.houseInterior = new THREE.Group();
+  refs.houseScene.add(refs.houseInterior);
+
+  console.log('[scene] Escena de la casa creada');
 }

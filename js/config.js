@@ -39,10 +39,10 @@ export const MAX_TOTAL_STARS = TOPICS_BASE.length * 9;
 // MISIONES DIARIAS
 // ============================================================
 export const MISSION_TEMPLATES = [
-  { id: 'answer5',  icon: 'E', name: 'Estudiosa',           desc: 'Responde 5 preguntas',         target: 5, reward: 2, field: 'answersToday' },
-  { id: 'stars3',   icon: '*', name: 'Cazadora estrellas',  desc: 'Gana 3 estrellas hoy',         target: 3, reward: 2, field: 'starsToday' },
-  { id: 'talk2',    icon: 'C', name: 'Charlatana',          desc: 'Habla con 2 aldeanos',         target: 2, reward: 1, field: 'npcsTalkedToday' },
-  { id: 'oneTheme', icon: 'H', name: 'Especialista',        desc: 'Completa un tema hoy',         target: 1, reward: 3, field: 'themesCompletedToday' }
+  { id: 'answer5',  icon: 'E', name: 'Estudiosa',          desc: 'Responde 5 preguntas',  target: 5, reward: 2, field: 'answersToday' },
+  { id: 'stars3',   icon: '*', name: 'Cazadora estrellas', desc: 'Gana 3 estrellas hoy',  target: 3, reward: 2, field: 'starsToday' },
+  { id: 'talk2',    icon: 'C', name: 'Charlatana',         desc: 'Habla con 2 aldeanos',  target: 2, reward: 1, field: 'npcsTalkedToday' },
+  { id: 'oneTheme', icon: 'H', name: 'Especialista',       desc: 'Completa un tema hoy',  target: 1, reward: 3, field: 'themesCompletedToday' }
 ];
 
 // ============================================================
@@ -138,19 +138,19 @@ export const state = {
 };
 
 // ============================================================
-// SESION ACTUAL (perfil activo, topics, apariencia, etc)
+// SESION ACTUAL
 // ============================================================
 export const session = {
-  currentProfile: null,      // { name, age }
-  topics: [],                // topics completos de la edad actual
+  currentProfile: null,
+  topics: [],
   totalStars: 0,
-  appearance: null,          // apariencia del personaje
-  achievements: [],          // logros del perfil
-  dailyData: null,           // misiones diarias
-  ejercicioIndexPorTema: {}, // indice de ejercicio por tema
-  houses: [],                // referencias a las casitas 3D
-  npcs: [],                  // referencias a los NPCs 3D
-  lampposts: [],             // referencias a las farolas 3D
+  appearance: null,
+  achievements: [],
+  dailyData: null,
+  ejercicioIndexPorTema: {},
+  houses: [],
+  npcs: [],
+  lampposts: [],
   sceneInitialized: false,
   modalOpen: false,
   currentTopic: null,
@@ -161,7 +161,7 @@ export const session = {
 };
 
 // ============================================================
-// REFERENCIAS 3D (se llenan al inicializar la escena)
+// REFERENCIAS 3D
 // ============================================================
 export const refs = {
   scene: null,
@@ -172,6 +172,8 @@ export const refs = {
   waterBall: null,
   homeGroup: null,
   houseInterior: null,
+  houseScene: null,       // Escena separada de la casa
+  houseCamera: null,      // Camara separada de la casa
   houseObstacles: [],
   previewRenderer: null,
   previewScene: null,
@@ -184,9 +186,6 @@ export const refs = {
 // FUNCIONES HELPERS
 // ============================================================
 
-/**
- * Escribe un mensaje de log en consola y en el panel de debug
- */
 export function log(msg, isError) {
   console.log(msg);
   const debugEl = document.getElementById('debug');
@@ -198,17 +197,11 @@ export function log(msg, isError) {
   }
 }
 
-/**
- * Devuelve la clave de fecha de hoy (YYYY-MM-DD)
- */
 export function getTodayKey() {
   const d = new Date();
   return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
 }
 
-/**
- * Devuelve la posicion mundial de un tema (sumando offset de su zona)
- */
 export function getWorldPosition(topic) {
   const zone = ZONES[topic.zone];
   return {
@@ -217,16 +210,10 @@ export function getWorldPosition(topic) {
   };
 }
 
-/**
- * Comprueba si una zona esta desbloqueada segun las estrellas actuales
- */
 export function isZoneUnlocked(zoneId) {
   return session.totalStars >= ZONES[zoneId].unlockStars;
 }
 
-/**
- * Comprueba si una opcion de personalizacion esta desbloqueada
- */
 export function isUnlocked(cat, val) {
   const map = UNLOCKS[cat];
   if (!map) return true;
@@ -236,9 +223,6 @@ export function isUnlocked(cat, val) {
   return session.totalStars >= req;
 }
 
-/**
- * Devuelve la apariencia por defecto del personaje
- */
 export function defaultAppearance() {
   return {
     skinColor: 0xffe0b2,
@@ -254,9 +238,6 @@ export function defaultAppearance() {
   };
 }
 
-/**
- * Devuelve la lista de logros por defecto
- */
 export function defaultAchievements() {
   return [
     { id: 'first_star',  icon: '*', name: 'Primera estrella',  desc: 'Consigue 1 estrella',                check: () => session.totalStars >= 1,                     unlocked: false },
@@ -270,36 +251,23 @@ export function defaultAchievements() {
   ];
 }
 
-/**
- * Comprueba si una posicion (x, z) esta sobre suelo caminable.
- * Tiene en cuenta las 3 zonas principales y los puentes.
- * Si el jugador esta dentro de la casa, usa los limites del interior.
- */
 export function isOnWalkableGround(x, z) {
   if (state.inHouse) {
-    // Limites interiores de la casa: cuadrado -9.5 a 9.5
     if (x < -9.5 || x > 9.5 || z < -9.5 || z > 9.5) return false;
-    // Comprobar obstaculos (muebles)
     for (let i = 0; i < refs.houseObstacles.length; i++) {
       const o = refs.houseObstacles[i];
       if (x >= o.x1 && x <= o.x2 && z >= o.z1 && z <= o.z2) return false;
     }
     return true;
   }
-  // Exterior: 3 zonas
-  if (x >= -28 && x <= 28 && z >= -28 && z <= 28) return true;      // Pueblo
-  if (x >= -28 && x <= 28 && z >= -98 && z <= -42) return true;     // Bosque
-  if (x >= 42 && x <= 98 && z >= -28 && z <= 28) return true;       // Montana
-  // Puente Pueblo-Bosque
+  if (x >= -28 && x <= 28 && z >= -28 && z <= 28) return true;
+  if (x >= -28 && x <= 28 && z >= -98 && z <= -42) return true;
+  if (x >= 42 && x <= 98 && z >= -28 && z <= 28) return true;
   if (x >= -1.5 && x <= 1.5 && z >= -44 && z <= -26) return true;
-  // Puente Pueblo-Montana
   if (x >= 26 && x <= 44 && z >= -1.5 && z <= 1.5) return true;
   return false;
 }
 
-/**
- * Crea un gradient map para el efecto toon (4 niveles de sombra)
- */
 export function makeGradientMap(steps) {
   steps = steps || 4;
   const data = new Uint8Array(steps);
