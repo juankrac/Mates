@@ -448,23 +448,21 @@ function animate() {
 
   // ---- Camara ----
   if (state.inHouse) {
-    // CAMARA DENTRO DE LA CASA
+    // CAMARA DENTRO DE LA CASA (vista cercana)
     if (state.celebrating <= 0) {
-      tempCamPos.set(state.x + 4, 6, state.z + 8);
+      // Camara mas cerca: 3 unidades detras y 3 de alto
+      tempCamPos.set(state.x + 3, 3.5, state.z + 5);
       refs.camera.position.lerp(tempCamPos, 8 * dt);
+      // Mirar mas bajo y mas cerca del personaje
       tempLookAt.set(state.x, 1, state.z);
       refs.camera.lookAt(tempLookAt);
-      // Debug: mostrar posicion de la camara cada 2 segundos
-      if (frames % 120 === 0) {
-        console.log('[cam casa] pos:', 
-          refs.camera.position.x.toFixed(1),
-          refs.camera.position.y.toFixed(1),
-          refs.camera.position.z.toFixed(1),
-          '-> mira a:',
-          tempLookAt.x.toFixed(1),
-          tempLookAt.y.toFixed(1),
-          tempLookAt.z.toFixed(1));
-      }
+    } else {
+      const ca = el * 1.5;
+      tempCamPos.set(state.x + Math.cos(ca) * 5, 3.5, state.z + Math.sin(ca) * 5);
+      refs.camera.position.lerp(tempCamPos, 5 * dt);
+      tempLookAt.set(state.x, 1, state.z);
+      refs.camera.lookAt(tempLookAt);
+    }
     } else {
       const ca = el * 1.5;
       tempCamPos.set(state.x + Math.cos(ca) * 6, 5, state.z + Math.sin(ca) * 6);
