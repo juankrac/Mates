@@ -29,6 +29,7 @@ import {
 
 import { createPlayer, applyAppearance } from './player.js';
 import { createHouseInterior } from './house.js';
+
 import {
   bindUI,
   updateStarDisplay,
@@ -124,7 +125,6 @@ function selectProfile(name) {
   profilesScreen.style.display = 'none';
   document.getElementById('hud-name').textContent = name;
 
-  // Inicializar la escena 3D solo la primera vez
   if (!session.sceneInitialized) {
     console.log('[main] Inicializando escena por primera vez');
 
@@ -448,15 +448,24 @@ function animate() {
 
   // ---- Camara ----
   if (state.inHouse) {
-    // Camara DENTRO de la casa: vista fija cercana
+    // CAMARA DENTRO DE LA CASA
     if (state.celebrating <= 0) {
-      // Camara en la esquina sureste del interior, mirando al centro
       tempCamPos.set(state.x + 4, 6, state.z + 8);
       refs.camera.position.lerp(tempCamPos, 8 * dt);
       tempLookAt.set(state.x, 1, state.z);
       refs.camera.lookAt(tempLookAt);
+      // Debug: mostrar posicion de la camara cada 2 segundos
+      if (frames % 120 === 0) {
+        console.log('[cam casa] pos:', 
+          refs.camera.position.x.toFixed(1),
+          refs.camera.position.y.toFixed(1),
+          refs.camera.position.z.toFixed(1),
+          '-> mira a:',
+          tempLookAt.x.toFixed(1),
+          tempLookAt.y.toFixed(1),
+          tempLookAt.z.toFixed(1));
+      }
     } else {
-      // Durante celebracion dentro de casa, orbitar
       const ca = el * 1.5;
       tempCamPos.set(state.x + Math.cos(ca) * 6, 5, state.z + Math.sin(ca) * 6);
       refs.camera.position.lerp(tempCamPos, 5 * dt);
@@ -464,7 +473,7 @@ function animate() {
       refs.camera.lookAt(tempLookAt);
     }
   } else {
-    // Camara exterior
+    // CAMARA EXTERIOR
     if (state.celebrating <= 0) {
       tempCamPos.set(state.x + 8, 12, state.z + 12);
       refs.camera.position.lerp(tempCamPos, 5 * dt);
@@ -476,6 +485,12 @@ function animate() {
     tempLookAt.set(state.x, 1.5, state.z);
     refs.camera.lookAt(tempLookAt);
   }
+
+  refs.renderer.render(refs.scene, refs.camera);
+
+  frames++;
+  if (frames === 30) log('TODO OK');
+}
 
 // ============================================================
 // ARRANQUE
