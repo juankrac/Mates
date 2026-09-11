@@ -623,6 +623,33 @@ html, body {
   pointer-events: none;
 }
 
+/* ============ FLECHAS DE EJERCICIOS ============ */
+#prev-exercise-btn,
+#next-exercise-btn {
+  background: #c8b6ff;
+  border: 3px solid #1a1a1a;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  font-size: 1.5rem;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 #1a1a1a;
+  color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-family: inherit;
+  flex-shrink: 0;
+  transition: 0.05s;
+}
+#prev-exercise-btn:active,
+#next-exercise-btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 #1a1a1a;
+}
+
 /* ============ FEEDBACK ============ */
 .feedback {
   font-size: 1.3rem;
