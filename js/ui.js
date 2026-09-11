@@ -50,7 +50,6 @@ export function closeModal() {
 export function startPractice() {
   if (!session.currentTopic) return;
 
-  // Inicializar el indice del ejercicio si no existe
   if (session.ejercicioIndexPorTema[session.currentTopic.id] === undefined) {
     session.ejercicioIndexPorTema[session.currentTopic.id] = 0;
   }
@@ -148,7 +147,6 @@ export function checkAnswer() {
     isCorrect = user === correct;
   }
 
-  // Soporte de fracciones
   if (!isCorrect && correct.indexOf('/') !== -1) {
     const p = correct.split('/');
     const n = parseFloat(p[0]);
@@ -170,7 +168,6 @@ export function checkAnswer() {
   const se = document.getElementById('stars-earned');
 
   if (isCorrect) {
-    // Logro "matematica veloz"
     const el = (performance.now() - state.questionStartTime) / 1000;
     if (el < 5) {
       const a = session.achievements.find(x => x.id === 'fast_math');
@@ -513,7 +510,7 @@ function getNearestTopicToNPC(npc) {
 }
 
 export function tryOpenNearbyHouse() {
-  if (session.modalOpen || session.customizing || session.bossModalOpen) return;
+  if (session.modalOpen || state.customizing || session.bossModalOpen) return;
   if (state.inHouse) return;
 
   if (state.nearHome) {
@@ -531,7 +528,7 @@ export function tryOpenNearbyHouse() {
 }
 
 export function tryTalkToNPC() {
-  if (session.modalOpen || session.customizing || session.bossModalOpen) return;
+  if (session.modalOpen || state.customizing || session.bossModalOpen) return;
   if (state.inHouse) return;
   if (!state.nearNPC) return;
 
@@ -553,7 +550,7 @@ export function tryTalkToNPC() {
 // CASA DE LA NINA
 // ============================================================
 export function openHome() {
-  if (session.modalOpen || session.customizing || session.bossModalOpen) return;
+  if (session.modalOpen || state.customizing || session.bossModalOpen) return;
   if (!state.nearHome) return;
 
   const stats = document.getElementById('home-stats-content');
@@ -575,7 +572,6 @@ export function closeHome() {
 
 // ============================================================
 // BINDINGS DE TODA LA UI
-// Se llama una vez al arrancar.
 // ============================================================
 export function bindUI() {
   // --- Modal ejercicios ---
@@ -633,6 +629,13 @@ export function bindUI() {
     if (e.target === document.getElementById('boss-modal')) closeBossModal();
   });
 
+  // --- Vestidor ---
+  document.getElementById('customize-btn').addEventListener('click', openCustomize);
+  document.getElementById('customize-close').addEventListener('click', closeCustomize);
+  document.getElementById('customize-modal').addEventListener('click', e => {
+    if (e.target === document.getElementById('customize-modal')) closeCustomize();
+  });
+
   // --- Logros ---
   document.getElementById('achievements-btn').addEventListener('click', () => {
     const list = document.getElementById('achievements-list');
@@ -675,7 +678,7 @@ export function bindUI() {
 
   // --- Foto ---
   document.getElementById('photo-btn').addEventListener('click', () => {
-    if (session.modalOpen || session.customizing || session.bossModalOpen) return;
+    if (session.modalOpen || state.customizing || session.bossModalOpen) return;
     Sounds.photo();
 
     const flash = document.getElementById('photo-flash');
@@ -740,8 +743,3 @@ export function bindUI() {
     }
   });
 }
-
-// ============================================================
-// EXPORT: abrir/cerrar el vestidor
-// (Reexportados desde customize.js para simplificar el binding)
-// ============================================================
