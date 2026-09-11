@@ -448,11 +448,19 @@ function animate() {
 
   // ---- Camara ----
   if (state.inHouse) {
-    // Camara dentro de la casa: vista isometrica pegada
+    // Camara DENTRO de la casa: vista fija cercana
     if (state.celebrating <= 0) {
-      tempCamPos.set(state.x + 5, 8, state.z + 7);
+      // Camara en la esquina sureste del interior, mirando al centro
+      tempCamPos.set(state.x + 4, 6, state.z + 8);
+      refs.camera.position.lerp(tempCamPos, 8 * dt);
+      tempLookAt.set(state.x, 1, state.z);
+      refs.camera.lookAt(tempLookAt);
+    } else {
+      // Durante celebracion dentro de casa, orbitar
+      const ca = el * 1.5;
+      tempCamPos.set(state.x + Math.cos(ca) * 6, 5, state.z + Math.sin(ca) * 6);
       refs.camera.position.lerp(tempCamPos, 5 * dt);
-      tempLookAt.set(state.x, 0.5, state.z);
+      tempLookAt.set(state.x, 1, state.z);
       refs.camera.lookAt(tempLookAt);
     }
   } else {
@@ -468,12 +476,6 @@ function animate() {
     tempLookAt.set(state.x, 1.5, state.z);
     refs.camera.lookAt(tempLookAt);
   }
-
-  refs.renderer.render(refs.scene, refs.camera);
-
-  frames++;
-  if (frames === 30) log('TODO OK');
-}
 
 // ============================================================
 // ARRANQUE
