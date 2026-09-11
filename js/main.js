@@ -29,7 +29,6 @@ import {
 } from './scene.js';
 
 import { createPlayer, applyAppearance } from './player.js';
-import { createHouseInterior } from './house.js';
 
 import {
   bindUI,
@@ -129,28 +128,33 @@ function selectProfile(name) {
   if (!session.sceneInitialized) {
     console.log('[main] Inicializando escena por primera vez');
 
+    // 1. Materiales toon
     initToon();
+
+    // 2. Escena del mundo
     initScene();
     console.log('[main] Escena base creada');
 
-    initHouseScene();
-    console.log('[main] Escena de la casa creada');
-
+    // 3. Jugador (antes de la escena de la casa)
     createPlayer();
     console.log('[main] Jugador creado');
 
-    createHouseInterior();
-    console.log('[main] Interior de casa creado:', refs.houseInterior ? 'OK' : 'FALLO');
+    // 4. Escena de la casa (crea el interior completo)
+    initHouseScene();
+    console.log('[main] Escena de la casa creada:', refs.houseInterior ? 'OK' : 'FALLO');
 
+    // 5. Casitas de los temas
     session.topics.forEach(createHouse);
     console.log('[main] Casitas creadas:', session.houses.length);
 
+    // 6. Casa propia, NPCs y jefe
     createHome();
     createNPC(-5, 5, 0xff6b6b, 'Maestro Ramon', ['Descompone: 15+20=35, +7.', 'Dibuja si dudas.']);
     createNPC(7, -3, 0x4ecdc4, 'Dona Marta', ['Busca denominador comun.', 'El 50% es la mitad.']);
     createNPC(2, 10, 0xffa94d, 'Pequeno Leo', ['Area = lado x lado.', '1 m = 100 cm.']);
     createBossLair();
 
+    // 7. Arrancar el bucle
     session.sceneInitialized = true;
     refs.clock = new THREE.Clock();
     animate();
@@ -160,12 +164,13 @@ function selectProfile(name) {
     applyAppearance();
   }
 
+  // Colocar al jugador en el centro del pueblo
   state.x = 0;
   state.z = 5;
   state.inHouse = false;
   refs.player.position.set(0, 0, 5);
 
-  // Asegurarse de que el jugador esta en la escena del mundo
+  // Asegurar que el jugador esta en la escena del mundo
   if (refs.scene && !refs.scene.children.includes(refs.player)) {
     refs.scene.add(refs.player);
   }
@@ -397,14 +402,14 @@ function animate() {
   refs.player.position.x = state.x;
   refs.player.position.z = state.z;
 
-  // ---- Mascota sigue al jugador (solo fuera) ----
+  // ---- Mascota (solo fuera) ----
   if (refs.parts.petGroup && !state.inHouse) {
     const petTarget = new THREE.Vector3(state.x + 1.3, 0, state.z - 0.8);
     refs.parts.petGroup.position.lerp(petTarget, 3 * dt);
     refs.parts.petGroup.lookAt(state.x, 0, state.z);
   }
 
-  // ---- Detecciones (solo fuera de la casa) ----
+  // ---- Detecciones (solo fuera) ----
   if (!state.inHouse) {
     let nh = null, mh = 5;
     session.houses.forEach(h => {
@@ -460,26 +465,22 @@ function animate() {
   // ---- Camara y render ----
   if (state.inHouse) {
     // === DENTRO DE LA CASA ===
-    if (refs.houseCamera) {
+    if (refs.houseCamera && refs.houseScene) {
       if (state.celebrating <= 0) {
-        tempCamPos.set(state.x + 5, 8, state.z + 8);
+        tempCamPos.set(state.x + 6, 9, state.z + 9);
         refs.houseCamera.position.lerp(tempCamPos, 8 * dt);
         tempLookAt.set(state.x, 1, state.z);
         refs.houseCamera.lookAt(tempLookAt);
       } else {
         const ca = el * 1.5;
-        tempCamPos.set(state.x + Math.cos(ca) * 6, 6, state.z + Math.sin(ca) * 6);
+        tempCamPos.set(state.x + Math.cos(ca) * 6, 7, state.z + Math.sin(ca) * 6);
         refs.houseCamera.position.lerp(tempCamPos, 5 * dt);
         tempLookAt.set(state.x, 1, state.z);
         refs.houseCamera.lookAt(tempLookAt);
       }
       refs.renderer.render(refs.houseScene, refs.houseCamera);
     } else {
-      // Fallback: si no existe la camara de la casa, usar la del mundo
-      tempCamPos.set(state.x + 5, 8, state.z + 8);
-      refs.camera.position.lerp(tempCamPos, 8 * dt);
-      tempLookAt.set(state.x, 1, state.z);
-      refs.camera.lookAt(tempLookAt);
+      // Fallback por si algo falla
       refs.renderer.render(refs.scene, refs.camera);
     }
   } else {
