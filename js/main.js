@@ -1,15 +1,63 @@
 // ============================================================
-// ARRANQUE Y BUCLE PRINCIPAL
+// MAIN: arranque, pantalla de perfiles y bucle principal
 // ============================================================
 
 import * as THREE from 'three';
-import { refs, session, state, log, MAX_TOTAL_STARS, getWorldPosition, isOnWalkableGround, isZoneUnlocked } from './config.js';
-import { initToon, initScene, createHouse, updateAllHousesForProfile } from './scene.js';
+import {
+  refs,
+  session,
+  state,
+  ZONES,
+  MAX_TOTAL_STARS,
+  HOME_POS,
+  BOSS_POS,
+  log,
+  getTodayKey,
+  getWorldPosition,
+  isOnWalkableGround
+} from './config.js';
+
+import {
+  initToon,
+  initScene,
+  createHouse,
+  createHome,
+  createNPC,
+  createBossLair,
+  updateAllHousesForProfile
+} from './scene.js';
+
 import { createPlayer, applyAppearance } from './player.js';
-import { createHouseInterior, exitHouse } from './house.js';
-import { bindUI, updateStarDisplay, updateMissionsBadge, tryOpenNearbyHouse, tryTalkToNPC, openHome, isBossUnlocked } from './ui.js';
-import { loadProfiles, saveProfiles, deleteProfile, createProfile, loadProfileIntoSession, saveProfileState, getActiveProfileName, setActiveProfileName } from './storage.js';
+import { createHouseInterior } from './house.js';
+import {
+  bindUI,
+  updateStarDisplay,
+  updateMissionsBadge,
+  openModal,
+  tryOpenNearbyHouse,
+  tryTalkToNPC,
+  isBossUnlocked
+} from './ui.js';
+
+import {
+  loadProfiles,
+  saveProfiles,
+  deleteProfile,
+  createProfile,
+  loadProfileIntoSession,
+  saveProfileState,
+  getActiveProfileName,
+  setActiveProfileName
+} from './storage.js';
+
 import { Sounds } from './audio.js';
+
+// ============================================================
+// COMPROBAR THREE.JS
+// ============================================================
+if (typeof THREE === 'undefined') {
+  log('ERROR: no se ha cargado three.module.js', true);
+}
 
 // ============================================================
 // PANTALLA DE PERFILES
@@ -23,24 +71,29 @@ function renderProfilesScreen() {
   const profiles = loadProfiles();
   profilesList.innerHTML = '';
   const names = Object.keys(profiles);
+
   if (names.length === 0) {
     profilesList.innerHTML = '<div style="text-align:center;font-weight:700;color:#8b6f4c;">Aun no hay perfiles. Crea uno para empezar!</div>';
   }
+
   names.forEach(name => {
     const p = profiles[name];
     const card = document.createElement('div');
     card.className = 'profile-card';
     const stars = p.totalStars || 0;
+
     card.innerHTML =
-      '<div class="delete-profile" data-name="' + name.replace(/"/g,'&quot;') + '">X</div>' +
+      '<div class="delete-profile" data-name="' + name.replace(/"/g, '&quot;') + '">X</div>' +
       '<div class="avatar">' + (p.age === 9 ? '9' : '11') + '</div>' +
       '<div class="pname">' + name + '</div>' +
       '<div class="page">' + p.age + ' anos</div>' +
       '<div class="pstars">' + stars + ' estrellas</div>';
+
     card.addEventListener('click', e => {
       if (e.target.classList.contains('delete-profile')) return;
       selectProfile(name);
     });
+
     const delBtn = card.querySelector('.delete-profile');
     delBtn.addEventListener('click', e => {
       e.stopPropagation();
@@ -49,39 +102,60 @@ function renderProfilesScreen() {
         renderProfilesScreen();
       }
     });
+
     profilesList.appendChild(card);
   });
 }
 
+// ============================================================
+// SELECCIONAR UN PERFIL
+// ============================================================
 function selectProfile(name) {
   if (!loadProfileIntoSession(name)) return;
+
   setActiveProfileName(name);
   profilesScreen.style.display = 'none';
   document.getElementById('hud-name').textContent = name;
 
+  // Inicializar la escena 3D solo la primera vez
   if (!session.sceneInitialized) {
     initToon();
     initScene();
     createPlayer();
     createHouseInterior();
     session.topics.forEach(createHouse);
+    createHome();
+    createNPC(-5, 5, 0xff6b6b, 'Maestro Ramon', ['Descompone: 15+20=35, +7.', 'Dibuja si dudas.']);
+    createNPC(7, -3, 0x4ecdc4, 'Dona Marta', ['Busca denominador comun.', 'El 50% es la mitad.']);
+    createNPC(2, 10, 0xffa94d, 'Pequeno Leo', ['Area = lado x lado.', '1 m = 100 cm.']);
+    createBossLair();
+
     session.sceneInitialized = true;
     refs.clock = new THREE.Clock();
     animate();
   } else {
-    applyAppearance();
+    // Si ya estaba inicializada, actualizar casitas y personaje
     updateAllHousesForProfile();
+    applyAppearance();
   }
-  applyAppearance();
+
+  // Colocar al jugador en el centro del pueblo
+  state.x = 0;
+  state.z = 5;
+  state.inHouse = false;
+  refs.player.position.set(0, 0, 5);
+  if (refs.houseInterior) refs.houseInterior.visible = false;
+  document.getElementById('btn-exit-house').style.display = 'none';
+
+  // Actualizar UI
   updateStarDisplay();
   updateMissionsBadge();
-  refs.player.position.set(0, 0, 5);
-  state.x = 0; state.z = 5;
-  state.inHouse = false;
-  refs.houseInterior.visible = false;
-  document.getElementById('btn-exit-house').style.display = 'none';
+  applyAppearance();
 }
 
+// ============================================================
+// BOTONES DE LA PANTALLA DE PERFILES
+// ============================================================
 document.getElementById('new-profile-card').addEventListener('click', () => {
   document.getElementById('profile-name').value = '';
   pendingAge = null;
@@ -107,108 +181,180 @@ document.getElementById('confirm-create-btn').addEventListener('click', () => {
   if (!name) { alert('Escribe tu nombre'); return; }
   if (name.length < 2) { alert('El nombre es muy corto'); return; }
   if (!pendingAge) { alert('Elige tu edad'); return; }
+
   const profiles = loadProfiles();
   if (profiles[name]) { alert('Ya existe un perfil con ese nombre'); return; }
+
   createProfile(name, pendingAge);
   createModal.classList.remove('show');
   renderProfilesScreen();
   selectProfile(name);
 });
 
+// Volver a la pantalla de perfiles
 document.getElementById('profiles-btn').addEventListener('click', () => {
   if (session.currentProfile) saveProfileState();
   profilesScreen.style.display = 'flex';
   renderProfilesScreen();
 });
 
+// Borrar el perfil activo
 document.getElementById('reset-btn').addEventListener('click', () => {
   if (!session.currentProfile) return;
   if (!confirm('Borrar todo el progreso de ' + session.currentProfile.name + '?')) return;
   deleteProfile(session.currentProfile.name);
-  localStorage.removeItem('expedicion_matematica_active_profile_v2');
+  localStorage.removeItem('expedicion_matematica_active_v1');
   location.reload();
 });
 
 // ============================================================
-// CONTROLES
+// CONTROLES DE TECLADO
 // ============================================================
 window.addEventListener('keydown', e => {
+  // Si el modal de ejercicios esta abierto
   if (session.modalOpen) {
-    if (e.key === 'Enter') { e.preventDefault(); import('./ui.js').then(m => m.checkAnswer()); }
-    if (e.key === 'Escape') import('./ui.js').then(m => m.closeModal());
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      import('./ui.js').then(m => m.checkAnswer());
+    }
+    if (e.key === 'Escape') {
+      import('./ui.js').then(m => m.closeModal());
+    }
     return;
   }
+
+  // Si el modal del jefe esta abierto
   if (session.bossModalOpen) {
-    if (e.key === 'Enter') { e.preventDefault(); import('./ui.js').then(m => m.bossAttack()); }
-    if (e.key === 'Escape') import('./ui.js').then(m => m.closeBossModal());
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      import('./ui.js').then(m => m.bossAttack());
+    }
+    if (e.key === 'Escape') {
+      import('./ui.js').then(m => m.closeBossModal());
+    }
     return;
   }
-  if (session.customizing) {
-    if (e.key === 'Escape') import('./customize.js').then(m => m.closeCustomize());
+
+  // Si estamos en el vestidor
+  if (state.customizing) {
+    if (e.key === 'Escape') {
+      import('./customize.js').then(m => m.closeCustomize());
+    }
     return;
   }
+
   const k = e.key.toLowerCase();
+
+  // Teclas que no queremos que hagan scroll
   if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' ', 'w', 'a', 's', 'd', 'q', 'e'].indexOf(k) !== -1) {
     e.preventDefault();
   }
+
   state.keys[k] = true;
+
   if (k === ' ' || k === 'e') tryOpenNearbyHouse();
   if (k === 'q') tryTalkToNPC();
 });
+
 window.addEventListener('keyup', e => {
   state.keys[e.key.toLowerCase()] = false;
 });
 
+// ============================================================
+// CONTROLES TACTILES
+// ============================================================
 function bindTouch(id, key) {
   const el = document.getElementById(id);
   if (!el) return;
-  el.addEventListener('touchstart', e => { e.preventDefault(); state.keys[key] = true; }, { passive: false });
-  el.addEventListener('touchend', e => { e.preventDefault(); state.keys[key] = false; });
-  el.addEventListener('touchcancel', e => { e.preventDefault(); state.keys[key] = false; });
-  el.addEventListener('mousedown', e => { e.preventDefault(); state.keys[key] = true; });
-  el.addEventListener('mouseup', e => { e.preventDefault(); state.keys[key] = false; });
-  el.addEventListener('mouseleave', e => { e.preventDefault(); state.keys[key] = false; });
+
+  el.addEventListener('touchstart', e => {
+    e.preventDefault();
+    state.keys[key] = true;
+  }, { passive: false });
+
+  el.addEventListener('touchend', e => {
+    e.preventDefault();
+    state.keys[key] = false;
+  });
+
+  el.addEventListener('touchcancel', e => {
+    e.preventDefault();
+    state.keys[key] = false;
+  });
+
+  el.addEventListener('mousedown', e => {
+    e.preventDefault();
+    state.keys[key] = true;
+  });
+
+  el.addEventListener('mouseup', e => {
+    e.preventDefault();
+    state.keys[key] = false;
+  });
+
+  el.addEventListener('mouseleave', e => {
+    e.preventDefault();
+    state.keys[key] = false;
+  });
 }
+
 bindTouch('t-up', 'arrowup');
 bindTouch('t-down', 'arrowdown');
 bindTouch('t-left', 'arrowleft');
 bindTouch('t-right', 'arrowright');
 
 // ============================================================
-// BUCLE PRINCIPAL
+// VECTORES TEMPORALES PARA LA CAMARA
 // ============================================================
 const tempCamPos = new THREE.Vector3();
 const tempLookAt = new THREE.Vector3();
 let frames = 0;
 
+// ============================================================
+// BUCLE PRINCIPAL
+// ============================================================
 function animate() {
   requestAnimationFrame(animate);
+
   if (!refs.renderer || !refs.scene || !refs.player || !refs.clock) return;
+
   const dt = Math.min(refs.clock.getDelta(), 0.1);
   const el = refs.clock.elapsedTime;
 
-  if (refs.waterBall) refs.waterBall.position.y = 2.2 + Math.sin(el * 3) * 0.15;
+  // Animar el agua de la fuente
+  if (refs.waterBall) {
+    refs.waterBall.position.y = 2.2 + Math.sin(el * 3) * 0.15;
+  }
 
-  if (session.customizing) {
+  // ---- Modo personalizacion: el personaje gira, no se mueve ----
+  if (state.customizing) {
     refs.player.rotation.y += dt * 1.2;
+
     tempCamPos.set(state.x + 3, 3, state.z + 5);
     refs.camera.position.lerp(tempCamPos, 5 * dt);
     tempLookAt.set(state.x, 1.5, state.z);
     refs.camera.lookAt(tempLookAt);
+
+    // Suavizar animaciones de caminar
     refs.parts.legL.rotation.x *= 0.9;
     refs.parts.legR.rotation.x *= 0.9;
     refs.parts.armL.rotation.x *= 0.9;
     refs.parts.armR.rotation.x *= 0.9;
+
     refs.renderer.render(refs.scene, refs.camera);
     return;
   }
 
-  let mx = 0, mz = 0;
-  if (state.keys['arrowup'] || state.keys['w']) mz -= 1;
-  if (state.keys['arrowdown'] || state.keys['s']) mz += 1;
-  if (state.keys['arrowleft'] || state.keys['a']) mx -= 1;
+  // ---- Movimiento ----
+  let mx = 0;
+  let mz = 0;
+
+  if (state.keys['arrowup'] || state.keys['w'])    mz -= 1;
+  if (state.keys['arrowdown'] || state.keys['s'])  mz += 1;
+  if (state.keys['arrowleft'] || state.keys['a'])  mx -= 1;
   if (state.keys['arrowright'] || state.keys['d']) mx += 1;
 
+  // Si esta celebrando (baile), no se mueve
   if (state.celebrating > 0) {
     state.celebrating -= dt;
     refs.player.rotation.y += dt * 8;
@@ -217,35 +363,52 @@ function animate() {
     refs.parts.legL.rotation.x = Math.sin(el * 20) * 0.6;
     refs.parts.legR.rotation.x = -Math.sin(el * 20) * 0.6;
     refs.player.position.y = Math.max(0, Math.sin(el * 12) * 0.15);
+
   } else if (mx !== 0 || mz !== 0) {
     const len = Math.hypot(mx, mz);
-    mx /= len; mz /= len;
+    mx /= len;
+    mz /= len;
+
     const newX = state.x + mx * state.speed * dt;
     const newZ = state.z + mz * state.speed * dt;
+
     let moved = false;
+
     if (isOnWalkableGround(newX, newZ)) {
-      state.x = newX; state.z = newZ; moved = true;
+      state.x = newX;
+      state.z = newZ;
+      moved = true;
     } else if (isOnWalkableGround(newX, state.z)) {
-      state.x = newX; moved = true;
+      state.x = newX;
+      moved = true;
     } else if (isOnWalkableGround(state.x, newZ)) {
-      state.z = newZ; moved = true;
+      state.z = newZ;
+      moved = true;
     }
+
     if (moved) {
       const ta = Math.atan2(mx, mz);
       let d = ta - refs.player.rotation.y;
       while (d > Math.PI) d -= Math.PI * 2;
       while (d < -Math.PI) d += Math.PI * 2;
       refs.player.rotation.y += d * 10 * dt;
+
       state.walkCycle += dt * 12;
       refs.parts.legL.rotation.x = Math.sin(state.walkCycle) * 0.5;
       refs.parts.legR.rotation.x = -Math.sin(state.walkCycle) * 0.5;
       refs.parts.armL.rotation.x = -Math.sin(state.walkCycle) * 0.5;
       refs.parts.armR.rotation.x = Math.sin(state.walkCycle) * 0.5;
+
       state.stepTimer += dt;
-      if (state.stepTimer > 0.35) { state.stepTimer = 0; Sounds.step(); }
+      if (state.stepTimer > 0.35) {
+        state.stepTimer = 0;
+        Sounds.step();
+      }
     }
     refs.player.position.y = 0;
+
   } else {
+    // Parado
     refs.parts.legL.rotation.x *= 0.85;
     refs.parts.legR.rotation.x *= 0.85;
     refs.parts.armL.rotation.x *= 0.85;
@@ -254,9 +417,11 @@ function animate() {
     refs.player.position.y = 0;
   }
 
+  // Actualizar posicion del jugador
   refs.player.position.x = state.x;
   refs.player.position.z = state.z;
 
+  // Mascota sigue al jugador
   if (refs.parts.petGroup && !state.inHouse) {
     const petTarget = new THREE.Vector3(state.x + 1.3, 0, state.z - 0.8);
     refs.parts.petGroup.position.lerp(petTarget, 3 * dt);
@@ -265,42 +430,50 @@ function animate() {
     refs.parts.petGroup.position.set(state.x + 1, 0, state.z - 0.5);
   }
 
+  // ---- Detecciones de cercania ----
   if (!state.inHouse) {
-    let nh = null, mh = 5;
+    let nh = null;
+    let mh = 5;
     session.houses.forEach(h => {
       const d = Math.hypot(state.x - h.x, state.z - h.z);
       if (d < mh) { mh = d; nh = h; }
     });
     state.nearHouse = nh;
 
-    const distHome = Math.hypot(state.x - 8, state.z - 8);
+    const distHome = Math.hypot(state.x - HOME_POS.x, state.z - HOME_POS.z);
     state.nearHome = distHome < 5;
 
-    let nn = null, mn = 3.5;
+    let nn = null;
+    let mn = 3.5;
     session.npcs.forEach(n => {
       const d = Math.hypot(state.x - n.x, state.z - n.z);
       if (d < mn) { mn = d; nn = n; }
     });
     state.nearNPC = nn;
 
-    state.nearBoss = Math.hypot(state.x - (70 + 15), state.z - (-15)) < 7;
+    state.nearBoss = Math.hypot(state.x - BOSS_POS.x, state.z - BOSS_POS.z) < 7;
 
     document.getElementById('btn-enter').disabled = !nh && !state.nearHome;
     document.getElementById('btn-talk').disabled = !nn;
     document.getElementById('btn-boss').disabled = !state.nearBoss || !isBossUnlocked();
     document.getElementById('btn-home').disabled = !state.nearHome;
 
+    // Texto del hint
     const hintEl = document.getElementById('hint');
     if (state.nearHome) {
       hintEl.innerHTML = 'MI CASA - Pulsa ESPACIO para entrar';
       hintEl.style.opacity = '1';
     } else if (state.nearBoss) {
-      hintEl.innerHTML = isBossUnlocked() ? 'Cueva del Jefe! Pulsa DESAFIAR' : 'Cueva: 40 estrellas (tienes ' + session.totalStars + ')';
+      hintEl.innerHTML = isBossUnlocked()
+        ? 'Cueva del Jefe! Pulsa DESAFIAR'
+        : 'Cueva: 40 estrellas (tienes ' + session.totalStars + ')';
       hintEl.style.opacity = '1';
     } else if (nh) {
-      const z = { pueblo: 'Pueblo', bosque: 'Bosque', montana: 'Montana' }[nh.zone];
-      const unlocked = nh.zone === 'pueblo' || (nh.zone === 'bosque' && session.totalStars >= 10) || (nh.zone === 'montana' && session.totalStars >= 30);
-      hintEl.innerHTML = unlocked ? nh.topic.name + ' - ESPACIO' : z + ': ' + (nh.zone === 'bosque' ? '10' : '30') + ' estrellas';
+      const zoneName = ZONES[nh.zone].name;
+      const unlocked = session.totalStars >= ZONES[nh.zone].unlockStars;
+      hintEl.innerHTML = unlocked
+        ? nh.topic.name + ' - ESPACIO'
+        : zoneName + ': ' + ZONES[nh.zone].unlockStars + ' estrellas';
       hintEl.style.opacity = '1';
     } else if (nn) {
       hintEl.innerHTML = nn.name + ' - Pulsa Q';
@@ -309,24 +482,39 @@ function animate() {
       hintEl.innerHTML = 'WASD/flechas - Cruza los puentes!';
       hintEl.style.opacity = '0.9';
     }
+
   } else {
     document.getElementById('hint').innerHTML = 'Explora la casa! Pulsa SALIR DE CASA para volver.';
   }
 
-  if (state.celebrating <= 0) {
-    tempCamPos.set(state.x + 8, 12, state.z + 12);
-    refs.camera.position.lerp(tempCamPos, 5 * dt);
+  // ---- Camara ----
+  if (state.inHouse) {
+    // Vista cercana dentro de la casa
+    if (state.celebrating <= 0) {
+      tempCamPos.set(state.x + 4, 7, state.z + 6);
+      refs.camera.position.lerp(tempCamPos, 5 * dt);
+      tempLookAt.set(state.x, 1, state.z);
+      refs.camera.lookAt(tempLookAt);
+    }
   } else {
-    const ca = el * 1.5;
-    tempCamPos.set(state.x + Math.cos(ca) * 10, 8, state.z + Math.sin(ca) * 10);
-    refs.camera.position.lerp(tempCamPos, 5 * dt);
+    // Vista exterior normal
+    if (state.celebrating <= 0) {
+      tempCamPos.set(state.x + 8, 12, state.z + 12);
+      refs.camera.position.lerp(tempCamPos, 5 * dt);
+    } else {
+      const ca = el * 1.5;
+      tempCamPos.set(state.x + Math.cos(ca) * 10, 8, state.z + Math.sin(ca) * 10);
+      refs.camera.position.lerp(tempCamPos, 5 * dt);
+    }
+    tempLookAt.set(state.x, 1.5, state.z);
+    refs.camera.lookAt(tempLookAt);
   }
-  tempLookAt.set(state.x, 1.5, state.z);
-  refs.camera.lookAt(tempLookAt);
 
+  // ---- Render ----
   refs.renderer.render(refs.scene, refs.camera);
+
   frames++;
-  if (frames === 30) log('MANGA OK');
+  if (frames === 30) log('TODO OK');
 }
 
 // ============================================================
