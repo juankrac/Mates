@@ -499,3 +499,10 @@ console.log('[main] Arrancando aplicacion');
 bindUI();
 renderProfilesScreen();
 console.log('[main] App lista. Perfiles guardados:', Object.keys(loadProfiles()));
+
+// DEBUG TEMPORAL: exponer refs y session globalmente
+window.__refs = refs;
+window.__session = session;
+window.__state = state;
+window.__THREE = THREE;
+console.log('[main] refs y session expuestos en window.__refs y window.__session');
