@@ -41,13 +41,11 @@ export function toonMat(color) {
   });
 }
 
-// Material de contorno (negro, solo cara trasera)
 const OUTLINE_MAT = new THREE.MeshBasicMaterial({
   color: 0x1a1a1a,
   side: THREE.BackSide
 });
 
-// Anadir un contorno a un mesh
 export function addOutline(mesh, thickness = 1.05) {
   try {
     if (!mesh || !mesh.geometry || !mesh.material || !mesh.parent) return null;
@@ -66,7 +64,6 @@ export function addOutline(mesh, thickness = 1.05) {
 // CONSTRUCTORES DE OBJETOS
 // ============================================================
 
-// --- Arbol ---
 export function createTree(x, z, scale = 1) {
   const g = new THREE.Group();
 
@@ -96,7 +93,6 @@ export function createTree(x, z, scale = 1) {
   return g;
 }
 
-// --- Farola ---
 export function createLamppost(x, z) {
   const g = new THREE.Group();
 
@@ -121,7 +117,6 @@ export function createLamppost(x, z) {
   return g;
 }
 
-// --- Puente entre dos puntos ---
 export function createBridge(x1, z1, x2, z2) {
   const dx = x2 - x1;
   const dz = z2 - z1;
@@ -171,12 +166,10 @@ export function createBridge(x1, z1, x2, z2) {
   return g;
 }
 
-// --- Casita de un tema ---
 export function createHouse(topic) {
   const wp = getWorldPosition(topic);
   const g = new THREE.Group();
 
-  // Base
   const base = new THREE.Mesh(
     new THREE.BoxGeometry(4, 3, 4),
     toonMat(0xfff5e0)
@@ -187,7 +180,6 @@ export function createHouse(topic) {
   g.add(base);
   addOutline(base, 1.05);
 
-  // Tejado
   const roofMat = toonMat(topic.color);
   const roof = new THREE.Mesh(
     new THREE.ConeGeometry(3.3, 2.2, 4),
@@ -199,7 +191,6 @@ export function createHouse(topic) {
   g.add(roof);
   addOutline(roof, 1.06);
 
-  // Puerta
   const door = new THREE.Mesh(
     new THREE.BoxGeometry(1.1, 1.8, 0.1),
     toonMat(0x8b5a2b)
@@ -207,7 +198,6 @@ export function createHouse(topic) {
   door.position.set(0, 0.9, 2.01);
   g.add(door);
 
-  // Ventanas
   const w1 = new THREE.Mesh(
     new THREE.BoxGeometry(0.9, 0.9, 0.1),
     toonMat(0x9be0ff)
@@ -218,7 +208,6 @@ export function createHouse(topic) {
   w2.position.x = 1.2;
   g.add(w2);
 
-  // Icono flotante (numero del tema)
   const cv = document.createElement('canvas');
   cv.width = 256;
   cv.height = 256;
@@ -241,7 +230,6 @@ export function createHouse(topic) {
   sprite.position.y = 6.2;
   g.add(sprite);
 
-  // Etiqueta con el nombre del tema
   const lc = document.createElement('canvas');
   lc.width = 512;
   lc.height = 96;
@@ -269,7 +257,6 @@ export function createHouse(topic) {
   lsprite.position.y = 7.4;
   g.add(lsprite);
 
-  // Posicion
   g.position.set(wp.x, 0, wp.z);
   g.rotation.y = Math.atan2(-wp.x, -wp.z);
   refs.scene.add(g);
@@ -283,13 +270,11 @@ export function createHouse(topic) {
     roofMat: roofMat
   });
 
-  // Si el tema ya estaba completado, ponerle tejado dorado
   if (topic.stars >= topic.maxStars) {
     roofMat.color.setHex(0xffd700);
   }
 }
 
-// --- Casa propia de la nina ---
 export function createHome() {
   const g = new THREE.Group();
 
@@ -331,7 +316,6 @@ export function createHome() {
   hw2.position.x = 1.5;
   g.add(hw2);
 
-  // Etiqueta "MI CASA"
   const lc = document.createElement('canvas');
   lc.width = 512;
   lc.height = 96;
@@ -364,7 +348,6 @@ export function createHome() {
   refs.homeGroup = g;
 }
 
-// --- NPC aldeano ---
 export function createNPC(x, z, color, name, hints) {
   const g = new THREE.Group();
 
@@ -423,7 +406,6 @@ export function createNPC(x, z, color, name, hints) {
   });
 }
 
-// --- Cueva del jefe final ---
 export function createBossLair() {
   const g = new THREE.Group();
 
@@ -463,9 +445,11 @@ export function initScene() {
   const container = document.getElementById('canvas-container');
 
   refs.scene = new THREE.Scene();
-  const SKY_COLOR = new THREE.Color(0xffe0ee);
+
+  // CIELO AZUL
+  const SKY_COLOR = new THREE.Color(0x87ceeb);
   refs.scene.background = SKY_COLOR.clone();
-  refs.scene.fog = new THREE.Fog(0xffd0e0, 90, 220);
+  refs.scene.fog = new THREE.Fog(0x87ceeb, 100, 260);
 
   refs.camera = new THREE.PerspectiveCamera(
     55,
@@ -483,10 +467,10 @@ export function initScene() {
   container.appendChild(refs.renderer.domElement);
 
   // Luces
-  refs.scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-  refs.scene.add(new THREE.HemisphereLight(0xfff5e0, 0xb0e0c0, 0.6));
+  refs.scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+  refs.scene.add(new THREE.HemisphereLight(0xc8e8ff, 0x7aa87a, 0.7));
 
-  const sun = new THREE.DirectionalLight(0xfff2c0, 1.0);
+  const sun = new THREE.DirectionalLight(0xfff2c0, 1.1);
   sun.position.set(40, 60, 30);
   sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
@@ -498,10 +482,23 @@ export function initScene() {
   sun.shadow.camera.far = 250;
   refs.scene.add(sun);
 
+  // ============================================================
+  // PLANO AZUL DE FONDO (debajo de todo)
+  // Cubre TODO el mapa. Se ve azul entre las zonas.
+  // ============================================================
+  const waterPlane = new THREE.Mesh(
+    new THREE.PlaneGeometry(300, 300),
+    new THREE.MeshBasicMaterial({ color: 0x6cb8e6 })
+  );
+  waterPlane.rotation.x = -Math.PI / 2;
+  waterPlane.position.y = -0.5;
+  refs.scene.add(waterPlane);
+
   // Suelos de las 3 zonas
   Object.keys(ZONES).forEach(id => {
     const zone = ZONES[id];
     const color = id === 'bosque' ? 0xb8f0b8 : (id === 'montana' ? 0xe0c8a8 : 0xc8f0c0);
+
     const mesh = new THREE.Mesh(
       new THREE.PlaneGeometry(60, 60),
       new THREE.MeshBasicMaterial({ color: color })
@@ -510,7 +507,6 @@ export function initScene() {
     mesh.position.set(zone.offset.x, 0, zone.offset.z);
     refs.scene.add(mesh);
 
-    // Borde negro alrededor de cada zona
     const edge = new THREE.Mesh(
       new THREE.RingGeometry(29.7, 30.3, 64),
       new THREE.MeshBasicMaterial({ color: 0x1a1a1a, side: THREE.DoubleSide })
@@ -520,7 +516,7 @@ export function initScene() {
     refs.scene.add(edge);
   });
 
-  // Camino circular del pueblo
+  // Camino circular
   const pathMesh = new THREE.Mesh(
     new THREE.RingGeometry(18, 21, 64),
     new THREE.MeshBasicMaterial({ color: 0xf0d8b8 })
@@ -555,14 +551,13 @@ export function initScene() {
   refs.scene.add(refs.waterBall);
   addOutline(refs.waterBall, 1.08);
 
-  // Arboles alrededor del pueblo
+  // Arboles
   for (let i = 0; i < 16; i++) {
     const a = (i / 16) * Math.PI * 2;
     const r = 26 + Math.random() * 2;
     refs.scene.add(createTree(Math.cos(a) * r, Math.sin(a) * r, 0.9 + Math.random() * 0.3));
   }
 
-  // Arboles del bosque
   for (let i = 0; i < 30; i++) {
     const bx = ZONES.bosque.offset.x + (Math.random() - 0.5) * 50;
     const bz = ZONES.bosque.offset.z + (Math.random() - 0.5) * 50;
@@ -570,7 +565,6 @@ export function initScene() {
     refs.scene.add(createTree(bx, bz, 0.9 + Math.random() * 0.4));
   }
 
-  // Rocas de la montana
   for (let i = 0; i < 20; i++) {
     const mx = ZONES.montana.offset.x + (Math.random() - 0.5) * 50;
     const mz = ZONES.montana.offset.z + (Math.random() - 0.5) * 50;
@@ -586,7 +580,6 @@ export function initScene() {
     addOutline(rock, 1.15);
   }
 
-  // Flores
   const flowerColors = [0xff9ff3, 0xffd93d, 0xff8fa3, 0xffffff, 0xc89bff, 0xffb347];
   for (let i = 0; i < 100; i++) {
     const a = Math.random() * Math.PI * 2;
@@ -613,13 +606,11 @@ export function initScene() {
     refs.scene.add(g);
   }
 
-  // Farolas alrededor del camino
   for (let i = 0; i < 8; i++) {
     const a = (i / 8) * Math.PI * 2;
     refs.scene.add(createLamppost(Math.cos(a) * 19.5, Math.sin(a) * 19.5));
   }
 
-  // Vallas (con huecos frente a las casitas)
   for (let i = 0; i < 60; i++) {
     const a = (i / 60) * Math.PI * 2;
     const deg = (i / 60) * 360;
@@ -654,24 +645,18 @@ export function initScene() {
     refs.scene.add(fence);
   }
 
-  // Puentes entre zonas
+  // Puentes
   refs.scene.add(createBridge(0, -26, 0, -44));
   refs.scene.add(createBridge(26, 0, 44, 0));
 
-  // Posicion inicial de la camara
   refs.camera.position.set(8, 12, 17);
   refs.camera.lookAt(0, 1.5, 5);
 }
 
-// ============================================================
-// ACTUALIZAR LAS CASITAS CUANDO CAMBIA EL PERFIL
-// ============================================================
 export function updateAllHousesForProfile() {
-  // Limpiar casitas anteriores
   session.houses.forEach(h => {
     refs.scene.remove(h.mesh);
   });
   session.houses = [];
-  // Crear casitas nuevas
   session.topics.forEach(createHouse);
 }

@@ -11,11 +11,8 @@ import {
 
 import { buildTopicsForAge } from './content.js';
 
-// ============================================================
-// CLAVES DE LOCALSTORAGE
-// ============================================================
-const PROFILES_KEY = 'expedicion_matematica_profiles_v1';
-const ACTIVE_PROFILE_KEY = 'expedicion_matematica_active_v1';
+const PROFILES_KEY = 'expedicion_matematica_profiles_v2';
+const ACTIVE_PROFILE_KEY = 'expedicion_matematica_active_v2';
 
 // ============================================================
 // CARGAR TODOS LOS PERFILES
@@ -23,9 +20,15 @@ const ACTIVE_PROFILE_KEY = 'expedicion_matematica_active_v1';
 export function loadProfiles() {
   try {
     const raw = localStorage.getItem(PROFILES_KEY);
-    return raw ? JSON.parse(raw) : {};
+    if (!raw) {
+      console.log('[storage] No hay perfiles guardados');
+      return {};
+    }
+    const parsed = JSON.parse(raw);
+    console.log('[storage] Perfiles cargados:', Object.keys(parsed));
+    return parsed;
   } catch (e) {
-    console.warn('Error cargando perfiles:', e);
+    console.warn('[storage] Error cargando perfiles:', e);
     return {};
   }
 }
@@ -35,9 +38,11 @@ export function loadProfiles() {
 // ============================================================
 export function saveProfiles(profiles) {
   try {
-    localStorage.setItem(PROFILES_KEY, JSON.stringify(profiles));
+    const json = JSON.stringify(profiles);
+    localStorage.setItem(PROFILES_KEY, json);
+    console.log('[storage] Perfiles guardados. Total:', Object.keys(profiles).length, 'Tamano:', json.length, 'bytes');
   } catch (e) {
-    console.warn('Error guardando perfiles:', e);
+    console.warn('[storage] Error guardando perfiles:', e);
   }
 }
 
@@ -48,6 +53,7 @@ export function deleteProfile(name) {
   const profiles = loadProfiles();
   delete profiles[name];
   saveProfiles(profiles);
+  console.log('[storage] Perfil borrado:', name);
 }
 
 // ============================================================
@@ -55,11 +61,12 @@ export function deleteProfile(name) {
 // ============================================================
 export function createProfile(name, age) {
   const profiles = loadProfiles();
+
   profiles[name] = {
     name: name,
     age: age,
     createdAt: Date.now(),
-    stars: {},          // { topicId: numero }
+    stars: {},
     totalStars: 0,
     appearance: defaultAppearance(),
     achievements: defaultAchievements().map(a => ({ id: a.id, unlocked: false })),
@@ -76,29 +83,25 @@ export function createProfile(name, age) {
       rewarded: []
     }
   };
+
   saveProfiles(profiles);
+  console.log('[storage] Perfil creado:', name, age, 'anos');
   return profiles[name];
 }
 
 // ============================================================
 // CARGAR UN PERFIL EN LA SESION ACTUAL
-// Coge el perfil de localStorage y rellena:
-//   - session.topics (con ejercicios de su edad)
-//   - session.totalStars
-//   - session.appearance
-//   - session.achievements
-//   - session.dailyData
-//   - session.currentProfile
 // ============================================================
 export function loadProfileIntoSession(name) {
   const profiles = loadProfiles();
   const p = profiles[name];
-  if (!p) return false;
+  if (!p) {
+    console.warn('[storage] Perfil no encontrado:', name);
+    return false;
+  }
 
-  // Reconstruir topics con los ejercicios de su edad
   session.topics = buildTopicsForAge(p.age);
 
-  // Restaurar las estrellas ganadas por tema
   if (p.stars) {
     session.topics.forEach(t => {
       if (typeof p.stars[t.id] === 'number') {
@@ -107,13 +110,9 @@ export function loadProfileIntoSession(name) {
     });
   }
 
-  // Total de estrellas
   session.totalStars = session.topics.reduce((acc, t) => acc + t.stars, 0);
-
-  // Restaurar apariencia
   session.appearance = Object.assign(defaultAppearance(), p.appearance || {});
 
-  // Restaurar logros
   session.achievements = defaultAchievements();
   if (p.achievements) {
     p.achievements.forEach(saved => {
@@ -122,7 +121,6 @@ export function loadProfileIntoSession(name) {
     });
   }
 
-  // Restaurar misiones diarias (o crear nuevas si es otro dia)
   if (p.daily && p.daily.date === getTodayKey()) {
     session.dailyData = p.daily;
   } else {
@@ -140,56 +138,47 @@ export function loadProfileIntoSession(name) {
     };
   }
 
-  // Perfil activo
   session.currentProfile = { name: name, age: p.age };
-
-  // Reset indices de ejercicios
   session.ejercicioIndexPorTema = {};
 
+  console.log('[storage] Perfil cargado en sesion:', name);
   return true;
 }
 
 // ============================================================
 // GUARDAR EL ESTADO ACTUAL EN EL PERFIL ACTIVO
-// Se llama cada vez que hay un cambio importante:
-//   - ganar una estrella
-//   - cambiar la apariencia
-//   - desbloquear un logro
-//   - completar una mision
 // ============================================================
 export function saveProfileState() {
-  if (!session.currentProfile) return;
+  if (!session.currentProfile) {
+    console.warn('[storage] No hay perfil activo, no se guarda');
+    return;
+  }
 
   const profiles = loadProfiles();
   const p = profiles[session.currentProfile.name];
-  if (!p) return;
+  if (!p) {
+    console.warn('[storage] No existe el perfil activo en storage');
+    return;
+  }
 
-  // Guardar estrellas por tema
   p.stars = {};
   session.topics.forEach(t => {
     p.stars[t.id] = t.stars;
   });
 
-  // Guardar total
   p.totalStars = session.totalStars;
-
-  // Guardar apariencia (copia profunda)
   p.appearance = JSON.parse(JSON.stringify(session.appearance));
-
-  // Guardar logros
   p.achievements = session.achievements.map(a => ({
     id: a.id,
     unlocked: a.unlocked
   }));
-
-  // Guardar misiones diarias
   p.daily = JSON.parse(JSON.stringify(session.dailyData));
 
   saveProfiles(profiles);
 }
 
 // ============================================================
-// PERFIL ACTIVO (persistencia entre sesiones)
+// PERFIL ACTIVO
 // ============================================================
 export function getActiveProfileName() {
   return localStorage.getItem(ACTIVE_PROFILE_KEY);

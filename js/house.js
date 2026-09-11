@@ -8,8 +8,6 @@ import { toonMat, addOutline } from './scene.js';
 
 // ============================================================
 // CREAR EL INTERIOR DE LA CASA
-// Se llama una sola vez. Crea el suelo, paredes, tabiques,
-// muebles de cada habitacion y carteles de zona.
 // ============================================================
 export function createHouseInterior() {
   if (refs.houseInterior) return;
@@ -26,7 +24,7 @@ export function createHouseInterior() {
   floor.receiveShadow = true;
   refs.houseInterior.add(floor);
 
-  // --- Paredes (helper) ---
+  // --- Paredes ---
   function wall(w, h, d, x, y, z) {
     const m = new THREE.Mesh(
       new THREE.BoxGeometry(w, h, d),
@@ -39,13 +37,12 @@ export function createHouseInterior() {
     addOutline(m, 1.03);
   }
 
-  // Paredes perimetrales
-  wall(20, 5, 0.3, 0, 2.5, -10);   // fondo (norte)
-  wall(20, 5, 0.3, 0, 2.5, 10);    // frente (sur)
-  wall(0.3, 5, 20, -10, 2.5, 0);   // izquierda
-  wall(0.3, 5, 20, 10, 2.5, 0);    // derecha
+  wall(20, 5, 0.3, 0, 2.5, -10);
+  wall(20, 5, 0.3, 0, 2.5, 10);
+  wall(0.3, 5, 20, -10, 2.5, 0);
+  wall(0.3, 5, 20, 10, 2.5, 0);
 
-  // --- Puerta de salida (pared frontal, al sur) ---
+  // --- Puerta de salida ---
   const exitDoor = new THREE.Mesh(
     new THREE.BoxGeometry(2, 3, 0.1),
     toonMat(0x8b5a2b)
@@ -54,7 +51,6 @@ export function createHouseInterior() {
   refs.houseInterior.add(exitDoor);
 
   // --- Tabiques internos ---
-  // Habitacion (arriba izquierda)
   const tab1 = new THREE.Mesh(
     new THREE.BoxGeometry(0.3, 4, 8),
     toonMat(0xffe0c0)
@@ -73,7 +69,6 @@ export function createHouseInterior() {
   refs.houseInterior.add(tab2);
   addOutline(tab2, 1.05);
 
-  // Bano (arriba derecha)
   const tab3 = new THREE.Mesh(
     new THREE.BoxGeometry(0.3, 4, 6),
     toonMat(0xffe0c0)
@@ -93,11 +88,10 @@ export function createHouseInterior() {
   addOutline(tab4, 1.05);
 
   // ==========================================================
-  // MUEBLES DEL SALON
+  // SALON
   // ==========================================================
-
-  // Sofa
   const sofa = new THREE.Group();
+
   const sofaBase = new THREE.Mesh(
     new THREE.BoxGeometry(3, 0.8, 1.2),
     toonMat(0xff6b6b)
@@ -118,7 +112,6 @@ export function createHouseInterior() {
   refs.houseInterior.add(sofa);
   refs.houseObstacles.push({ x1: -7.6, x2: -4.4, z1: 2.3, z2: 3.7 });
 
-  // Mesa de centro
   const table = new THREE.Mesh(
     new THREE.CylinderGeometry(0.9, 0.9, 0.15, 16),
     toonMat(0xa86b3b)
@@ -137,7 +130,6 @@ export function createHouseInterior() {
 
   refs.houseObstacles.push({ x1: -3.9, x2: -2.1, z1: 2.1, z2: 3.9 });
 
-  // TV
   const tv = new THREE.Mesh(
     new THREE.BoxGeometry(2, 1.2, 0.15),
     toonMat(0x1a1a1a)
@@ -147,7 +139,6 @@ export function createHouseInterior() {
   addOutline(tv, 1.05);
   refs.houseObstacles.push({ x1: -7, x2: -5, z1: -1.9, z2: -1.5 });
 
-  // Alfombra
   const rug = new THREE.Mesh(
     new THREE.CircleGeometry(2.5, 32),
     toonMat(0xffd966)
@@ -157,10 +148,8 @@ export function createHouseInterior() {
   refs.houseInterior.add(rug);
 
   // ==========================================================
-  // MUEBLES DE LA COCINA
+  // COCINA
   // ==========================================================
-
-  // Encimera
   const counter = new THREE.Mesh(
     new THREE.BoxGeometry(4, 1, 1.2),
     toonMat(0xf0d8b8)
@@ -171,7 +160,6 @@ export function createHouseInterior() {
   addOutline(counter, 1.04);
   refs.houseObstacles.push({ x1: 4.9, x2: 9.1, z1: 2.3, z2: 3.7 });
 
-  // Nevera
   const fridge = new THREE.Mesh(
     new THREE.BoxGeometry(1.2, 2.5, 1),
     toonMat(0xf0f0f0)
@@ -181,7 +169,6 @@ export function createHouseInterior() {
   addOutline(fridge, 1.04);
   refs.houseObstacles.push({ x1: 7.9, x2: 9.1, z1: 6.4, z2: 7.6 });
 
-  // Fogones
   for (let i = 0; i < 2; i++) {
     const burner = new THREE.Mesh(
       new THREE.CylinderGeometry(0.25, 0.25, 0.05, 16),
@@ -192,10 +179,8 @@ export function createHouseInterior() {
   }
 
   // ==========================================================
-  // MUEBLES DE LA HABITACION
+  // HABITACION
   // ==========================================================
-
-  // Cama
   const bed = new THREE.Group();
 
   const bedBase = new THREE.Mesh(
@@ -224,7 +209,6 @@ export function createHouseInterior() {
   refs.houseInterior.add(bed);
   refs.houseObstacles.push({ x1: -8.4, x2: -5.6, z1: -8.1, z2: -5.9 });
 
-  // Armario
   const wardrobe = new THREE.Mesh(
     new THREE.BoxGeometry(1.5, 3, 1),
     toonMat(0xa86b3b)
@@ -234,7 +218,6 @@ export function createHouseInterior() {
   addOutline(wardrobe, 1.04);
   refs.houseObstacles.push({ x1: -5.9, x2: -4.1, z1: -9.6, z2: -8.4 });
 
-  // Mesita de noche
   const nightstand = new THREE.Mesh(
     new THREE.BoxGeometry(0.8, 0.8, 0.8),
     toonMat(0xa86b3b)
@@ -245,10 +228,8 @@ export function createHouseInterior() {
   refs.houseObstacles.push({ x1: -5, x2: -4, z1: -7.5, z2: -6.5 });
 
   // ==========================================================
-  // MUEBLES DEL BANO
+  // BANO
   // ==========================================================
-
-  // Banera
   const bathtub = new THREE.Mesh(
     new THREE.BoxGeometry(2.5, 0.8, 1.4),
     toonMat(0xffffff)
@@ -258,7 +239,6 @@ export function createHouseInterior() {
   addOutline(bathtub, 1.05);
   refs.houseObstacles.push({ x1: 6.1, x2: 8.9, z1: -8.8, z2: -7.2 });
 
-  // Lavabo
   const sink = new THREE.Mesh(
     new THREE.BoxGeometry(1.2, 0.2, 0.7),
     toonMat(0xffffff)
@@ -274,7 +254,6 @@ export function createHouseInterior() {
   sinkPed.position.set(5, 0.45, -5);
   refs.houseInterior.add(sinkPed);
 
-  // Espejo
   const mirror = new THREE.Mesh(
     new THREE.BoxGeometry(1, 1.2, 0.1),
     toonMat(0xc8f0ff)
@@ -283,7 +262,6 @@ export function createHouseInterior() {
   refs.houseInterior.add(mirror);
   addOutline(mirror, 1.05);
 
-  // Inodoro
   const toilet = new THREE.Mesh(
     new THREE.CylinderGeometry(0.4, 0.4, 0.8, 12),
     toonMat(0xffffff)
@@ -293,9 +271,7 @@ export function createHouseInterior() {
   addOutline(toilet, 1.05);
   refs.houseObstacles.push({ x1: 8, x2: 9, z1: -5.5, z2: -4.5 });
 
-  // ==========================================================
-  // TECHO
-  // ==========================================================
+  // Techo
   const ceiling = new THREE.Mesh(
     new THREE.BoxGeometry(20, 0.2, 20),
     toonMat(0xfff0d8)
@@ -303,9 +279,7 @@ export function createHouseInterior() {
   ceiling.position.y = 5;
   refs.houseInterior.add(ceiling);
 
-  // ==========================================================
-  // CARTELES DE ZONA
-  // ==========================================================
+  // Carteles de zona
   function addZoneSign(text, x, z, color) {
     const cv = document.createElement('canvas');
     cv.width = 256;
@@ -344,7 +318,7 @@ export function createHouseInterior() {
   addZoneSign('HABITACION', -7, -3, 0xffb3d9);
   addZoneSign('BANO',        7, -3, 0x9be0ff);
 
-  // El interior empieza oculto
+  // Empieza oculto
   refs.houseInterior.visible = false;
 }
 
@@ -361,17 +335,17 @@ export function enterHouse() {
   refs.player.position.set(state.x, 0, state.z);
   refs.player.rotation.y = Math.PI;
 
-  // Ocultar elementos del exterior
+  // Ocultar exterior
   session.houses.forEach(h => { h.mesh.visible = false; });
   session.npcs.forEach(n => { n.mesh.visible = false; });
   if (refs.homeGroup) refs.homeGroup.visible = false;
 
-  // Mostrar el interior
+  // Mostrar interior
   refs.houseInterior.visible = true;
 
-  // Reposicionar la camara dentro
-  refs.camera.position.set(0, 8, 15);
-  refs.camera.lookAt(0, 1.5, 0);
+  // Colocar la camara ya en su sitio (sin lerp) para que se vea de inmediato
+  refs.camera.position.set(0, 12, 18);
+  refs.camera.lookAt(0, 0, 0);
 
   // Ajustar botones
   document.getElementById('btn-enter').disabled = true;
@@ -381,6 +355,8 @@ export function enterHouse() {
   document.getElementById('btn-exit-house').style.display = 'flex';
 
   document.getElementById('hint').innerHTML = 'Explora la casa! Pulsa SALIR DE CASA cuando quieras salir.';
+
+  console.log('[house] Entrando en la casa. Camara:', refs.camera.position);
 }
 
 // ============================================================
@@ -390,19 +366,15 @@ export function exitHouse() {
   if (!state.inHouse) return;
   state.inHouse = false;
 
-  // Colocar al jugador fuera, delante de la puerta
   state.x = 8;
   state.z = 12;
   refs.player.position.set(state.x, 0, state.z);
 
-  // Ocultar interior
   refs.houseInterior.visible = false;
 
-  // Mostrar exterior
   session.houses.forEach(h => { h.mesh.visible = true; });
   session.npcs.forEach(n => { n.mesh.visible = true; });
   if (refs.homeGroup) refs.homeGroup.visible = true;
 
-  // Restaurar botones
   document.getElementById('btn-exit-house').style.display = 'none';
 }
